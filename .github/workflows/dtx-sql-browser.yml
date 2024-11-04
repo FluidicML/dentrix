@@ -1,0 +1,21 @@
+name: dtx-sql-browser Code Signing
+
+on:
+  push:
+    branches:
+      - dtx-sql-browser
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Sign DtxSQLBrowser
+        run: |
+          dotnet tool install --global AzureSignTool
+          AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" --kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc ${{ secrets.AZURE_CERT_NAME }} -tr http://timestamp.digicert.com -v "DtxSQLBrowser/DtxSQLBrowser.exe"
