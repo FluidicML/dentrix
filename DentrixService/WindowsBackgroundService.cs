@@ -3,10 +3,15 @@ namespace DentrixService;
 public sealed class WindowsBackgroundService : BackgroundService
 {
     private readonly ILogger<WindowsBackgroundService> _logger;
+    private readonly DatabaseAdapter _adapter;
 
-    public WindowsBackgroundService(ILogger<WindowsBackgroundService> logger)
+    public WindowsBackgroundService(
+        ILogger<WindowsBackgroundService> logger,
+        DatabaseAdapter databaseAdapter
+    )
     {
         _logger = logger;
+        _adapter = databaseAdapter;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
