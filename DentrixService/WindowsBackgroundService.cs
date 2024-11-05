@@ -4,14 +4,17 @@ public sealed class WindowsBackgroundService : BackgroundService
 {
     private readonly ILogger<WindowsBackgroundService> _logger;
     private readonly DatabaseAdapter _adapter;
+    private readonly HttpClient _httpClient;
 
     public WindowsBackgroundService(
         ILogger<WindowsBackgroundService> logger,
-        DatabaseAdapter databaseAdapter
+        DatabaseAdapter adapter,
+        HttpClient httpClient
     )
     {
         _logger = logger;
-        _adapter = databaseAdapter;
+        _adapter = adapter;
+        _httpClient = httpClient;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
