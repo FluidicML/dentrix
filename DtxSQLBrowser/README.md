@@ -44,8 +44,7 @@ the following details:
 
 Field | Value
 ----- | -----
-Extended Key Usages (EKUs) | `1.3.6.1.5.5.7.3.1, 1.3.6.1.5.5.7.3.2, 1.3.6.1.5.5.7.3.3, 1.3.6.1.4.1.311.10.3.13
-`
+Extended Key Usages (EKUs) | 1.3.6.1.5.5.7.3.1, 1.3.6.1.5.5.7.3.2, 1.3.6.1.5.5.7.3.3, 1.3.6.1.4.1.311.10.3.13
 X.509 Key Usage Flags | Digital Signature, Key Encipherment
 Exportable Private Key? | No
 Key Type | RSA-HSM
