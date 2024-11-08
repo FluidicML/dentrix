@@ -1,8 +1,5 @@
 # Dentrix Code Signing
 
-The `DtxSQLBrowser.exe` file is used as an example of how code signing is done
-through CI.
-
 ## Quickstart
 
 To create a new signed version of the SQL browser, run the following:
@@ -12,7 +9,10 @@ $ git tag sql/v<VERSION>
 $ git push origin tag sql/v<VERSION>
 ```
 
-where `<VERSION>` should be determined in advance.
+where `<VERSION>` should be determined in advance. You can zip the produced
+`DtxSQLBrowser.exe` file and send to Dentrix (through their developer portal)
+for them to extract the public key and add it to their servers. Henry Schein
+One should send a notification to us when that is finished.
 
 ## Code Signing Certificate Creation
 
@@ -89,6 +89,5 @@ Unzip the emailed bundle of certificates. Go back to the created certificate
 entry and click `Certificate Operations`. This time you'll click `Merge Signed
 Request`. Specify the organization specific certificate to finish the process.
 
-Send this same certificate up to Dentrix (through their developer portal) so
-they can upload it to their servers. Once that's finished, applications signed
-with our certificate should be able to connect through the Dentrix API.
+Make sure to configure the GitHub Actions secrets to reflect this completed
+certificate.
