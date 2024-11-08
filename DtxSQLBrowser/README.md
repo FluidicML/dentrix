@@ -1,5 +1,8 @@
 # Dentrix Code Signing
 
+The `DtxSQLBrowser.exe` file is used as an example of how code signing is done
+through CI.
+
 ## Quickstart
 
 To create a new signed version of the SQL browser, run the following:
@@ -26,16 +29,6 @@ how tedious the organization validation is (especially EV validation we opted
 into). When our certificate expires, we'll need to either renew it or create a
 new one. In most cases we probably just want to renew and not think about it
 any further.
-
-To finish registering with Dentrix, sign the `DtxSqlBrowser.exe` file included
-in this directory and send that to the Dentrix team. Funny enough, the only
-explanation that actually details this is the following excerpt from their
-"documentation":
-
-> Note: Please be aware of reported changes with obtaining a certificate from a
-> CA Authority. Please prepare for that take more time than before. Nothing has
-> changed on our end as the expectation is still the same to sign the
-> dtxsqlbrowser and send that to us zipped to be added to our servers.
 
 ### Azure
 
@@ -86,13 +79,16 @@ Organization | Fluidic ML, INC.
 Provisioning options | Install on an HSM
 FIPS 140-2 level 2 HSM | Yes
 
-You can then upload the CSR downloaded from Azure. Once the order has been
-made, the configured recipient will get an email to approve. The certificate
-should be issued shortly after.
+You can now upload the CSR downloaded from Azure. Once the order has been made,
+the configured recipient will get an email to approve. The certificate should
+be issued shortly after.
 
-### Back to Azure
+### Final Steps
 
 Unzip the emailed bundle of certificates. Go back to the created certificate
-entry and click `Certificate Operations`. This time you'll click
-`Merge Signed Request`. Specify the organization specific certificate to finish
-the process.
+entry and click `Certificate Operations`. This time you'll click `Merge Signed
+Request`. Specify the organization specific certificate to finish the process.
+
+Send this same certificate up to Dentrix (through their developer portal) so
+they can upload it to their servers. Once that's finished, applications signed
+with our certificate should be able to connect through the Dentrix API.
