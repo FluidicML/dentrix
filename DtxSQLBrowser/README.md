@@ -1,5 +1,18 @@
 # Dentrix Code Signing
 
+## Quickstart
+
+To create a new signed version of the SQL browser, run the following:
+
+```bash
+$ git tag sql/v<VERSION>
+$ git push origin tag sql/v<VERSION>
+```
+
+where `<VERSION>` should be determined in advance.
+
+## Code Signing Certificate Creation
+
 Integrating with Dentrix is painful. The only way to do it, even in a
 development environment, is to create a signed Windows application. Signing
 requires a certificate that:
@@ -23,8 +36,6 @@ explanation that actually details this is the following excerpt from their
 > CA Authority. Please prepare for that take more time than before. Nothing has
 > changed on our end as the expectation is still the same to sign the
 > dtxsqlbrowser and send that to us zipped to be added to our servers.
-
-## Code Signing Certificate Creation
 
 ### Azure
 
