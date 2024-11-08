@@ -32,6 +32,8 @@ Navigate to the `kv-dentrix-shared-eastus` Key Vault in Azure. In the sidebar,
 click on `Objects > Certificates`. Afterwards, press `Generate/Import`. Fill
 out the following:
 
+![Screenshot from 2024-11-08 10-10-22](https://github.com/user-attachments/assets/933b7a54-f027-4efd-92cb-21a7c09af223)
+
 Field | Value
 ----- | -----
 Method of Certificate Creation | Generate
