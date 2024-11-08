@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - dtx-sql-browser
+        # TODO: Remove
+      - jrpotter/dtx-sql-browser
 
 jobs:
   build:
