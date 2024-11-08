@@ -1,0 +1,44 @@
+name: DtxSQLBrowser Code Signing Example
+
+on:
+  push:
+    tags:
+      - "sql/v*.*.*"
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Sign DtxSQLBrowser
+        run: |
+          dotnet tool install --global AzureSignTool
+          AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc ${{ secrets.AZURE_CERT_NAME }} -tr http://timestamp.digicert.com -v "DtxSQLBrowser/DtxSQLBrowser.exe"
+
+      - name: Upload Exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: DtxSQLBrowser.exe
+          path: "DtxSQLBrowser/DtxSQLBrowser.exe"
+
+  release:
+    runs-on: windows-latest
+    needs: build
+    permissions:
+      contents: write
+
+    steps:
+      - name: Get Artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          prerelease: true
+          files: |
+            */*.exe
