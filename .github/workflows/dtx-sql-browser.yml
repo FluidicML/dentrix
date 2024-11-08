@@ -1,4 +1,4 @@
-name: dtx-sql-browser Code Signing
+name: DtxSQLBrowser Code Signing Example
 
 on:
   push:
