@@ -80,6 +80,6 @@ should be issued shortly after.
 ### Back to Azure
 
 Unzip the emailed bundle of certificates. Go back to the created certificate
-entry and click "Certificate Operations". This time you'll click
+entry and click `Certificate Operations`. This time you'll click
 `Merge Signed Request`. Specify the organization specific certificate to finish
 the process.
