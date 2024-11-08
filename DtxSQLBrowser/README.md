@@ -29,7 +29,7 @@ explanation that actually details this is the following excerpt from their
 ### Azure
 
 Navigate to the `kv-dentrix-shared-eastus` Key Vault in Azure. In the sidebar,
-click on "Objects > Certificates". Afterwards, press "Generate/Import". Fill
+click on `Objects > Certificates`. Afterwards, press `Generate/Import`. Fill
 out the following:
 
 Field | Value
@@ -39,7 +39,7 @@ Type of Certificate Authority (CA) | Certificate issued by a non-integrated CA
 Subject | CN=fluidicml.com, O="Fluidic ML, INC.", L=Fremont, S=California, C=US
 Content Type | PKCS #12
 
-Next, click "Not configured" under "Advanced Policy Configuration" and enter
+Next, click `Not configured` under `Advanced Policy Configuration` and enter
 the following details:
 
 Field | Value
@@ -58,13 +58,13 @@ sure the values align with what DigiCert also asks.
 ---
 
 Once finished, click on the newly created entry in the table. Press
-"Certificate Operation" and download the CSR. With this in hand, you can now go
+`Certificate Operation` and download the CSR. With this in hand, you can now go
 to DigiCert.
 
 ### DigiCert
 
-Once logged in, select "Certificates > Orders" in the sidebar. On the new page,
-press "Request a certificate > EV Code Signing". Fill out the following:
+Once logged in, select `Certificates > Orders` in the sidebar. On the new page,
+press `Request a certificate > EV Code Signing`. Fill out the following:
 
 Field | Value
 ----- | -----
@@ -80,5 +80,6 @@ should be issued shortly after.
 ### Back to Azure
 
 Unzip the emailed bundle of certificates. Go back to the created certificate
-entry and click "Certificate Operations". This time you'll click "Merge Signed
-Request". Specify the organization specific certificate to finish the process.
+entry and click "Certificate Operations". This time you'll click
+`Merge Signed Request`. Specify the organization specific certificate to finish
+the process.
