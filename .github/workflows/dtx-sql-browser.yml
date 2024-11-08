@@ -2,10 +2,8 @@ name: dtx-sql-browser Code Signing
 
 on:
   push:
-    branches:
-      - dtx-sql-browser
-        # TODO: Remove
-      - jrpotter/dtx-sql-browser
+    tags:
+      - "sql/v*.*.*"
 
 jobs:
   build:
@@ -29,7 +27,6 @@ jobs:
           path: "DtxSQLBrowser/DtxSQLBrowser.exe"
 
   release:
-    if: contains(github.ref, 'tags/v')
     runs-on: windows-latest
     needs: build
 
