@@ -1,4 +1,5 @@
 ﻿using DentrixUI.Hosting;
+using Wpf.Ui.Tray;
 
 namespace DentrixUI.Views;
 
