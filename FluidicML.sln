@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DentrixService", "DentrixService\DentrixService.csproj", "{32B1DB75-0A7C-42E7-A066-5050AC6ABF77}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DentrixService", "DentrixService\DentrixService.csproj", "{32B1DB75-0A7C-42E7-A066-5050AC6ABF77}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DentrixUI", "DentrixUI\DentrixUI.csproj", "{69B01A97-BCC2-41D7-BB2E-67CA4DB990D2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{32B1DB75-0A7C-42E7-A066-5050AC6ABF77}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32B1DB75-0A7C-42E7-A066-5050AC6ABF77}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32B1DB75-0A7C-42E7-A066-5050AC6ABF77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69B01A97-BCC2-41D7-BB2E-67CA4DB990D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69B01A97-BCC2-41D7-BB2E-67CA4DB990D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69B01A97-BCC2-41D7-BB2E-67CA4DB990D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69B01A97-BCC2-41D7-BB2E-67CA4DB990D2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
