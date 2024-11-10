@@ -1,34 +1,104 @@
+using SocketIO.Core;
+using SocketIOClient;
+
 namespace DentrixService;
 
 public sealed class WindowsBackgroundService : BackgroundService
 {
     private readonly ILogger<WindowsBackgroundService> _logger;
+    private readonly AppSettings _appSettings;
     private readonly DatabaseAdapter _adapter;
     private readonly HttpClient _httpClient;
 
+    private SocketIOClient.SocketIO? _socketIO = null;
+
     public WindowsBackgroundService(
         ILogger<WindowsBackgroundService> logger,
+        AppSettings appSettings,
         DatabaseAdapter adapter,
         HttpClient httpClient
     )
     {
         _logger = logger;
+        _appSettings = appSettings;
         _adapter = adapter;
         _httpClient = httpClient;
+    }
+
+    private async Task InitSocketIO(CancellationToken stoppingToken)
+    {
+        if (String.IsNullOrEmpty(_appSettings.ApiKey))
+        {
+            return;
+        }
+
+        if (_socketIO != null)
+        {
+            _socketIO.Dispose();
+            _socketIO = null;
+        }
+
+        _socketIO = new SocketIOClient.SocketIO(_appSettings.WsUrl, new SocketIOOptions
+        {
+            EIO = EngineIO.V4,
+            Reconnection = true,
+            ReconnectionAttempts = int.MaxValue,
+            ReconnectionDelay = 5000, // Milliseconds
+            ConnectionTimeout = TimeSpan.FromSeconds(10.0),
+            AutoUpgrade = true,
+            Transport = SocketIOClient.Transport.TransportProtocol.WebSocket,
+            Auth = new Dictionary<string, string>()
+                {
+                    { "apiKey", _appSettings.ApiKey }
+                }
+        });
+
+        _socketIO.OnConnected += (sender, e) =>
+        {
+            _logger.LogInformation("Connected at: {time}", DateTimeOffset.Now);
+        };
+
+        _socketIO.OnDisconnected += (sender, e) =>
+        {
+            _logger.LogInformation("Disconnected \"{e}\" at: {time}", e, DateTimeOffset.Now);
+        };
+
+        _socketIO.OnReconnectAttempt += (sender, attempt) =>
+        {
+            _logger.LogInformation("Reconnect attempt {attempt} at: {time}", attempt, DateTimeOffset.Now);
+        };
+
+        _socketIO.OnError += (sender, e) =>
+        {
+            _logger.LogError("Error \"{e}\" at: {time}", e, DateTimeOffset.Now);
+        };
+
+        _socketIO.OnPing += (sender, e) =>
+        {
+            _logger.LogInformation("Ping at: {time}", DateTimeOffset.Now);
+        };
+
+        _socketIO.OnPong += (sender, e) =>
+        {
+            _logger.LogInformation("Pong at: {time}", DateTimeOffset.Now);
+        };
+
+        _logger.LogInformation("Initiating connection at: {time}", DateTimeOffset.Now);
+
+        await _socketIO.ConnectAsync(stoppingToken);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         try
         {
-            while (!stoppingToken.IsCancellationRequested)
+            if (_logger.IsEnabled(LogLevel.Debug))
             {
-                if (_logger.IsEnabled(LogLevel.Information))
-                {
-                    _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                }
-                await Task.Delay(1000, stoppingToken);
+                _logger.LogDebug("Worker running at: {time}", DateTimeOffset.Now);
             }
+
+            await InitSocketIO(stoppingToken);
+            await Task.Delay(Timeout.Infinite, stoppingToken);
         }
         catch (OperationCanceledException)
         {

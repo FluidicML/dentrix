@@ -1,6 +1,6 @@
 using DentrixService;
 
-var config = new ConfigurationBuilder()
+var configService = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
 #if DEBUG
     .AddJsonFile("appsettings.Staging.json")
@@ -9,17 +9,24 @@ var config = new ConfigurationBuilder()
 #endif
     .Build();
 
+var appSettings = new AppSettings(configService);
+
 var builder = Host.CreateApplicationBuilder(args);
+
 builder.Services.AddHostedService<WindowsBackgroundService>();
-builder.Services.AddSingleton<IConfiguration>(config);
+
+builder.Services.AddSingleton(configService);
+builder.Services.AddSingleton(appSettings);
+
 builder.Services.AddSingleton(new HttpClient()
 {
-    BaseAddress = new Uri("https://api.usegain.ai"),
+    BaseAddress = appSettings.apiUrl,
     DefaultRequestHeaders =
     {
-        { "Authorization", $"Api {config.GetValue<string>("API_KEY")}" }
+        { "Authorization", $"Api {appSettings.apiKey}" }
     }
 });
+
 builder.Services.AddSingleton<DatabaseAdapter>();
 
 var host = builder.Build();
