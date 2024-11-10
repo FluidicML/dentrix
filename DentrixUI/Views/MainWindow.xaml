@@ -8,6 +8,7 @@
     xmlns:tray="http://schemas.lepo.co/wpfui/2022/xaml/tray"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     mc:Ignorable="d"
+    Closing="MainWindow_Closing"
     ExtendsContentIntoTitleBar="True"
     Icon="pack://application:,,,/Assets/Images/taskbar.png"
     Title="MainWindow"
@@ -40,7 +41,7 @@
             FocusOnLeftClick="True"
             Icon="pack://application:,,,/Assets/Images/favicon.ico"
             MenuOnRightClick="True"
-            TooltipText="Gain - Dentrix" />
-
+            TooltipText="Gain - Dentrix"
+            LeftClick="MainWindow_TrayLeftClick" />
     </Grid>
 </ui:FluentWindow>
