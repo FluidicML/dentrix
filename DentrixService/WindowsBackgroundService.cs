@@ -98,6 +98,8 @@ public sealed class WindowsBackgroundService : BackgroundService
             }
 
             await InitSocketIO(stoppingToken);
+
+            // Keep our service alive even when our websocket isn't initiating.
             await Task.Delay(Timeout.Infinite, stoppingToken);
         }
         catch (OperationCanceledException)

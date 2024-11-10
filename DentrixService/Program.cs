@@ -20,10 +20,10 @@ builder.Services.AddSingleton(appSettings);
 
 builder.Services.AddSingleton(new HttpClient()
 {
-    BaseAddress = appSettings.apiUrl,
+    BaseAddress = appSettings.ApiUrl,
     DefaultRequestHeaders =
     {
-        { "Authorization", $"Api {appSettings.apiKey}" }
+        { "Authorization", $"Api {appSettings.ApiKey}" }
     }
 });
 
