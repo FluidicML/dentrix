@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Windows;
+using System.Net.Http;
 
 namespace DentrixUI;
 
@@ -14,6 +15,16 @@ namespace DentrixUI;
 /// </summary>
 public partial class App : Application
 {
+    private static IConfiguration _configService { get; } =
+        new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+#if DEBUG
+            .AddJsonFile("appsettings.Staging.json")
+#else
+            .AddJsonFile("appsettings.Production.json")
+#endif
+        .Build();
+
     private static IHost? _host = null;
 
     /// <summary>
@@ -30,6 +41,7 @@ public partial class App : Application
                 (_1, services) =>
                 {
                     _ = services.AddHostedService<ApplicationHostService>();
+                    _ = services.AddSingleton(_configService);
                     _ = services.AddView<SettingsPage, SettingsViewModel>();
                     _ = services.AddSingleton<IWindow, MainWindow>();
                 }
