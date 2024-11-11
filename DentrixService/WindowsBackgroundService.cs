@@ -3,28 +3,16 @@ using SocketIOClient;
 
 namespace DentrixService;
 
-public sealed class WindowsBackgroundService : BackgroundService
+public sealed class WindowsBackgroundService(
+    ILogger<WindowsBackgroundService> logger,
+    ConfigViewModel configViewModel
+    ) : BackgroundService
 {
-    private readonly ILogger<WindowsBackgroundService> _logger;
-    private readonly Config _config;
-    private readonly DatabaseAdapter _adapter;
-
     private SocketIOClient.SocketIO? _socketIO = null;
-
-    public WindowsBackgroundService(
-        ILogger<WindowsBackgroundService> logger,
-        Config config,
-        DatabaseAdapter adapter
-    )
-    {
-        _logger = logger;
-        _config = config;
-        _adapter = adapter;
-    }
 
     private async Task InitSocketIO(CancellationToken stoppingToken)
     {
-        if (String.IsNullOrEmpty(_config.ApiKey))
+        if (String.IsNullOrEmpty(configViewModel.ApiKey))
         {
             return;
         }
@@ -35,7 +23,7 @@ public sealed class WindowsBackgroundService : BackgroundService
             _socketIO = null;
         }
 
-        _socketIO = new SocketIOClient.SocketIO(_config.WsUrl, new SocketIOOptions
+        _socketIO = new SocketIOClient.SocketIO(configViewModel.WsUrl, new SocketIOOptions
         {
             EIO = EngineIO.V4,
             Reconnection = true,
@@ -46,41 +34,41 @@ public sealed class WindowsBackgroundService : BackgroundService
             Transport = SocketIOClient.Transport.TransportProtocol.WebSocket,
             Auth = new Dictionary<string, string>()
                 {
-                    { "apiKey", _config.ApiKey }
+                    { "apiKey", configViewModel.ApiKey }
                 }
         });
 
         _socketIO.OnConnected += (sender, e) =>
         {
-            _logger.LogInformation("Connected at: {time}", DateTimeOffset.Now);
+            logger.LogInformation("Connected at: {time}", DateTimeOffset.Now);
         };
 
         _socketIO.OnDisconnected += (sender, e) =>
         {
-            _logger.LogInformation("Disconnected \"{e}\" at: {time}", e, DateTimeOffset.Now);
+            logger.LogInformation("Disconnected \"{e}\" at: {time}", e, DateTimeOffset.Now);
         };
 
         _socketIO.OnReconnectAttempt += (sender, attempt) =>
         {
-            _logger.LogInformation("Reconnect attempt {attempt} at: {time}", attempt, DateTimeOffset.Now);
+            logger.LogInformation("Reconnect attempt {attempt} at: {time}", attempt, DateTimeOffset.Now);
         };
 
         _socketIO.OnError += (sender, e) =>
         {
-            _logger.LogError("Error \"{e}\" at: {time}", e, DateTimeOffset.Now);
+            logger.LogError("Error \"{e}\" at: {time}", e, DateTimeOffset.Now);
         };
 
         _socketIO.OnPing += (sender, e) =>
         {
-            _logger.LogInformation("Ping at: {time}", DateTimeOffset.Now);
+            logger.LogInformation("Ping at: {time}", DateTimeOffset.Now);
         };
 
         _socketIO.OnPong += (sender, e) =>
         {
-            _logger.LogInformation("Pong at: {time}", DateTimeOffset.Now);
+            logger.LogInformation("Pong at: {time}", DateTimeOffset.Now);
         };
 
-        _logger.LogInformation("Initiating connection at: {time}", DateTimeOffset.Now);
+        logger.LogInformation("Initiating connection at: {time}", DateTimeOffset.Now);
 
         await _socketIO.ConnectAsync(stoppingToken);
     }
@@ -89,9 +77,9 @@ public sealed class WindowsBackgroundService : BackgroundService
     {
         try
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
+            if (logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("Worker running at: {time}", DateTimeOffset.Now);
+                logger.LogDebug("Worker running at: {time}", DateTimeOffset.Now);
             }
 
             await InitSocketIO(stoppingToken);
@@ -105,7 +93,7 @@ public sealed class WindowsBackgroundService : BackgroundService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "{Message}", ex.Message);
+            logger.LogError(ex, "{Message}", ex.Message);
 
             // Terminates this process and returns an exit code to the operating system.
             // This is required to avoid the 'BackgroundServiceExceptionBehavior', which

@@ -1,5 +1,4 @@
 ﻿using DentrixUI.ViewModels;
-using System.Net;
 using Wpf.Ui.Controls;
 
 namespace DentrixUI.Views;
@@ -11,9 +10,7 @@ public partial class SettingsPage : INavigableView<SettingsViewModel>
 {
     public SettingsViewModel ViewModel { get; }
 
-    public SettingsPage(
-        SettingsViewModel settingsPageViewModel
-    )
+    public SettingsPage(SettingsViewModel settingsPageViewModel)
     {
         ViewModel = settingsPageViewModel;
 
