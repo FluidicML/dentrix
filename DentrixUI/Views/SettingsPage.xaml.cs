@@ -1,5 +1,7 @@
 ﻿using DentrixUI.ViewModels;
 using Microsoft.Extensions.Configuration;
+using System.IO;
+using System.IO.Pipes;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Windows.Media;
@@ -67,7 +69,13 @@ public partial class SettingsPage : INavigableView<SettingsViewModel>
             {
                 response.EnsureSuccessStatusCode();
 
-                // TODO: Dispatch the new API key to background service.
+                await using var pipeClient = new NamedPipeClientStream(".", "gain-dentrix", PipeDirection.Out);
+                await pipeClient.ConnectAsync();
+
+                using var writer = new StreamWriter(pipeClient);
+                await writer.WriteAsync($"Api {ViewModel.ApiKey}\n");
+                await writer.FlushAsync();
+                writer.Close();
 
                 ViewModel.Message = "Success.";
                 ViewModel.IsError = false;

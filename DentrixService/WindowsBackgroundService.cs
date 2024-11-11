@@ -1,5 +1,6 @@
 using SocketIO.Core;
 using SocketIOClient;
+using System.IO.Pipes;
 
 namespace DentrixService;
 
@@ -19,6 +20,7 @@ public sealed class WindowsBackgroundService(
 
         if (_socketIO != null)
         {
+            await _socketIO.DisconnectAsync();
             _socketIO.Dispose();
             _socketIO = null;
         }
@@ -77,15 +79,44 @@ public sealed class WindowsBackgroundService(
     {
         try
         {
-            if (logger.IsEnabled(LogLevel.Debug))
-            {
-                logger.LogDebug("Worker running at: {time}", DateTimeOffset.Now);
-            }
+            logger.LogInformation("Service started at: {time}", DateTimeOffset.Now);
 
+            // If we already have an API key available, we can immediately initialize our connection.
             await InitSocketIO(stoppingToken);
 
-            // Keep our service alive even when our websocket isn't initiating.
-            await Task.Delay(Timeout.Infinite, stoppingToken);
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                try
+                {
+                    // This named pipe communicates with DentrixUI.
+                    await using var server = new NamedPipeServerStream("gain-dentrix", PipeDirection.In);
+                    logger.LogInformation("Waiting for DentrixUI connection: {time}.", DateTimeOffset.Now);
+
+                    await server.WaitForConnectionAsync(stoppingToken);
+
+                    using var reader = new StreamReader(server);
+
+                    string? buffer = null;
+                    while ((buffer = reader.ReadLine()) != null)
+                    {
+                        if (buffer.StartsWith("Api "))
+                        {
+                            configViewModel.ApiKey = buffer["Api ".Length..];
+                            logger.LogInformation("Updated API key at: {time}.", DateTimeOffset.Now);
+
+                            await InitSocketIO(stoppingToken);
+                        }
+                        else
+                        {
+                            logger.LogError("Received malformed message {message} at: {time}.", buffer, DateTimeOffset.Now);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(e, "Encountered unknown exception.");
+                }
+            }
         }
         catch (OperationCanceledException)
         {
