@@ -5,13 +5,38 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:local="clr-namespace:DentrixUI.Views"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     mc:Ignorable="d" 
     d:DataContext="{d:DesignInstance local:SettingsPage, IsDesignTimeCreatable=False}"
     d:DesignHeight="450"
     d:DesignWidth="800"
     Title="Settings">
+    <DockPanel Margin="24">
+        <StackPanel DockPanel.Dock="Top">
+            <Label>API Key</Label>
+            <ui:PasswordBox
+                PasswordChanged="SettingsPage_ApiKeyChanged" />
+        </StackPanel>
 
-    <Grid>
+        <DockPanel DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
+            <StackPanel
+                Orientation="Horizontal"
+                HorizontalAlignment="Right">
+
+                <ui:ProgressRing
+                    Width="24"
+                    Height="24"
+                    Margin="0,0,12,0"
+                    IsIndeterminate="True"
+                    Visibility="{Binding ViewModel.IsLoading, Converter={StaticResource BoolToCollapsedConverter}}" />
+
+                <ui:Button
+                    DockPanel.Dock="Bottom"
+                    Content="Save"
+                    IsEnabled="{Binding ViewModel.SaveButtonIsEnabled}"
+                    Click="SettingsPage_SaveClick" />
+            </StackPanel>
+        </DockPanel>
         
-    </Grid>
+    </DockPanel>
 </Page>

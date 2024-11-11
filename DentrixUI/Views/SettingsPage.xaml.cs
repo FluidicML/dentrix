@@ -17,4 +17,15 @@ public partial class SettingsPage : INavigableView<SettingsViewModel>
         DataContext = this;
         InitializeComponent();
     }
+
+    private void SettingsPage_ApiKeyChanged(object sender, EventArgs e)
+    {
+        ViewModel.ApiKey = ((PasswordBox)sender).Password;
+        ViewModel.IsDirty = true;
+    }
+
+    private void SettingsPage_SaveClick(object sender, System.Windows.RoutedEventArgs e)
+    {
+        ViewModel.IsLoading = true;
+    }
 }
