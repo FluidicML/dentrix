@@ -4,13 +4,15 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:local="clr-namespace:DentrixUI"
+    xmlns:local="clr-namespace:DentrixUI.Views"
     xmlns:tray="http://schemas.lepo.co/wpfui/2022/xaml/tray"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    d:DataContext="{d:DesignInstance local:MainWindow, IsDesignTimeCreatable=False}"
     mc:Ignorable="d"
     Closing="MainWindow_Closing"
     ExtendsContentIntoTitleBar="True"
     Icon="pack://application:,,,/Assets/Images/taskbar.png"
+    Loaded="MainWindow_Loaded"
     Title="MainWindow"
     Height="600"
     Width="400"
@@ -35,6 +37,11 @@
                 <ui:ImageIcon Source="pack://application:,,,/Assets/Images/title.png" />
             </ui:TitleBar.Icon>
         </ui:TitleBar>
+
+        <Frame
+            x:Name="SettingsPageFrame"
+            Grid.Column="0"
+            Grid.Row="1" />
 
         <tray:NotifyIcon
             Grid.Row="0"

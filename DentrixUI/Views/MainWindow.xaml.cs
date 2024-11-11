@@ -1,6 +1,5 @@
 ﻿using DentrixUI.Hosting;
 using System.Windows;
-using Wpf.Ui.Tray;
 
 namespace DentrixUI.Views;
 
@@ -9,11 +8,21 @@ namespace DentrixUI.Views;
 /// </summary>
 public partial class MainWindow : IWindow
 {
-    public MainWindow()
+    private readonly SettingsPage _settingsPage;
+
+    public MainWindow(SettingsPage settingsPage)
     {
-        InitializeComponent();
+        _settingsPage = settingsPage;
 
         Application.Current.MainWindow = this;
+
+        DataContext = this;
+        InitializeComponent();
+    }
+
+    private void MainWindow_Loaded(object sender, System.Windows.RoutedEventArgs e)
+    {
+        SettingsPageFrame.Navigate(_settingsPage);
     }
 
     private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)

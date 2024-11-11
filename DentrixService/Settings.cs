@@ -1,10 +1,10 @@
 ﻿namespace DentrixService;
 
-public sealed class AppSettings
+public sealed class Settings
 {
     private readonly IConfiguration _configService;
 
-    public AppSettings(IConfiguration configService)
+    public Settings(IConfiguration configService)
     {
         _configService = configService;
     }

@@ -1,5 +1,7 @@
-﻿using DentrixUI.Hosting;
+﻿using DentrixUI.Extensions;
+using DentrixUI.Hosting;
 using DentrixUI.Views;
+using DentrixUI.ViewModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -28,6 +30,7 @@ public partial class App : Application
                 (_1, services) =>
                 {
                     _ = services.AddHostedService<ApplicationHostService>();
+                    _ = services.AddView<SettingsPage, SettingsViewModel>();
                     _ = services.AddSingleton<IWindow, MainWindow>();
                 }
             )

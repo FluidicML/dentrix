@@ -9,21 +9,21 @@ var configService = new ConfigurationBuilder()
 #endif
     .Build();
 
-var appSettings = new AppSettings(configService);
+var settings = new Settings(configService);
 
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.Services.AddHostedService<WindowsBackgroundService>();
 
 builder.Services.AddSingleton(configService);
-builder.Services.AddSingleton(appSettings);
+builder.Services.AddSingleton(settings);
 
 builder.Services.AddSingleton(new HttpClient()
 {
-    BaseAddress = appSettings.ApiUrl,
+    BaseAddress = settings.ApiUrl,
     DefaultRequestHeaders =
     {
-        { "Authorization", $"Api {appSettings.ApiKey}" }
+        { "Authorization", $"Api {settings.ApiKey}" }
     }
 });
 

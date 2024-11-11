@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:DentrixUI"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-             StartupUri="Views/MainWindow.xaml">
+             Exit="App_Exit"
+             Startup="App_Startup">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

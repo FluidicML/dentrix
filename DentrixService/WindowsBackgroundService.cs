@@ -6,7 +6,7 @@ namespace DentrixService;
 public sealed class WindowsBackgroundService : BackgroundService
 {
     private readonly ILogger<WindowsBackgroundService> _logger;
-    private readonly AppSettings _appSettings;
+    private readonly Settings _settings;
     private readonly DatabaseAdapter _adapter;
     private readonly HttpClient _httpClient;
 
@@ -14,20 +14,20 @@ public sealed class WindowsBackgroundService : BackgroundService
 
     public WindowsBackgroundService(
         ILogger<WindowsBackgroundService> logger,
-        AppSettings appSettings,
+        Settings settings,
         DatabaseAdapter adapter,
         HttpClient httpClient
     )
     {
         _logger = logger;
-        _appSettings = appSettings;
+        _settings = settings;
         _adapter = adapter;
         _httpClient = httpClient;
     }
 
     private async Task InitSocketIO(CancellationToken stoppingToken)
     {
-        if (String.IsNullOrEmpty(_appSettings.ApiKey))
+        if (String.IsNullOrEmpty(_settings.ApiKey))
         {
             return;
         }
@@ -38,7 +38,7 @@ public sealed class WindowsBackgroundService : BackgroundService
             _socketIO = null;
         }
 
-        _socketIO = new SocketIOClient.SocketIO(_appSettings.WsUrl, new SocketIOOptions
+        _socketIO = new SocketIOClient.SocketIO(_settings.WsUrl, new SocketIOOptions
         {
             EIO = EngineIO.V4,
             Reconnection = true,
@@ -49,7 +49,7 @@ public sealed class WindowsBackgroundService : BackgroundService
             Transport = SocketIOClient.Transport.TransportProtocol.WebSocket,
             Auth = new Dictionary<string, string>()
                 {
-                    { "apiKey", _appSettings.ApiKey }
+                    { "apiKey", _settings.ApiKey }
                 }
         });
 
