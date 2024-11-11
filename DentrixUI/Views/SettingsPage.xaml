@@ -14,12 +14,26 @@
     <DockPanel Margin="24">
         <StackPanel DockPanel.Dock="Top">
             <Label>API Key</Label>
+
             <ui:PasswordBox
-                PasswordChanged="SettingsPage_ApiKeyChanged" />
+                x:Name="ApiKeyPasswordBox"
+                Password="{Binding ViewModel.ApiKey}"
+                PasswordChanged="SettingsPage_ApiKeyChanged"
+                PasswordChar="•"
+                PlaceholderText="DX••••••••••••••••••••••••••••••••••••••" />
         </StackPanel>
 
         <DockPanel DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
+            <TextBlock
+                DockPanel.Dock="Left"
+                Margin="0,4,0,0"
+                TextWrapping="wrap"
+                Text="{Binding ViewModel.Message}"
+                Visibility="{Binding ViewModel.MessageVisibility}"
+                Foreground="{Binding ViewModel.MessageColor}" />
+
             <StackPanel
+                DockPanel.Dock="Right"
                 Orientation="Horizontal"
                 HorizontalAlignment="Right">
 
