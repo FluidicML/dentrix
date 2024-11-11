@@ -12,7 +12,7 @@ var configService = new ConfigurationBuilder()
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddHostedService<WindowsBackgroundService>();
 builder.Services.AddSingleton<IConfiguration>(configService);
-builder.Services.AddSingleton<ConfigViewModel>();
+builder.Services.AddSingleton<ConfigProxy>();
 builder.Services.AddSingleton<DatabaseAdapter>();
 
 var host = builder.Build();

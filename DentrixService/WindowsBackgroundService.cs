@@ -6,18 +6,18 @@ namespace DentrixService;
 
 public sealed class WindowsBackgroundService(
     ILogger<WindowsBackgroundService> logger,
-    ConfigViewModel configViewModel
-    ) : BackgroundService
+    ConfigProxy configProxy
+) : BackgroundService
 {
+    // TODO: We need to secure this. As of now, anyone could write to this
+    // server and we blindly accept this. How we go about securing this isn't
+    // exactly clear though.
+    private static readonly string NAMED_PIPE_SERVER = "gain-dentrix";
+
     private SocketIOClient.SocketIO? _socketIO = null;
 
-    private async Task InitSocketIO(CancellationToken stoppingToken)
+    private async Task InitSocketIO(string apiKey, CancellationToken stoppingToken)
     {
-        if (String.IsNullOrEmpty(configViewModel.ApiKey))
-        {
-            return;
-        }
-
         if (_socketIO != null)
         {
             await _socketIO.DisconnectAsync();
@@ -25,7 +25,7 @@ public sealed class WindowsBackgroundService(
             _socketIO = null;
         }
 
-        _socketIO = new SocketIOClient.SocketIO(configViewModel.WsUrl, new SocketIOOptions
+        _socketIO = new SocketIOClient.SocketIO(configProxy.WsUrl, new SocketIOOptions
         {
             EIO = EngineIO.V4,
             Reconnection = true,
@@ -36,7 +36,7 @@ public sealed class WindowsBackgroundService(
             Transport = SocketIOClient.Transport.TransportProtocol.WebSocket,
             Auth = new Dictionary<string, string>()
                 {
-                    { "apiKey", configViewModel.ApiKey }
+                    { "apiKey", apiKey }
                 }
         });
 
@@ -82,14 +82,20 @@ public sealed class WindowsBackgroundService(
             logger.LogInformation("Service started at: {time}", DateTimeOffset.Now);
 
             // If we already have an API key available, we can immediately initialize our connection.
-            await InitSocketIO(stoppingToken);
+            {
+                var apiKey = configProxy.ApiKey;
+                if (!string.IsNullOrEmpty(apiKey))
+                {
+                    await InitSocketIO(apiKey, stoppingToken);
+                }
+            }
 
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
                     // This named pipe communicates with DentrixUI.
-                    await using var server = new NamedPipeServerStream("gain-dentrix", PipeDirection.In);
+                    await using var server = new NamedPipeServerStream(NAMED_PIPE_SERVER, PipeDirection.In);
                     logger.LogInformation("Waiting for DentrixUI connection: {time}.", DateTimeOffset.Now);
 
                     await server.WaitForConnectionAsync(stoppingToken);
@@ -101,16 +107,22 @@ public sealed class WindowsBackgroundService(
                     {
                         if (buffer.StartsWith("Api "))
                         {
-                            configViewModel.ApiKey = buffer["Api ".Length..];
-                            logger.LogInformation("Updated API key at: {time}.", DateTimeOffset.Now);
+                            var apiKey = buffer["Api ".Length..];
 
-                            await InitSocketIO(stoppingToken);
+                            logger.LogInformation("Updated API key at: {time}.", DateTimeOffset.Now);
+                            configProxy.ApiKey = apiKey;
+
+                            await InitSocketIO(apiKey, stoppingToken);
                         }
                         else
                         {
                             logger.LogError("Received malformed message {message} at: {time}.", buffer, DateTimeOffset.Now);
                         }
                     }
+                }
+                catch (OperationCanceledException)
+                {
+                    // Intentionally empty.
                 }
                 catch (Exception e)
                 {

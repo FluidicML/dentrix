@@ -14,6 +14,8 @@ namespace DentrixUI.Views;
 /// </summary>
 public partial class SettingsPage : INavigableView<SettingsViewModel>
 {
+    private static readonly string NAMED_PIPE_SERVER = "gain-dentrix";
+
     private readonly Uri _baseAddress;
     private readonly HttpClient _httpClient;
 
@@ -69,7 +71,7 @@ public partial class SettingsPage : INavigableView<SettingsViewModel>
             {
                 response.EnsureSuccessStatusCode();
 
-                await using var pipeClient = new NamedPipeClientStream(".", "gain-dentrix", PipeDirection.Out);
+                await using var pipeClient = new NamedPipeClientStream(".", NAMED_PIPE_SERVER, PipeDirection.Out);
                 await pipeClient.ConnectAsync();
 
                 using var writer = new StreamWriter(pipeClient);
@@ -82,7 +84,7 @@ public partial class SettingsPage : INavigableView<SettingsViewModel>
                 ViewModel.IsDirty = false;
             }
         }
-        catch (HttpRequestException)
+        catch (Exception)
         {
             ViewModel.Message = "Encountered an unknown error. Please try again later.";
             ViewModel.IsError = true;
