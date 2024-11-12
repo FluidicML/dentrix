@@ -1,8 +1,8 @@
-﻿using DentrixUI.Hosting;
+﻿using FluidicML.Gain.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 
-namespace DentrixUI.Extensions;
+namespace FluidicML.Gain.Extensions;
 
 internal static class DependencyInjection
 {

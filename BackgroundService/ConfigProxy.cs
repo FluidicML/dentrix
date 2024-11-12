@@ -1,6 +1,6 @@
 ﻿using System.IO.IsolatedStorage;
 
-namespace DentrixService;
+namespace FluidicML.Gain;
 
 public partial class ConfigProxy(IConfiguration configService)
 {

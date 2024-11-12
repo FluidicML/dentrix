@@ -1,4 +1,4 @@
-﻿using DentrixUI.ViewModels;
+﻿using FluidicML.Gain.ViewModels;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using System.IO.Pipes;
@@ -7,7 +7,7 @@ using System.Net.Http.Headers;
 using System.Windows.Media;
 using Wpf.Ui.Controls;
 
-namespace DentrixUI.Views;
+namespace FluidicML.Gain.Views;
 
 /// <summary>
 /// Interaction logic for Settings.xaml

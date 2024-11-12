@@ -1,7 +1,7 @@
-﻿using DentrixUI.Hosting;
+﻿using FluidicML.Gain.Hosting;
 using System.Windows;
 
-namespace DentrixUI.Views;
+namespace FluidicML.Gain.Views;
 
 /// <summary>
 /// Interaction logic for MainWindow.xaml

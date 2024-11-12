@@ -1,9 +1,8 @@
-using Microsoft.Win32;
 using SocketIO.Core;
 using SocketIOClient;
 using System.IO.Pipes;
 
-namespace DentrixService;
+namespace FluidicML.Gain;
 
 public sealed class WindowsBackgroundService(
     ILogger<WindowsBackgroundService> logger,
@@ -99,9 +98,9 @@ public sealed class WindowsBackgroundService(
             {
                 try
                 {
-                    // This named pipe communicates with DentrixUI.
+                    // This named pipe communicates with Application.
                     await using var server = new NamedPipeServerStream(NAMED_PIPE_SERVER, PipeDirection.In);
-                    logger.LogInformation("Waiting for DentrixUI connection: {time}.", DateTimeOffset.Now);
+                    logger.LogInformation("Waiting for Application connection: {time}.", DateTimeOffset.Now);
 
                     await server.WaitForConnectionAsync(stoppingToken);
 

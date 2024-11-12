@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.Windows;
 
-namespace DentrixUI.ViewModels;
+namespace FluidicML.Gain.ViewModels;
 
 public partial class SettingsViewModel : BaseViewModel
 {

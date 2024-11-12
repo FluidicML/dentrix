@@ -1,12 +1,17 @@
 ﻿<Project Sdk="WixToolset.Sdk/5.0.2">
-  <ItemGroup>
-    <Content Include="Assets\Images\shortcut.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Application\Application.csproj" />
-    <ProjectReference Include="..\BackgroundService\BackgroundService.csproj" />
-  </ItemGroup>
+
+	<ItemGroup>
+		<Content Include="Assets\Images\shortcut.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
+		<PackageReference Include="WixToolset.Util.wixext" Version="5.0.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Application\Application.csproj" />
+		<ProjectReference Include="..\BackgroundService\BackgroundService.csproj" />
+	</ItemGroup>
+
 </Project>

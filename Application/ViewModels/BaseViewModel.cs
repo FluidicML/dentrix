@@ -1,9 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using DentrixUI.Hosting;
+using FluidicML.Gain.Hosting;
 using System.Windows;
 using Wpf.Ui.Controls;
 
-namespace DentrixUI.ViewModels;
+namespace FluidicML.Gain.ViewModels;
 
 public abstract class BaseViewModel : ObservableObject, INavigationAware, IViewModel
 {

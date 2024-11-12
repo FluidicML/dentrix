@@ -1,9 +1,9 @@
-﻿using DentrixUI.Views;
+﻿using FluidicML.Gain.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Windows;
 
-namespace DentrixUI.Hosting;
+namespace FluidicML.Gain.Hosting;
 
 internal class ApplicationHostService : IHostedService
 {

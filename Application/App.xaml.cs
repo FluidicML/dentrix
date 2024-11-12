@@ -1,14 +1,13 @@
-﻿using DentrixUI.Extensions;
-using DentrixUI.Hosting;
-using DentrixUI.Views;
-using DentrixUI.ViewModels;
+﻿using FluidicML.Gain.Extensions;
+using FluidicML.Gain.Hosting;
+using FluidicML.Gain.Views;
+using FluidicML.Gain.ViewModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Windows;
-using System.Net.Http;
 
-namespace DentrixUI;
+namespace FluidicML.Gain;
 
 /// <summary>
 /// Interaction logic for App.xaml

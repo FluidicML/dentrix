@@ -2,7 +2,7 @@
 using System.Windows.Data;
 using System.Windows;
 
-namespace DentrixUI.Converters;
+namespace FluidicML.Gain.Converters;
 
 public class BoolToCollapsedConverter : IValueConverter
 {

@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace DentrixUI.Hosting;
+namespace FluidicML.Gain.Hosting;
 
 public interface IWindow
 {
