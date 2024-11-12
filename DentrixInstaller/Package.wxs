@@ -12,7 +12,7 @@
 		<MediaTemplate EmbedCab="yes" />
 
 		<ui:WixUI
-			Id="WixUI_InstallDir"
+			Id="DialogSet"
 			InstallDirectory="INSTALLFOLDER" />
 
 		<Feature Id="UIFeature" Title="Gain Dentrix UI">
