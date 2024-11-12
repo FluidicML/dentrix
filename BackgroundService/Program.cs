@@ -16,10 +16,12 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = Host.CreateApplicationBuilder(args);
+#if !DEBUG
         builder.Services.AddWindowsService(options =>
         {
             options.ServiceName = "Gain - Dentrix Adapter";
         });
+#endif
 
         LoggerProviderOptions.RegisterProviderOptions<
             EventLogSettings, EventLogLoggerProvider>(builder.Services);

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Be explicit we want the .exe file. $TargetPath may specify something different, e.g. a DLL. -->
-<?define FL_AppTarget = "$(var.BackgroundService.TargetDir)\$(var.BackgroundService.TargetName).exe" ?>
+<?define FL_AppTarget = "$(var.Application.TargetDir)\$(var.Application.TargetName).exe" ?>
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
 	<Fragment>

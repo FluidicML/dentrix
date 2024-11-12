@@ -84,9 +84,9 @@ public partial class SettingsPage : INavigableView<SettingsViewModel>
                 ViewModel.IsDirty = false;
             }
         }
-        catch (Exception)
+        catch (Exception exc)
         {
-            ViewModel.Message = "Encountered an unknown error. Please try again later.";
+            ViewModel.Message = exc.Message;
             ViewModel.IsError = true;
         }
         finally

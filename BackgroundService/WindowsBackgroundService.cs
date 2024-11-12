@@ -1,6 +1,8 @@
 using SocketIO.Core;
 using SocketIOClient;
 using System.IO.Pipes;
+using System.Security.AccessControl;
+using System.Security.Principal;
 
 namespace FluidicML.Gain;
 
@@ -98,9 +100,25 @@ public sealed class WindowsBackgroundService(
             {
                 try
                 {
+                    // TODO: I don't have a full sense of the implications of this security rule.
+                    // Actually explore this once the design of the application is settled.
+                    PipeSecurity pipeSecurity = new();
+                    var sid = new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null);
+                    pipeSecurity.SetAccessRule(new PipeAccessRule(sid, PipeAccessRights.ReadWrite, AccessControlType.Allow));
+
                     // This named pipe communicates with Application.
-                    await using var server = new NamedPipeServerStream(NAMED_PIPE_SERVER, PipeDirection.In);
-                    logger.LogInformation("Waiting for Application connection: {time}.", DateTimeOffset.Now);
+                    await using var server = NamedPipeServerStreamAcl.Create(
+                        NAMED_PIPE_SERVER,
+                        PipeDirection.In,
+                        NamedPipeServerStream.MaxAllowedServerInstances,
+                        PipeTransmissionMode.Message,
+                        PipeOptions.Asynchronous,
+                        1024,
+                        1024,
+                        pipeSecurity
+                    );
+
+                    logger.LogInformation("Waiting for frontend connection: {time}.", DateTimeOffset.Now);
 
                     await server.WaitForConnectionAsync(stoppingToken);
 
@@ -131,6 +149,8 @@ public sealed class WindowsBackgroundService(
                 catch (Exception e)
                 {
                     logger.LogError(e, "Encountered unknown exception.");
+
+                    await Task.Delay(5000, stoppingToken);
                 }
             }
         }
