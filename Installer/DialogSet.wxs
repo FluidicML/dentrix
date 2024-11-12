@@ -46,7 +46,7 @@
 			<DialogRef Id="ProgressDlg" />
 			<DialogRef Id="ResumeDlg" />
 			<DialogRef Id="UserExit" />
-			
+
 			<Publish
 				Dialog="BrowseDlg"
 				Control="OK"
@@ -124,7 +124,7 @@
 				Event="SpawnDialog"
 				Value="BrowseDlg"
 				Order="2" />
-			
+
 			<Publish
 				Dialog="VerifyReadyDlg"
 				Control="Back"

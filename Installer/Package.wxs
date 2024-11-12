@@ -6,8 +6,8 @@
 	    Manufacturer="Fluidic ML, INC."
 	    Version="1.0.0.0"
 	    UpgradeCode="f68cb4b7-7e79-4d25-984f-08a980e2af4f">
-	  
-	    <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
+
+		<MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
 
 		<MediaTemplate EmbedCab="yes" />
 
@@ -28,7 +28,7 @@
 		<Feature Id="FL_ServiceFeature" Title="Background Service">
 			<ComponentGroupRef Id="FL_ServiceFiles" />
 		</Feature>
-    </Package>
+	</Package>
 
 	<Fragment>
 		<StandardDirectory Id="ProgramFiles6432Folder">
