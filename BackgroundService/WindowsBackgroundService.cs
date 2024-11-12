@@ -1,3 +1,4 @@
+using Microsoft.Win32;
 using SocketIO.Core;
 using SocketIOClient;
 using System.IO.Pipes;
@@ -6,7 +7,8 @@ namespace DentrixService;
 
 public sealed class WindowsBackgroundService(
     ILogger<WindowsBackgroundService> logger,
-    ConfigProxy configProxy
+    ConfigProxy configProxy,
+    DatabaseAdapter adapter
 ) : BackgroundService
 {
     // TODO: We need to secure this. As of now, anyone could write to this
@@ -80,6 +82,9 @@ public sealed class WindowsBackgroundService(
         try
         {
             logger.LogInformation("Service started at: {time}", DateTimeOffset.Now);
+
+            // Attempt to load in the Dentrix DLL and connect to the Dentrix database.
+            await adapter.ConnectAsync();
 
             // If we already have an API key available, we can immediately initialize our connection.
             {
