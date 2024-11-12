@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DentrixService", "DentrixService\DentrixService.csproj", "{32B1DB75-0A7C-42E7-A066-5050AC6ABF77}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackgroundService", "BackgroundService\BackgroundService.csproj", "{32B1DB75-0A7C-42E7-A066-5050AC6ABF77}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DentrixUI", "DentrixUI\DentrixUI.csproj", "{69B01A97-BCC2-41D7-BB2E-67CA4DB990D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "Application\Application.csproj", "{69B01A97-BCC2-41D7-BB2E-67CA4DB990D2}"
 EndProject
-Project("{B7DD6F7E-DEF8-4E67-B5B7-07EF123DB6F0}") = "DentrixInstaller", "DentrixInstaller\DentrixInstaller.wixproj", "{686825AA-56A8-4313-A084-DDB0F158311A}"
+Project("{B7DD6F7E-DEF8-4E67-B5B7-07EF123DB6F0}") = "Installer", "Installer\Installer.wixproj", "{686825AA-56A8-4313-A084-DDB0F158311A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

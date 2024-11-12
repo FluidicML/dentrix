@@ -3,7 +3,7 @@
     <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DentrixService\DentrixService.csproj" />
-    <ProjectReference Include="..\DentrixUI\DentrixUI.csproj" />
+    <ProjectReference Include="..\Application\Application.csproj" />
+    <ProjectReference Include="..\BackgroundService\BackgroundService.csproj" />
   </ItemGroup>
 </Project>

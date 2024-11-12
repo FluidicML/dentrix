@@ -2,7 +2,7 @@
 	xmlns="http://wixtoolset.org/schemas/v4/wxs"
 	xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
 	<Package
-	    Name="Gain Dentrix Setup"
+	    Name="Gain"
 	    Manufacturer="Fluidic ML, INC."
 	    Version="1.0.0.0"
 	    UpgradeCode="f68cb4b7-7e79-4d25-984f-08a980e2af4f">
@@ -16,11 +16,11 @@
 			InstallDirectory="INSTALLFOLDER" />
 
 		<Feature Id="UIFeature" Title="Gain Dentrix UI">
-			<ComponentGroupRef Id="UIComponents" />
+			<ComponentGroupRef Id="ApplicationComponents" />
 		</Feature>
 
 		<Feature Id="ServiceFeature" Title="Gain Dentrix Service">
-			<ComponentGroupRef Id="ServiceComponents" />
+			<ComponentGroupRef Id="BackgroundServiceComponents" />
 		</Feature>
     </Package>
 
@@ -28,5 +28,21 @@
 		<StandardDirectory Id="ProgramFiles6432Folder">
 			<Directory Id="INSTALLFOLDER" Name="!(bind.Property.ProductName)" />
 		</StandardDirectory>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ApplicationComponents" Directory="INSTALLFOLDER">
+			<Component>
+				<File Source="DialogSet.wxs" />
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="BackgroundServiceComponents" Directory="INSTALLFOLDER">
+			<Component>
+				<File Source="Package.wxs" />
+			</Component>
+		</ComponentGroup>
 	</Fragment>
 </Wix>
