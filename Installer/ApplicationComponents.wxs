@@ -5,8 +5,6 @@
 		  <Files Include="$(var.Application.TargetDir)\**" />
 	  </ComponentGroup>
 
-	  <Icon Id="FL_AppShortcutIco" SourceFile="Assets\Images\shortcut.ico"/>
-
 	  <StandardDirectory Id="DesktopFolder">
 		  <Component Id="FL_AppDesktopShortcutComponent" Guid="*">
 			  <Shortcut

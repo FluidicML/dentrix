@@ -11,6 +11,10 @@
 
 		<MediaTemplate EmbedCab="yes" />
 
+		<Icon Id="FL_AppShortcutIco" SourceFile="Assets\Images\shortcut.ico"/>
+
+		<Property Id="ARPPRODUCTICON" Value="FL_AppShortcutIco" />
+
 		<ui:WixUI
 			Id="FL_DialogSet"
 			InstallDirectory="FL_InstallFolder" />
