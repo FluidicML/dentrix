@@ -15,7 +15,7 @@
 				<File Source="$(var.FL_ServiceTarget)" KeyPath="yes" />
 
 				<ServiceInstall
-					Name="Gain"
+					Name="Gain - Dentrix Adapter"
 					DisplayName="Gain - Dentrix Adapter"
 					Description="Service for triggering Gain workflows"
 					Type="ownProcess"
@@ -29,7 +29,7 @@
 
 				<ServiceControl
 					Id="FL_ServiceControl"
-					Name="Gain"
+					Name="Gain - Dentrix Adapter"
 					Start="install"
 					Stop="both"
 					Remove="uninstall" />

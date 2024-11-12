@@ -1,4 +1,6 @@
 using FluidicML.Gain;
+using Microsoft.Extensions.Logging.Configuration;
+using Microsoft.Extensions.Logging.EventLog;
 
 var configService = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
@@ -10,6 +12,14 @@ var configService = new ConfigurationBuilder()
     .Build();
 
 var builder = Host.CreateApplicationBuilder(args);
+builder.Services.AddWindowsService(options =>
+{
+    options.ServiceName = "Gain - Dentrix Adapter";
+});
+
+LoggerProviderOptions.RegisterProviderOptions<
+    EventLogSettings, EventLogLoggerProvider>(builder.Services);
+
 builder.Services.AddHostedService<WindowsBackgroundService>();
 builder.Services.AddSingleton<IConfiguration>(configService);
 builder.Services.AddSingleton<ConfigProxy>();
