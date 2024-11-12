@@ -1,0 +1,32 @@
+﻿<Wix
+	xmlns="http://wixtoolset.org/schemas/v4/wxs"
+	xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+	<Package
+	    Name="Gain Dentrix Setup"
+	    Manufacturer="Fluidic ML, INC."
+	    Version="1.0.0.0"
+	    UpgradeCode="f68cb4b7-7e79-4d25-984f-08a980e2af4f">
+	  
+	    <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
+
+		<MediaTemplate EmbedCab="yes" />
+
+		<ui:WixUI
+			Id="WixUI_InstallDir"
+			InstallDirectory="INSTALLFOLDER" />
+
+		<Feature Id="UIFeature" Title="Gain Dentrix UI">
+			<ComponentGroupRef Id="UIComponents" />
+		</Feature>
+
+		<Feature Id="ServiceFeature" Title="Gain Dentrix Service">
+			<ComponentGroupRef Id="ServiceComponents" />
+		</Feature>
+    </Package>
+
+	<Fragment>
+		<StandardDirectory Id="ProgramFiles6432Folder">
+			<Directory Id="INSTALLFOLDER" Name="!(bind.Property.ProductName)" />
+		</StandardDirectory>
+	</Fragment>
+</Wix>
