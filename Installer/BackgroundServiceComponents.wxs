@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Be explicit we want the .exe file. $TargetPath may specify something different, e.g. a DLL. -->
+<?define FL_ServiceTarget = "$(var.BackgroundService.TargetDir)\$(var.BackgroundService.TargetName).exe" ?>
+
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Fragment>
-	  <ComponentGroup Id="FL_ServiceExe" Directory="FL_ServiceInstallFolder">
-		  <Component>
-			  <File Source="BackgroundService.exe" />
-		  </Component>
+	  <ComponentGroup Id="FL_ServiceFiles" Directory="FL_ServiceInstallFolder">
+		  <Files Include="$(var.BackgroundService.TargetDir)\**">
+			  <Exclude Files="$(var.FL_ServiceTarget)" />
+		  </Files>
+		  <File Source="$(var.FL_ServiceTarget)" KeyPath="yes" />
 	  </ComponentGroup>
   </Fragment>
 </Wix>

@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Be explicit we want the .exe file. $TargetPath may specify something different, e.g. a DLL. -->
+<?define FL_AppTarget = "$(var.BackgroundService.TargetDir)\$(var.BackgroundService.TargetName).exe" ?>
+
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Fragment>
 	  <ComponentGroup Id="FL_AppFiles" Directory="FL_AppInstallFolder">
-		  <Files Include="$(var.Application.TargetDir)\**" />
+		  <Files Include="$(var.Application.TargetDir)\**">
+			  <Exclude Files="$(var.FL_AppTarget)" />
+		  </Files>
+		  <File Source="$(var.FL_AppTarget)" KeyPath="yes" />
 	  </ComponentGroup>
 
 	  <StandardDirectory Id="DesktopFolder">
