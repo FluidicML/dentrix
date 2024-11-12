@@ -15,11 +15,11 @@
 			Id="DialogSet"
 			InstallDirectory="INSTALLFOLDER" />
 
-		<Feature Id="UIFeature" Title="Gain Dentrix UI">
-			<ComponentGroupRef Id="ApplicationComponents" />
+		<Feature Id="ApplicationFeature" Title="Application">
+			<Files Include="$(var.Application.TargetDir)\**" />
 		</Feature>
 
-		<Feature Id="ServiceFeature" Title="Gain Dentrix Service">
+		<Feature Id="BackgroundServiceFeature" Title="Background Service">
 			<ComponentGroupRef Id="BackgroundServiceComponents" />
 		</Feature>
     </Package>
@@ -31,17 +31,9 @@
 	</Fragment>
 
 	<Fragment>
-		<ComponentGroup Id="ApplicationComponents" Directory="INSTALLFOLDER">
-			<Component>
-				<File Source="DialogSet.wxs" />
-			</Component>
-		</ComponentGroup>
-	</Fragment>
-
-	<Fragment>
 		<ComponentGroup Id="BackgroundServiceComponents" Directory="INSTALLFOLDER">
 			<Component>
-				<File Source="Package.wxs" />
+				<File Source="BackgroundService.exe" />
 			</Component>
 		</ComponentGroup>
 	</Fragment>
