@@ -18,13 +18,13 @@ jobs:
       - name: Sign DtxSQLBrowser
         run: |
           dotnet tool install --global AzureSignTool
-          AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc ${{ secrets.AZURE_CERT_NAME }} -tr http://timestamp.digicert.com -v "DtxSQLBrowser/DtxSQLBrowser.exe"
+          AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc ${{ secrets.AZURE_CERT_NAME }} -tr http://timestamp.digicert.com -v "CodeSigningCertificate/DtxSQLBrowser.exe"
 
       - name: Upload Exe
         uses: actions/upload-artifact@v4
         with:
           name: DtxSQLBrowser.exe
-          path: "DtxSQLBrowser/DtxSQLBrowser.exe"
+          path: "CodeSigningCertificate/DtxSQLBrowser.exe"
 
   release:
     runs-on: windows-latest
