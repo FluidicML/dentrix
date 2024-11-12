@@ -83,7 +83,7 @@ public sealed class WindowsBackgroundService(
             logger.LogInformation("Service started at: {time}", DateTimeOffset.Now);
 
             // Attempt to load in the Dentrix DLL and connect to the Dentrix database.
-            await adapter.ConnectAsync();
+            // await adapter.ConnectAsync();
 
             // If we already have an API key available, we can immediately initialize our connection.
             {

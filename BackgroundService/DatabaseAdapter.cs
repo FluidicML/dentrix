@@ -24,12 +24,12 @@ public sealed class DatabaseAdapter(ILogger<DatabaseAdapter> logger)
         {
             logger.LogInformation("Dentrix found at {path}.", exe);
 
-            //var DLL = Assembly.LoadFile(Path.Combine(exe, "Dentrix.API.dll"));
+            var DLL = Assembly.LoadFile(Path.Combine(exe, "Dentrix.API.dll"));
 
-            //foreach (Type type in DLL.GetExportedTypes())
-            //{
-            //    logger.LogDebug("DLL exports type {name}.", type.Name);
-            //}
+            foreach (Type type in DLL.GetExportedTypes())
+            {
+                logger.LogDebug("DLL exports type {name}.", type.Name);
+            }
         }
         else
         {

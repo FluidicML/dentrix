@@ -2,28 +2,34 @@ using FluidicML.Gain;
 using Microsoft.Extensions.Logging.Configuration;
 using Microsoft.Extensions.Logging.EventLog;
 
-var configService = new ConfigurationBuilder()
-    .AddJsonFile("appsettings.json")
-#if DEBUG
-    .AddJsonFile("appsettings.Staging.json")
-#else
-    .AddJsonFile("appsettings.Production.json")
-#endif
-    .Build();
-
-var builder = Host.CreateApplicationBuilder(args);
-builder.Services.AddWindowsService(options =>
+public class Program
 {
-    options.ServiceName = "Gain - Dentrix Adapter";
-});
+    private static IConfiguration configService = new ConfigurationBuilder()
+        .AddJsonFile("appsettings.json")
+#if DEBUG
+        .AddJsonFile("appsettings.Staging.json")
+#else
+        .AddJsonFile("appsettings.Production.json")
+#endif
+        .Build();
 
-LoggerProviderOptions.RegisterProviderOptions<
-    EventLogSettings, EventLogLoggerProvider>(builder.Services);
+    public static void Main(string[] args)
+    {
+        var builder = Host.CreateApplicationBuilder(args);
+        builder.Services.AddWindowsService(options =>
+        {
+            options.ServiceName = "Gain - Dentrix Adapter";
+        });
 
-builder.Services.AddHostedService<WindowsBackgroundService>();
-builder.Services.AddSingleton<IConfiguration>(configService);
-builder.Services.AddSingleton<ConfigProxy>();
-builder.Services.AddSingleton<DatabaseAdapter>();
+        LoggerProviderOptions.RegisterProviderOptions<
+            EventLogSettings, EventLogLoggerProvider>(builder.Services);
 
-var host = builder.Build();
-host.Run();
+        builder.Services.AddHostedService<WindowsBackgroundService>();
+        builder.Services.AddSingleton<IConfiguration>(configService);
+        builder.Services.AddSingleton<ConfigProxy>();
+        builder.Services.AddSingleton<DatabaseAdapter>();
+
+        var host = builder.Build();
+        host.Run();
+    }
+}
