@@ -45,4 +45,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           prerelease: true
-          files: */*.msi
+          files: |
+            - */*.msi
