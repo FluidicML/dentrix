@@ -12,29 +12,27 @@
 		<MediaTemplate EmbedCab="yes" />
 
 		<ui:WixUI
-			Id="DialogSet"
-			InstallDirectory="INSTALLFOLDER" />
+			Id="FL_DialogSet"
+			InstallDirectory="FL_InstallFolder" />
 
-		<Feature Id="ApplicationFeature" Title="Application">
-			<Files Include="$(var.Application.TargetDir)\**" />
+		<Feature Id="FL_AppFeature" Title="Application">
+			<ComponentGroupRef Id="FL_AppFiles" />
+			<ComponentRef Id="FL_AppShortcutComponent" />
 		</Feature>
 
-		<Feature Id="BackgroundServiceFeature" Title="Background Service">
-			<ComponentGroupRef Id="BackgroundServiceComponents" />
+		<Feature Id="FL_ServiceFeature" Title="Background Service">
+			<ComponentGroupRef Id="FL_ServiceExe" />
 		</Feature>
     </Package>
 
 	<Fragment>
 		<StandardDirectory Id="ProgramFiles6432Folder">
-			<Directory Id="INSTALLFOLDER" Name="!(bind.Property.ProductName)" />
+			<Directory Id="FL_ParentInstallFolder" Name="!(bind.Property.Manufacturer)">
+				<Directory Id="FL_InstallFolder" Name="!(bind.Property.ProductName)">
+					<Directory Id="FL_AppInstallFolder" Name="Application" />
+					<Directory Id="FL_ServiceInstallFolder" Name="Service" />
+				</Directory>
+			</Directory>
 		</StandardDirectory>
-	</Fragment>
-
-	<Fragment>
-		<ComponentGroup Id="BackgroundServiceComponents" Directory="INSTALLFOLDER">
-			<Component>
-				<File Source="BackgroundService.exe" />
-			</Component>
-		</ComponentGroup>
 	</Fragment>
 </Wix>

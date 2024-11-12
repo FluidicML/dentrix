@@ -1,7 +1,7 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
 	<?foreach WIXUIARCH in X86;X64;A64 ?>
 	<Fragment>
-		<UI Id="DialogSet_$(WIXUIARCH)">
+		<UI Id="FL_DialogSet_$(WIXUIARCH)">
 			<Publish
 				Dialog="LicenseAgreementDlg"
 				Control="Print"
@@ -22,18 +22,20 @@
 				Order="2"
 				Condition="NOT WIXUI_DONTVALIDATEPATH" />
 		</UI>
-		<UIRef Id="DialogSet" />
+		<UIRef Id="FL_DialogSet" />
 	</Fragment>
 	<?endforeach?>
 
 	<Fragment>
-		<UI Id="file DialogSet">
+		<UI Id="file FL_DialogSet">
+			<!-- Font names are references by the Wix Toolset dialogs. -->
 			<TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
 			<TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
 			<TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
 
 			<Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
 
+			<!-- Wix Toolset provides these dialogs out of the box. -->
 			<DialogRef Id="BrowseDlg" />
 			<DialogRef Id="DiskCostDlg" />
 			<DialogRef Id="ErrorDlg" />

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+	  <ComponentGroup Id="FL_AppFiles" Directory="FL_AppInstallFolder">
+		  <Files Include="$(var.Application.TargetDir)\**" />
+	  </ComponentGroup>
+
+	  <Icon Id="FL_AppShortcutIco" SourceFile="Assets\Images\shortcut.ico"/>
+
+	  <StandardDirectory Id="ProgramMenuFolder">
+		  <Directory Id="FL_AppProgramMenuFolder" Name="Gain">
+			  <Component Id="FL_AppShortcutComponent">
+				  <Shortcut
+					  Id="Fl_AppShortcut"
+					  Name="Gain"
+					  Icon="FL_AppShortcutIco"
+					  Target="$(var.Application.TargetFileName)"
+					  Directory="ProgramMenuFolder"
+					  WorkingDirectory="INSTALLFOLDER" />
+
+				  <RemoveFolder
+					  Id="FL_AppCleanupShortcut"
+					  Directory="FL_AppProgramMenuFolder"
+					  On="uninstall"/>
+
+				  <RegistryValue
+					  Root="HKCU"
+					  Key="Software\!(bind.Property.Manufacturer)\!(bind.Property.ProductName)"
+					  Name="installed"
+					  Type="integer"
+					  Value="1"
+					  KeyPath="yes" />
+			  </Component>
+		  </Directory>
+	  </StandardDirectory>
+  </Fragment>
+</Wix>
