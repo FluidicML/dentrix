@@ -7,16 +7,34 @@
 
 	  <Icon Id="FL_AppShortcutIco" SourceFile="Assets\Images\shortcut.ico"/>
 
+	  <StandardDirectory Id="DesktopFolder">
+		  <Component Id="FL_AppDesktopShortcutComponent" Guid="*">
+			  <Shortcut
+				  Id="FL_AppAppDesktopShortcut"
+				  Name="Gain"
+				  Icon="FL_AppShortcutIco"
+				  Target="$(var.Application.TargetName).exe"
+				  WorkingDirectory="FL_AppInstallFolder" />
+
+			  <RegistryValue
+				  Root="HKCU"
+				  Key="Software\!(bind.Property.Manufacturer)\!(bind.Property.ProductName)"
+				  Name="desktop_menu_shortcut"
+				  Type="integer"
+				  Value="1"
+				  KeyPath="yes" />
+		  </Component>
+	  </StandardDirectory>
+
 	  <StandardDirectory Id="ProgramMenuFolder">
 		  <Directory Id="FL_AppProgramMenuFolder" Name="Gain">
-			  <Component Id="FL_AppShortcutComponent">
+			  <Component Id="FL_AppProgramMenuShortcutComponent">
 				  <Shortcut
-					  Id="Fl_AppShortcut"
+					  Id="Fl_AppProgramMenuShortcut"
 					  Name="Gain"
 					  Icon="FL_AppShortcutIco"
-					  Target="$(var.Application.TargetFileName)"
-					  Directory="ProgramMenuFolder"
-					  WorkingDirectory="INSTALLFOLDER" />
+					  Target="$(var.Application.TargetName).exe"
+					  WorkingDirectory="FL_AppInstallFolder" />
 
 				  <RemoveFolder
 					  Id="FL_AppCleanupShortcut"
@@ -26,7 +44,7 @@
 				  <RegistryValue
 					  Root="HKCU"
 					  Key="Software\!(bind.Property.Manufacturer)\!(bind.Property.ProductName)"
-					  Name="installed"
+					  Name="program_menu_shortcut"
 					  Type="integer"
 					  Value="1"
 					  KeyPath="yes" />

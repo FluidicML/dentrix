@@ -17,7 +17,8 @@
 
 		<Feature Id="FL_AppFeature" Title="Application">
 			<ComponentGroupRef Id="FL_AppFiles" />
-			<ComponentRef Id="FL_AppShortcutComponent" />
+			<ComponentRef Id="FL_AppDesktopShortcutComponent" />
+			<ComponentRef Id="FL_AppProgramMenuShortcutComponent" />
 		</Feature>
 
 		<Feature Id="FL_ServiceFeature" Title="Background Service">
