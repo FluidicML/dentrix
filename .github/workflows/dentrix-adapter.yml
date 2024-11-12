@@ -1,0 +1,48 @@
+name: Dentrix Adapter
+
+on:
+  push:
+    tags:
+      - "dentrix/v*.*.*"
+    branches:
+      - jrpotter/signwix
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Build Project
+        run: dotnet build -c Release
+
+      - name: Sign MSI
+        run: |
+          dotnet tool install --global AzureSignTool
+          AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc ${{ secrets.AZURE_CERT_NAME }} -tr http://timestamp.digicert.com -v "bin/x64/Release/en-US/Installer.msi"
+
+      - name: Upload MSI
+        uses: actions/upload-artifact@v4
+        with:
+          name: Installer.msi
+          path: bin/x64/Release/en-US/Installer.msi
+
+  release:
+    runs-on: windows-latest
+    needs: build
+    permissions:
+      contents: write
+
+    steps:
+      - name: Get Artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          prerelease: true
+          files: */*.msi
