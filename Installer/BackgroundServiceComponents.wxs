@@ -10,8 +10,8 @@
 			<Files Include="$(var.BackgroundService.TargetDir)\**">
 				<Exclude Files="$(var.FL_ServiceTarget)" />
 			</Files>
-			
-			<Component Id="FL_ServiceComponent" Guid="011E5106-D965-4133-9D71-C207467927DA">
+
+			<Component Id="FL_ServiceComponent" Guid="{011E5106-D965-4133-9D71-C207467927DA}">
 				<File Source="$(var.FL_ServiceTarget)" KeyPath="yes" />
 
 				<ServiceInstall

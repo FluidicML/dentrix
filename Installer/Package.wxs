@@ -5,32 +5,12 @@
 	    Name="Gain"
 	    Manufacturer="Fluidic ML, INC."
 	    Version="1.0.0.0"
-	    UpgradeCode="f68cb4b7-7e79-4d25-984f-08a980e2af4f">
+	    UpgradeCode="{f68cb4b7-7e79-4d25-984f-08a980e2af4f}">
 
 		<MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
 
 		<MediaTemplate EmbedCab="yes" />
 
-		<Icon Id="FL_AppShortcutIco" SourceFile="Assets\Images\shortcut.ico"/>
-
-		<Property Id="ARPPRODUCTICON" Value="FL_AppShortcutIco" />
-
-		<ui:WixUI
-			Id="FL_DialogSet"
-			InstallDirectory="FL_InstallFolder" />
-
-		<Feature Id="FL_AppFeature" Title="Application">
-			<ComponentGroupRef Id="FL_AppFiles" />
-			<ComponentRef Id="FL_AppDesktopShortcutComponent" />
-			<ComponentRef Id="FL_AppProgramMenuShortcutComponent" />
-		</Feature>
-
-		<Feature Id="FL_ServiceFeature" Title="Background Service">
-			<ComponentGroupRef Id="FL_ServiceFiles" />
-		</Feature>
-	</Package>
-
-	<Fragment>
 		<StandardDirectory Id="ProgramFiles6432Folder">
 			<Directory Id="FL_ParentInstallFolder" Name="!(bind.Property.Manufacturer)">
 				<Directory Id="FL_InstallFolder" Name="!(bind.Property.ProductName)">
@@ -39,5 +19,21 @@
 				</Directory>
 			</Directory>
 		</StandardDirectory>
-	</Fragment>
+
+		<Icon Id="FL_AppShortcut.Ico" SourceFile="Assets\Images\shortcut.ico"/>
+
+		<Property Id="ARPPRODUCTICON" Value="FL_AppShortcut.Ico" />
+
+		<ui:WixUI
+			Id="FL_DialogSet"
+			InstallDirectory="FL_InstallFolder" />
+
+		<Feature Id="FL_AppFeature" Title="Application">
+			<ComponentGroupRef Id="FL_AppFiles" />
+		</Feature>
+
+		<Feature Id="FL_ServiceFeature" Title="Background Service">
+			<ComponentGroupRef Id="FL_ServiceFiles" />
+		</Feature>
+	</Package>
 </Wix>
