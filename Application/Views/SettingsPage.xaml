@@ -21,6 +21,47 @@
                 PasswordChanged="SettingsPage_ApiKeyChanged"
                 PasswordChar="•"
                 PlaceholderText="DX••••••••••••••••••••••••••••••••••••••" />
+
+            <StackPanel
+                Orientation="Horizontal"
+                Margin="0,24,0,0">
+                <CheckBox
+                    IsThreeState="True"
+                    IsEnabled="False"
+                    IsChecked="{Binding ViewModel.StatusService}" />
+
+                <Label
+                    VerticalAlignment="Center"
+                    Margin="0,4,0,0">
+                    Service Healthy
+                </Label>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal">
+                <CheckBox
+                    IsThreeState="True"
+                    IsEnabled="False"
+                    IsChecked="{Binding ViewModel.StatusApiKey}" />
+
+                <Label
+                    VerticalAlignment="Center"
+                    Margin="0,4,0,0">
+                    API Key Set
+                </Label>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal">
+                <CheckBox
+                    IsThreeState="True"
+                    IsEnabled="False"
+                    IsChecked="{Binding ViewModel.StatusDatabase}" />
+
+                <Label
+                    VerticalAlignment="Center"
+                    Margin="0,4,0,0">
+                    Dentrix Connected
+                </Label>
+            </StackPanel>
         </StackPanel>
 
         <DockPanel DockPanel.Dock="Bottom" VerticalAlignment="Bottom">

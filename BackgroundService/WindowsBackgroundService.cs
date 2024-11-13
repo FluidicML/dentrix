@@ -18,37 +18,10 @@ public sealed class WindowsBackgroundService(
 
             // The order we initialize things is important. This reflects the
             // order of our dependency chain.
+
             await _database.Initialize(stoppingToken);
             await _socket.Initialize(_configProxy.ApiKey, stoppingToken);
-
-            await foreach (var msg in _pipe.Listen(stoppingToken))
-            {
-                try
-                {
-                    if (msg.StartsWith("Api "))
-                    {
-                        _configProxy.ApiKey = msg["Api ".Length..];
-
-                        _logger.LogInformation("Updated API key at: {time}.", DateTimeOffset.Now);
-
-                        await _socket.Initialize(_configProxy.ApiKey, stoppingToken);
-                    }
-                    else
-                    {
-                        _logger.LogError("Received malformed message {msg} at: {time}.", msg, DateTimeOffset.Now);
-                    }
-                }
-                catch (OperationCanceledException)
-                {
-                    // Intentionally empty.
-                }
-                catch (Exception e)
-                {
-                    _logger.LogError(e, "Encountered unknown exception at: {time}.", DateTimeOffset.Now);
-
-                    await Task.Delay(5000, stoppingToken);
-                }
-            }
+            await _pipe.Initialize(stoppingToken);
         }
         catch (OperationCanceledException)
         {
