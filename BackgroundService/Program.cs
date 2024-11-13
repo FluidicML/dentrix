@@ -1,6 +1,7 @@
-using FluidicML.Gain;
 using Microsoft.Extensions.Logging.Configuration;
 using Microsoft.Extensions.Logging.EventLog;
+
+namespace FluidicML.Gain;
 
 public class Program
 {
@@ -30,6 +31,7 @@ public class Program
         builder.Services.AddSingleton<IConfiguration>(configService);
         builder.Services.AddSingleton<ConfigProxy>();
         builder.Services.AddSingleton<DatabaseAdapter>();
+        builder.Services.AddSingleton<SocketAdapter>();
 
         var host = builder.Build();
         host.Run();

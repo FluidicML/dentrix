@@ -60,7 +60,7 @@ public sealed class DatabaseAdapter
         }
     }
 
-    public async Task Initialize()
+    public async Task Initialize(CancellationToken stoppingToken)
     {
         var status = RU_UNSET;
         var authFilePath = Path.GetFullPath(Path.Combine(".", "Assets", DtxKey));
@@ -73,9 +73,11 @@ public sealed class DatabaseAdapter
             status == RU_UNSET
         )
         {
+            stoppingToken.ThrowIfCancellationRequested();
+
             if (status != RU_UNSET)
             {
-                await Task.Delay(5000);
+                await Task.Delay(5000, stoppingToken);
             }
 
             status = DENTRIXAPI_RegisterUser(authFilePath);

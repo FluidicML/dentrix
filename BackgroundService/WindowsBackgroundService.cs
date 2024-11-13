@@ -1,6 +1,3 @@
-using FluidicML.Gain.DTO;
-using SocketIO.Core;
-using SocketIOClient;
 using System.IO.Pipes;
 using System.Security.AccessControl;
 using System.Security.Principal;
@@ -8,108 +5,24 @@ using System.Security.Principal;
 namespace FluidicML.Gain;
 
 public sealed class WindowsBackgroundService(
-    ILogger<WindowsBackgroundService> logger,
-    ConfigProxy configProxy,
-    DatabaseAdapter adapter
+    ILogger<WindowsBackgroundService> _logger,
+    ConfigProxy _configProxy,
+    DatabaseAdapter _database,
+    SocketAdapter _socket
 ) : BackgroundService
 {
     private static readonly string NAMED_PIPE_SERVER = "gain-dentrix";
-
-    private SocketIOClient.SocketIO? _socketIO = null;
-
-    private async Task InitSocketIO(string apiKey, CancellationToken stoppingToken)
-    {
-        if (_socketIO != null)
-        {
-            await _socketIO.DisconnectAsync();
-            _socketIO.Dispose();
-            _socketIO = null;
-        }
-
-        _socketIO = new SocketIOClient.SocketIO(configProxy.WsUrl, new SocketIOOptions
-        {
-            EIO = EngineIO.V4,
-            Reconnection = true,
-            ReconnectionAttempts = int.MaxValue,
-            ReconnectionDelay = 5000, // Milliseconds
-            ConnectionTimeout = TimeSpan.FromSeconds(10.0),
-            AutoUpgrade = true,
-            Transport = SocketIOClient.Transport.TransportProtocol.WebSocket,
-            Auth = new Dictionary<string, string>()
-                {
-                    { "apiKey", apiKey }
-                }
-        });
-
-        _socketIO.OnConnected += (sender, e) =>
-        {
-            logger.LogInformation("Connected at: {time}", DateTimeOffset.Now);
-        };
-
-        _socketIO.OnDisconnected += (sender, e) =>
-        {
-            logger.LogInformation("Disconnected \"{e}\" at: {time}", e, DateTimeOffset.Now);
-        };
-
-        _socketIO.OnReconnectAttempt += (sender, attempt) =>
-        {
-            logger.LogInformation("Reconnect attempt {attempt} at: {time}", attempt, DateTimeOffset.Now);
-        };
-
-        _socketIO.OnError += (sender, e) =>
-        {
-            logger.LogError("Error \"{e}\" at: {time}", e, DateTimeOffset.Now);
-        };
-
-        _socketIO.OnPing += (sender, e) =>
-        {
-            logger.LogInformation("Ping at: {time}", DateTimeOffset.Now);
-        };
-
-        _socketIO.OnPong += (sender, e) =>
-        {
-            logger.LogInformation("Pong at: {time}", DateTimeOffset.Now);
-        };
-
-        _socketIO.On("query", async (response) =>
-        {
-            var queryDto = response.GetValue<QueryDto>();
-
-            await foreach (var row in adapter.Query(queryDto.query, stoppingToken))
-            {
-                await _socketIO.EmitAsync("results", new ResultsDto()
-                {
-                    id = queryDto.id,
-                    results = [row]
-                });
-            }
-
-            await _socketIO.EmitAsync("finished", new FinishedDto()
-            {
-                id = queryDto.id
-            });
-        });
-
-        logger.LogInformation("Initiating connection at: {time}", DateTimeOffset.Now);
-
-        await _socketIO.ConnectAsync(stoppingToken);
-    }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         try
         {
-            logger.LogInformation("Service started at: {time}", DateTimeOffset.Now);
+            _logger.LogInformation("Service started at: {time}", DateTimeOffset.Now);
 
-            await adapter.Initialize();
-
-            {
-                var apiKey = configProxy.ApiKey;
-                if (!string.IsNullOrEmpty(apiKey))
-                {
-                    await InitSocketIO(apiKey, stoppingToken);
-                }
-            }
+            // The order we initialize things is important. This reflects the
+            // order of our dependency chain.
+            await _database.Initialize(stoppingToken);
+            await _socket.Initialize(_configProxy.ApiKey, stoppingToken);
 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -133,7 +46,7 @@ public sealed class WindowsBackgroundService(
                         pipeSecurity
                     );
 
-                    logger.LogInformation("Waiting for frontend connection at: {time}.", DateTimeOffset.Now);
+                    _logger.LogInformation("Waiting for frontend connection at: {time}.", DateTimeOffset.Now);
 
                     await server.WaitForConnectionAsync(stoppingToken);
 
@@ -146,14 +59,14 @@ public sealed class WindowsBackgroundService(
                         {
                             var apiKey = buffer["Api ".Length..];
 
-                            logger.LogInformation("Updated API key at: {time}.", DateTimeOffset.Now);
-                            configProxy.ApiKey = apiKey;
+                            _logger.LogInformation("Updated API key at: {time}.", DateTimeOffset.Now);
+                            _configProxy.ApiKey = apiKey;
 
-                            await InitSocketIO(apiKey, stoppingToken);
+                            await _socket.Initialize(apiKey, stoppingToken);
                         }
                         else
                         {
-                            logger.LogError("Received malformed message {message} at: {time}.", buffer, DateTimeOffset.Now);
+                            _logger.LogError("Received malformed message {message} at: {time}.", buffer, DateTimeOffset.Now);
                         }
                     }
                 }
@@ -163,7 +76,7 @@ public sealed class WindowsBackgroundService(
                 }
                 catch (Exception e)
                 {
-                    logger.LogError(e, "Encountered unknown exception at: {time}.", DateTimeOffset.Now);
+                    _logger.LogError(e, "Encountered unknown exception at: {time}.", DateTimeOffset.Now);
 
                     await Task.Delay(5000, stoppingToken);
                 }
@@ -175,7 +88,7 @@ public sealed class WindowsBackgroundService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "{Message}", ex.Message);
+            _logger.LogError(ex, "{Message}", ex.Message);
 
             // Terminates this process and returns an exit code to the operating system.
             // This is required to avoid the 'BackgroundServiceExceptionBehavior', which
