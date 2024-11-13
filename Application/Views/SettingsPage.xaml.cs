@@ -61,9 +61,9 @@ public partial class SettingsPage : INavigableView<SettingsViewModel>
                     {
                         foreach (string kv in status.Split(","))
                         {
-                            if (kv.StartsWith("Api="))
+                            if (kv.StartsWith("Ws="))
                             {
-                                ViewModel.StatusApiKey = kv == "Api=1";
+                                ViewModel.StatusWebSocket = kv == "Ws=1";
                             }
                             else if (kv.StartsWith("Db="))
                             {
@@ -75,13 +75,13 @@ public partial class SettingsPage : INavigableView<SettingsViewModel>
                 catch (TimeoutException)
                 {
                     ViewModel.StatusService = false;
-                    ViewModel.StatusApiKey = null;
+                    ViewModel.StatusWebSocket = null;
                     ViewModel.StatusDatabase = null;
                 }
                 catch (Exception)
                 {
                     ViewModel.StatusService = null;
-                    ViewModel.StatusApiKey = null;
+                    ViewModel.StatusWebSocket = null;
                     ViewModel.StatusDatabase = null;
                 }
 

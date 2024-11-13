@@ -7,20 +7,6 @@ namespace FluidicML.Gain;
 
 public sealed class DatabaseAdapter
 {
-    // DENTRIXAPI_RegisterUser status codes.
-    private const int RU_SUCCESS = 0;
-    private const int RU_USER_CANCELED = 1;
-    private const int RU_INVALID_AUTH = 2;
-    private const int RU_INVALID_FILE = 3;
-    private const int RU_NO_CONNECT = 4;
-    private const int RU_LOCAL_RIGHTS_UNSECURED = 5;
-    private const int RU_USER_INSERT_FAILED = 6;
-    private const int RU_USER_ACCESS_REVOKED = 7;
-    private const int RU_INVALID_CERT = 8;
-    private const int RU_DATABASE_EX = 9;
-    private const int RU_UNKNOWN_ERROR = -1;
-    private const int RU_UNSET = -2;
-
     [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
     private static extern IntPtr LoadLibrary(string dllName);
 
@@ -39,16 +25,6 @@ public sealed class DatabaseAdapter
 
     private readonly ILogger<DatabaseAdapter> _logger;
 
-    private string _connectionStr = string.Empty;
-
-    public bool IsConnected { get => !String.IsNullOrEmpty(_connectionStr); }
-
-    private const string DtxKey = "MNCN5L2G.dtxkey";
-
-    private const string DtxUser = "MNCN5L2G";
-
-    private const string DtxPassword = "MNCN5L2G5";
-
     public DatabaseAdapter(ILogger<DatabaseAdapter> logger)
     {
         _logger = logger;
@@ -62,27 +38,73 @@ public sealed class DatabaseAdapter
         }
     }
 
-    public async Task Initialize(CancellationToken stoppingToken)
+    private const string DtxKey = "MNCN5L2G.dtxkey";
+    private const string DtxUser = "MNCN5L2G";
+    private const string DtxPassword = "MNCN5L2G5";
+
+    // DENTRIXAPI_RegisterUser status codes.
+    private const int RU_SUCCESS = 0;
+    private const int RU_USER_CANCELED = 1;
+    private const int RU_INVALID_AUTH = 2;
+    private const int RU_INVALID_FILE = 3;
+    private const int RU_NO_CONNECT = 4;
+    private const int RU_LOCAL_RIGHTS_UNSECURED = 5;
+    private const int RU_USER_INSERT_FAILED = 6;
+    private const int RU_USER_ACCESS_REVOKED = 7;
+    private const int RU_INVALID_CERT = 8;
+    private const int RU_DATABASE_EX = 9;
+    private const int RU_UNKNOWN_ERROR = -1;
+    private const int RU_UNSET = -2;
+
+    public bool IsConnected { get => !string.IsNullOrEmpty(_dbConnStr); }
+
+    /// <summary>
+    /// The database connection string returned by Dentrix.
+    /// </summary>
+    private string _dbConnStr = string.Empty;
+
+    /// <summary>
+    /// Ensures only one connection request happens at a time.
+    /// </summary>
+    private static readonly SemaphoreSlim _semDbConnStr = new(1, 1);
+
+    /// <summary>
+    /// Periodically check if the database connection is set.
+    /// </summary>
+    public void Initialize(CancellationToken stoppingToken)
     {
-        var status = RU_UNSET;
-        var authFilePath = Path.GetFullPath(Path.Combine(".", "Assets", DtxKey));
-
-        while (
-            status == RU_USER_CANCELED ||
-            status == RU_NO_CONNECT ||
-            status == RU_DATABASE_EX ||
-            status == RU_UNKNOWN_ERROR ||
-            status == RU_UNSET
-        )
+        _ = Task.Run(async () =>
         {
-            stoppingToken.ThrowIfCancellationRequested();
-
-            if (status != RU_UNSET)
+            while (!stoppingToken.IsCancellationRequested)
             {
-                await Task.Delay(5000, stoppingToken);
+                await ConnectToDatabase(stoppingToken);
+                await Task.Delay(10000, stoppingToken);
             }
+        }, stoppingToken);
+    }
 
-            status = DENTRIXAPI_RegisterUser(authFilePath);
+    private async Task ConnectToDatabase(CancellationToken stoppingToken)
+    {
+        if (!string.IsNullOrEmpty(_dbConnStr))
+        {
+            // The connection string is already set. Nothing left to do.
+            return;
+        }
+
+        // IMPORTANT! This is the only place we should acquire this semaphore.
+        // If that were to change, this logic also needs to change.
+        var locked = await _semDbConnStr.WaitAsync(0, stoppingToken);
+
+        if (!locked)
+        {
+            // Another connection attempt must already be in progress.
+            return;
+        }
+
+        try
+        {
+            var authFilePath = Path.GetFullPath(Path.Combine(".", "Assets", DtxKey));
+            var status = DENTRIXAPI_RegisterUser(authFilePath);
 
             switch (status)
             {
@@ -101,26 +123,31 @@ public sealed class DatabaseAdapter
                         break;
                     }
             }
-        }
 
 #if !DEBUG
-        if (status != RU_SUCCESS)
-        {
-            throw new InvalidProgramException(RegisterUserErrorMessage(status, authFilePath));
-        }
+            if (status != RU_SUCCESS)
+            {
+                throw new InvalidProgramException(RegisterUserErrorMessage(status, authFilePath));
+            }
 
-        var builder = new StringBuilder(512);
+            var builder = new StringBuilder(512);
+            DENTRIXAPI_GetConnectionString(DtxUser, DtxPassword, builder, 512);
+            _dbConnStr = builder.ToString();
 
-        DENTRIXAPI_GetConnectionString(DtxUser, DtxPassword, builder, 512);
-
-        // This string is only set on a DDP-signed application.
-        _connectionStr = builder.ToString();
-
-        if (string.IsNullOrEmpty(_connectionStr))
-        {
-            throw new InvalidOperationException("Empty connection string to Dentrix API.");
-        }
+            if (string.IsNullOrEmpty(_dbConnStr))
+            {
+                throw new InvalidProgramException("Empty connection string to Dentrix API.");
+            }
 #endif
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to connect to Dentrix database at: {time}", DateTimeOffset.Now);
+        }
+        finally
+        {
+            _semDbConnStr.Release();
+        }
     }
 
     private static string RegisterUserErrorMessage(int status, string authFilePath)
@@ -182,33 +209,77 @@ public sealed class DatabaseAdapter
         [EnumeratorCancellation] CancellationToken stoppingToken
     )
     {
-        if (String.IsNullOrEmpty(_connectionStr))
+        if (string.IsNullOrEmpty(_dbConnStr))
         {
-            throw new InvalidOperationException("Dentrix connection string is not set.");
+            // Can't continue. The server will try the request again.
+            yield break;
         }
 
-        using var conn = new OdbcConnection(_connectionStr);
-
-        await conn.OpenAsync(stoppingToken);
-
-        using var command = new OdbcCommand(query, conn);
-        using var reader = command.ExecuteReader();
-
-        object[] columns = new object[MAX_COLUMNS];
-
-        while (await reader.ReadAsync(stoppingToken))
+        using var conn = new OdbcConnection(_dbConnStr);
+        try
         {
-            int NumberOfColums = reader.GetValues(columns);
+            await conn.OpenAsync(stoppingToken);
+        }
+        catch (Exception e) when (e is not OperationCanceledException)
+        {
+            _logger.LogError(e, "Could not connect to Dentrix database at: {time}", DateTimeOffset.Now);
 
-            var json = new Dictionary<string, object> { };
-
-            for (int i = 0; i < NumberOfColums; i++)
+            // It is possible our background task responsible for determining the connection string
+            // updated _dbConnStr in-between when our connection was made and when this exception was
+            // thrown. If that was the case, don't throw away our work.
+            if (conn.ConnectionString == _dbConnStr)
             {
-                var type = reader.GetFieldType(i);
-                json[reader.GetName(i)] = Convert.ChangeType(columns[i], type);
+                _dbConnStr = string.Empty;
             }
 
-            yield return json;
+            yield break;
+        }
+
+        using var command = new OdbcCommand(query, conn);
+
+        OdbcDataReader reader;
+        try
+        {
+            reader = command.ExecuteReader();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Could not execute Dentrix database reader at: {time}", DateTimeOffset.Now);
+
+            yield break;
+        }
+
+        using (reader)
+        {
+            while (true)
+            {
+                var json = new Dictionary<string, object> { };
+
+                try
+                {
+                    if (!await reader.ReadAsync(stoppingToken))
+                    {
+                        yield break;
+                    }
+
+                    object[] columns = new object[MAX_COLUMNS];
+                    int NumberOfColums = reader.GetValues(columns);
+
+                    for (int i = 0; i < NumberOfColums; i++)
+                    {
+                        var type = reader.GetFieldType(i);
+                        json[reader.GetName(i)] = Convert.ChangeType(columns[i], type);
+                    }
+                }
+                catch (Exception e) when (e is not OperationCanceledException)
+                {
+                    _logger.LogError(e, "Could not read Dentrix database row at: {time}", DateTimeOffset.Now);
+
+                    yield break;
+                }
+
+                yield return json;
+            }
         }
     }
 }
