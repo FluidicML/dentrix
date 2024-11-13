@@ -12,13 +12,8 @@ public sealed class DatabaseAdapter(ILogger<DatabaseAdapter> logger)
             throw new InvalidProgramException("Attempting to run on a non-Windows machine.");
         }
 
-        var dentrixKey = Path.Combine(Registry.CurrentUser.Name, "Software", "Dentrix Dental Systems, Inc.", "Dentrix", "General");
-        var exePath = Registry.GetValue(dentrixKey, "ExePath", null);
-
-        if (exePath == null)
-        {
-            throw new InvalidProgramException("Could not find Dentrix location.");
-        }
+        // TODO: This has to be specified at installation time.
+        var exePath = "C:\\Program Files (x86)\\Dentrix";
 
         if (exePath is string exe)
         {
