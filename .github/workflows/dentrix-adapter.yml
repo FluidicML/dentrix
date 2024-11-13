@@ -26,33 +26,32 @@ jobs:
       - name: Sign Application and BackgroundService
         run: >
           AzureSignTool sign
-            -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}"
-            -kvt "${{ secrets.AZURE_TENANT_ID }}"
-            -kvi "${{ secrets.AZURE_CLIENT_ID }}"
-            -kvs "${{ secrets.AZURE_CLIENT_SECRET }}"
-            -kvc "${{ secrets.AZURE_CERT_NAME }}"
-            -tr http://timestamp.digicert.com
-            -v
-            "Application/bin/Release/net8.0-windows/**/*.dll"
-            "Application/bin/Release/net8.0-windows/**/*.exe"
-            "BackgroundService/bin/Release/net8.0-windows/**/*.dll"
-            "BackgroundService/bin/Release/net8.0-windows/**/*.exe"
+          -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}"
+          -kvt "${{ secrets.AZURE_TENANT_ID }}"
+          -kvi "${{ secrets.AZURE_CLIENT_ID }}"
+          -kvs "${{ secrets.AZURE_CLIENT_SECRET }}"
+          -kvc "${{ secrets.AZURE_CERT_NAME }}"
+          -tr http://timestamp.digicert.com
+          -v
+          "Application/bin/Release/net8.0-windows/**/*.dll"
+          "Application/bin/Release/net8.0-windows/**/*.exe"
+          "BackgroundService/bin/Release/net8.0-windows/**/*.dll"
+          "BackgroundService/bin/Release/net8.0-windows/**/*.exe"
 
       - name: Build Installer
-        run: |
-          dotnet build -c Release Installer
+        run: dotnet build -c Release Installer
 
       - name: Sign Installer
         run: >
           AzureSignTool sign
-            -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}"
-            -kvt "${{ secrets.AZURE_TENANT_ID }}"
-            -kvi "${{ secrets.AZURE_CLIENT_ID }}"
-            -kvs "${{ secrets.AZURE_CLIENT_SECRET }}"
-            -kvc "${{ secrets.AZURE_CERT_NAME }}"
-            -tr http://timestamp.digicert.com
-            -v
-            "Installer/bin/x64/Release/en-US/Installer.msi"
+          -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}"
+          -kvt "${{ secrets.AZURE_TENANT_ID }}"
+          -kvi "${{ secrets.AZURE_CLIENT_ID }}"
+          -kvs "${{ secrets.AZURE_CLIENT_SECRET }}"
+          -kvc "${{ secrets.AZURE_CERT_NAME }}"
+          -tr http://timestamp.digicert.com
+          -v
+          "Installer/bin/x64/Release/en-US/Installer.msi"
 
       - name: Upload MSI
         uses: actions/upload-artifact@v4
