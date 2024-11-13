@@ -7,10 +7,10 @@ namespace FluidicML.Gain;
 
 public sealed class DatabaseAdapter
 {
-    private const string DtxAPI = "Dentrix.API.dll";
-
     [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
     private static extern IntPtr LoadLibrary(string dllName);
+
+    private const string DtxAPI = "Dentrix.API.dll";
 
     [DllImport(DtxAPI, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)]
     private static extern int DENTRIXAPI_RegisterUser([MarshalAs(UnmanagedType.LPStr)] string szKeyFilePath);
@@ -39,8 +39,26 @@ public sealed class DatabaseAdapter
         }
     }
 
+    private const string DtxKey = "MNCN5L2G.dtxkey";
+
+    private const string DtxUser = "MNCN5L2G";
+
+    private const string DtxPassword = "MNCN5L2G5";
+
     public async Task ConnectAsync()
     {
-        DENTRIXAPI_RegisterUser("test");
+        _logger.LogInformation("Attempting to connect to Dentrix.");
+
+        DENTRIXAPI_RegisterUser(Path.Combine(".", "Assets", DtxKey));
+
+        _logger.LogInformation("Registered user to Dentrix.API.");
+
+        var connectionStr = new StringBuilder(512);
+
+        DENTRIXAPI_GetConnectionString(DtxUser, DtxPassword, connectionStr, 512);
+
+        var result = connectionStr.ToString();
+
+        throw new Exception(result);
     }
 }
