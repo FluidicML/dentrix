@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging.EventLog;
 
 public class Program
 {
-    private static IConfiguration configService = new ConfigurationBuilder()
+    private static readonly IConfiguration configService = new ConfigurationBuilder()
         .AddJsonFile("appsettings.json")
 #if DEBUG
         .AddJsonFile("appsettings.Staging.json")
