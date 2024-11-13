@@ -9,7 +9,6 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     d:DataContext="{d:DesignInstance local:MainWindow, IsDesignTimeCreatable=False}"
     mc:Ignorable="d"
-    Closing="MainWindow_Closing"
     ExtendsContentIntoTitleBar="True"
     Icon="pack://application:,,,/Assets/Images/taskbar.png"
     Loaded="MainWindow_Loaded"
