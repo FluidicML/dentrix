@@ -20,7 +20,7 @@ public partial class App : Application
 #if DEBUG
             .AddJsonFile("appsettings.Staging.json")
 #else
-            .AddJsonFile("appsettings.Production.json")
+            .AddJsonFile("appsettings.Staging.json")
 #endif
         .Build();
 
