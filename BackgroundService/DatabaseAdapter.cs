@@ -5,13 +5,13 @@ using System.Text;
 
 namespace FluidicML.Gain;
 
-public sealed class DatabaseAdapter(ILogger<DatabaseAdapter> logger)
+public sealed class DatabaseAdapter
 {
-    // TODO: This should be specified at installation.
-    // TODO: See if copying is sufficient. Test by moving after installation.
-    // 
     private const string DtxAPI = "Dentrix.API.dll";
-    
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+    private static extern IntPtr LoadLibrary(string dllName);
+
     [DllImport(DtxAPI, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)]
     private static extern int DENTRIXAPI_RegisterUser([MarshalAs(UnmanagedType.LPStr)] string szKeyFilePath);
 
@@ -22,6 +22,22 @@ public sealed class DatabaseAdapter(ILogger<DatabaseAdapter> logger)
         StringBuilder szConnectionsString,
         int ConnectionStringSize
     );
+
+    private ILogger<DatabaseAdapter> _logger;
+
+    public DatabaseAdapter(ILogger<DatabaseAdapter> logger)
+    {
+        _logger = logger;
+
+        // TODO: Use DtxApi and find location from installation.
+        IntPtr hModule = LoadLibrary("C:\\Program Files (x86)\\Dentrix\\Dentrix.API.dll");
+
+        if (hModule == IntPtr.Zero)
+        {
+            _logger.LogError("Could not load Dentrix.API.dll.");
+            return;
+        }
+    }
 
     public async Task ConnectAsync()
     {
