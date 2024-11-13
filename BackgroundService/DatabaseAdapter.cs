@@ -47,7 +47,7 @@ public sealed class DatabaseAdapter
 
         _logger.LogInformation("Attempting to connect to Dentrix.");
 
-        DENTRIXAPI_RegisterUser(Path.Combine(".", "Assets", DtxKey));
+        DENTRIXAPI_RegisterUser(Path.GetFullPath(Path.Combine(".", "Assets", DtxKey)));
 
         _logger.LogInformation("Registered user to Dentrix.API.");
 
