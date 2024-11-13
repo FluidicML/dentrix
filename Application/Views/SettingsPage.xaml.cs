@@ -78,6 +78,12 @@ public partial class SettingsPage : INavigableView<SettingsViewModel>
                     ViewModel.StatusApiKey = null;
                     ViewModel.StatusDatabase = null;
                 }
+                catch (Exception)
+                {
+                    ViewModel.StatusService = null;
+                    ViewModel.StatusApiKey = null;
+                    ViewModel.StatusDatabase = null;
+                }
 
                 await Task.Delay(2500);
             }

@@ -70,7 +70,7 @@ public sealed class PipeAdapter(
 
                 await _socket.Initialize(_configProxy.ApiKey, stoppingToken);
             }
-            else if (buffer.StartsWith("Status"))
+            else if (buffer == "Status")
             {
                 _logger.LogInformation("Requested status at: {time}.", DateTimeOffset.Now);
 
