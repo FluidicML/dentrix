@@ -29,7 +29,6 @@ public class Program
 
         builder.Services.AddHostedService<WindowsBackgroundService>();
         builder.Services.AddSingleton<IConfiguration>(configService);
-        builder.Services.AddSingleton<ConfigViewModel>();
         builder.Services.AddSingleton<DatabaseAdapter>();
         builder.Services.AddSingleton<SocketAdapter>();
         builder.Services.AddSingleton<PipeAdapter>();

@@ -25,15 +25,9 @@ public sealed class DatabaseAdapter
 
     private readonly ILogger<DatabaseAdapter> _logger;
 
-    private readonly ConfigViewModel _configViewModel;
-
-    public DatabaseAdapter(
-        ILogger<DatabaseAdapter> logger,
-        ConfigViewModel configViewModel
-    )
+    public DatabaseAdapter(ILogger<DatabaseAdapter> logger)
     {
         _logger = logger;
-        _configViewModel = configViewModel;
 
         // TODO: Use DtxApi and find location from installation.
         IntPtr hModule = LoadLibrary("C:\\Program Files (x86)\\Dentrix\\Dentrix.API.dll");
@@ -62,6 +56,8 @@ public sealed class DatabaseAdapter
     private const int RU_UNKNOWN_ERROR = -1;
     private const int RU_UNSET = -2;
 
+    public bool IsConnected { get => !string.IsNullOrEmpty(_dbConnStr); }
+
     /// <summary>
     /// The database connection string returned by Dentrix.
     /// </summary>
@@ -70,7 +66,7 @@ public sealed class DatabaseAdapter
     /// <summary>
     /// Ensures only one connection request happens at a time.
     /// </summary>
-    private static SemaphoreSlim _semDbConnStr = new(1, 1);
+    private static readonly SemaphoreSlim _semDbConnStr = new(1, 1);
 
     /// <summary>
     /// Periodically check if the database connection is set.
@@ -82,7 +78,7 @@ public sealed class DatabaseAdapter
             while (!stoppingToken.IsCancellationRequested)
             {
                 await ConnectToDatabase(stoppingToken);
-                await Task.Delay(10000);
+                await Task.Delay(10000, stoppingToken);
             }
         }, stoppingToken);
     }
@@ -95,6 +91,8 @@ public sealed class DatabaseAdapter
             return;
         }
 
+        // IMPORTANT! This is the only place we should acquire this semaphore.
+        // If that were to change, this logic also needs to change.
         var locked = await _semDbConnStr.WaitAsync(0, stoppingToken);
 
         if (!locked)
@@ -218,12 +216,11 @@ public sealed class DatabaseAdapter
         }
 
         using var conn = new OdbcConnection(_dbConnStr);
-
         try
         {
             await conn.OpenAsync(stoppingToken);
         }
-        catch (Exception e)
+        catch (Exception e) when (e is not OperationCanceledException)
         {
             _logger.LogError(e, "Could not connect to Dentrix database at: {time}", DateTimeOffset.Now);
 
@@ -274,13 +271,12 @@ public sealed class DatabaseAdapter
                         json[reader.GetName(i)] = Convert.ChangeType(columns[i], type);
                     }
                 }
-                catch (Exception e)
+                catch (Exception e) when (e is not OperationCanceledException)
                 {
                     _logger.LogError(e, "Could not read Dentrix database row at: {time}", DateTimeOffset.Now);
 
                     yield break;
                 }
-
 
                 yield return json;
             }

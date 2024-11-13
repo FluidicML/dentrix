@@ -33,7 +33,7 @@
                 <Label
                     VerticalAlignment="Center"
                     Margin="0,4,0,0">
-                    Service Healthy
+                    Background Service Healthy
                 </Label>
             </StackPanel>
 
@@ -41,12 +41,12 @@
                 <CheckBox
                     IsThreeState="True"
                     IsEnabled="False"
-                    IsChecked="{Binding ViewModel.StatusApiKey}" />
+                    IsChecked="{Binding ViewModel.StatusWebSocket}" />
 
                 <Label
                     VerticalAlignment="Center"
                     Margin="0,4,0,0">
-                    API Key Set
+                    Connected to Gain
                 </Label>
             </StackPanel>
 
@@ -59,7 +59,7 @@
                 <Label
                     VerticalAlignment="Center"
                     Margin="0,4,0,0">
-                    Dentrix Connected
+                    Connected to Dentrix
                 </Label>
             </StackPanel>
         </StackPanel>

@@ -6,7 +6,6 @@ namespace FluidicML.Gain;
 
 public sealed class PipeAdapter(
     ILogger<SocketAdapter> _logger,
-    ConfigViewModel _configProxy,
     DatabaseAdapter _database,
     SocketAdapter _socket
 )
@@ -34,70 +33,55 @@ public sealed class PipeAdapter(
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            await pipeServer.WaitForConnectionAsync(stoppingToken);
-
             try
             {
+                await pipeServer.WaitForConnectionAsync(stoppingToken);
+
                 var writer = new StreamWriter(pipeServer);
                 var reader = new StreamReader(pipeServer);
 
                 string? buffer = await reader.ReadLineAsync(stoppingToken);
-                if (!String.IsNullOrEmpty(buffer))
+                if (!string.IsNullOrEmpty(buffer))
                 {
                     await Dispatch(buffer, writer, reader, stoppingToken);
                 }
             }
-            catch (Exception e)
+            catch (Exception e) when (e is not OperationCanceledException)
             {
                 _logger.LogError(e, "Could not read/write to named pipe at: {time}.", DateTimeOffset.Now);
             }
             finally
             {
                 pipeServer.Disconnect();
-            }            
+            }
         }
     }
 
     private async Task Dispatch(String buffer, StreamWriter writer, StreamReader reader, CancellationToken stoppingToken)
     {
-        try
+        if (buffer.StartsWith("Api "))
         {
-            if (buffer.StartsWith("Api "))
-            {
-                _logger.LogInformation("Updated API key at: {time}.", DateTimeOffset.Now);
+            _logger.LogInformation("Updated API key at: {time}.", DateTimeOffset.Now);
 
-                _configProxy.ApiKey = buffer["Api ".Length..];
-
-                await _socket.Initialize(_configProxy.ApiKey, stoppingToken);
-            }
-            else if (buffer == "Status")
-            {
-                _logger.LogInformation("Requested status at: {time}.", DateTimeOffset.Now);
-
-                var IsApiKeySet = String.IsNullOrEmpty(_configProxy.ApiKey) ? 0 : 1;
-                var IsDbConnected = _database.IsConnected ? 1 : 0;
-
-                await writer.WriteLineAsync($"Api={IsApiKeySet},Db={IsDbConnected}");
-                await writer.FlushAsync(stoppingToken);
-            }
-            else
-            {
-                _logger.LogError(
-                    "Received malformed message {msg} at: {time}.",
-                    buffer,
-                    DateTimeOffset.Now
-                );
-            }
+            await _socket.Initialize(buffer["Api ".Length..], stoppingToken);
         }
-        catch (OperationCanceledException)
+        else if (buffer == "Status")
         {
-            // Intentionally empty.
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Encountered unknown exception at: {time}.", DateTimeOffset.Now);
+            _logger.LogInformation("Requested status at: {time}.", DateTimeOffset.Now);
 
-            await Task.Delay(5000, stoppingToken);
+            var IsWsConnected = _socket.IsConnected ? 1 : 0;
+            var IsDbConnected = _database.IsConnected ? 1 : 0;
+
+            await writer.WriteLineAsync($"Ws={IsWsConnected},Db={IsDbConnected}");
+            await writer.FlushAsync(stoppingToken);
+        }
+        else
+        {
+            _logger.LogError(
+                "Received malformed message {msg} at: {time}.",
+                buffer,
+                DateTimeOffset.Now
+            );
         }
     }
 }

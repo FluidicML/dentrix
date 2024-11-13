@@ -36,7 +36,7 @@ public partial class SettingsViewModel : BaseViewModel
     private bool? _statusService;
 
     [ObservableProperty]
-    private bool? _statusApiKey;
+    private bool? _statusWebSocket;
 
     [ObservableProperty]
     private bool? _statusDatabase;
@@ -51,7 +51,7 @@ public partial class SettingsViewModel : BaseViewModel
         _isLoading = false;
 
         _statusService = null;
-        _statusApiKey = null;
+        _statusWebSocket = null;
         _statusDatabase = null;
     }
 }

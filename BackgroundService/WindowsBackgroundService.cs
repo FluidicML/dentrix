@@ -7,8 +7,6 @@ public sealed class WindowsBackgroundService(
     PipeAdapter _pipe
 ) : BackgroundService
 {
-    private static readonly string NAMED_PIPE_SERVER = "gain-dentrix";
-
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         try
@@ -19,12 +17,8 @@ public sealed class WindowsBackgroundService(
             // order of our dependency chain.
 
             _database.Initialize(stoppingToken);
-            await _socket.Initialize(stoppingToken);
+            _socket.Initialize(stoppingToken);
             await _pipe.Initialize(stoppingToken);
-        }
-        catch (OperationCanceledException)
-        {
-            // Intentionally empty.
         }
         catch (Exception ex)
         {
