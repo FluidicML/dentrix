@@ -101,25 +101,24 @@ public sealed class DatabaseAdapter
             }
         }
 
+#if !DEBUG
         if (status != RU_SUCCESS)
         {
             throw new InvalidProgramException(RegisterUserErrorMessage(status, authFilePath));
         }
 
-        lock (_connectionStr)
+        var builder = new StringBuilder(512);
+
+        DENTRIXAPI_GetConnectionString(DtxUser, DtxPassword, builder, 512);
+
+        // This string is only set on a DDP-signed application.
+        _connectionStr = builder.ToString();
+
+        if (string.IsNullOrEmpty(_connectionStr))
         {
-            var builder = new StringBuilder(512);
-
-            DENTRIXAPI_GetConnectionString(DtxUser, DtxPassword, builder, 512);
-
-            // This string is only set on a DDP-signed application.
-            _connectionStr = builder.ToString();
-
-            if (string.IsNullOrEmpty(_connectionStr))
-            {
-                throw new InvalidOperationException("Empty connection string to Dentrix API.");
-            }
+            throw new InvalidOperationException("Empty connection string to Dentrix API.");
         }
+#endif
     }
 
     private static string RegisterUserErrorMessage(int status, string authFilePath)
@@ -181,6 +180,11 @@ public sealed class DatabaseAdapter
         [EnumeratorCancellation] CancellationToken stoppingToken
     )
     {
+        if (String.IsNullOrEmpty(_connectionStr))
+        {
+            throw new InvalidOperationException("Dentrix connection string is not set.");
+        }
+
         using var conn = new OdbcConnection(_connectionStr);
 
         await conn.OpenAsync(stoppingToken);

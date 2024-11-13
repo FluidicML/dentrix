@@ -32,6 +32,7 @@ public class Program
         builder.Services.AddSingleton<ConfigProxy>();
         builder.Services.AddSingleton<DatabaseAdapter>();
         builder.Services.AddSingleton<SocketAdapter>();
+        builder.Services.AddSingleton<PipeAdapter>();
 
         var host = builder.Build();
         host.Run();

@@ -14,7 +14,7 @@ namespace FluidicML.Gain.Views;
 /// </summary>
 public partial class SettingsPage : INavigableView<SettingsViewModel>
 {
-    private static readonly string NAMED_PIPE_SERVER = "gain-dentrix";
+    private const string NAMED_PIPE_SERVER = "DB3B88B2-AC72-4B06-893A-89E69E73E134";
 
     private readonly Uri _baseAddress;
     private readonly HttpClient _httpClient;
