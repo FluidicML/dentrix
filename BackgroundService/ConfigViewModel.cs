@@ -1,43 +1,30 @@
-﻿using System.IO.IsolatedStorage;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System.IO.IsolatedStorage;
 
 namespace FluidicML.Gain;
 
-public partial class ConfigProxy(IConfiguration configService)
+public partial class ConfigViewModel(IConfiguration _configService) : ObservableObject
 {
     private static readonly string PERSISTED_FILENAME = "Config.data";
     private static readonly string API_KEY = "API_KEY";
 
-    private readonly IConfiguration _configService = configService;
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(WriteApiKey))]
     private string _apiKey = ReadApiKey() ?? string.Empty;
 
-    public String ApiKey
+    [RelayCommand]
+    private async Task WriteApiKey()
     {
-        get => _apiKey;
-        set
+        await Task.Run(() =>
         {
-            _apiKey = value;
-            WriteApiKey();
-        }
-    }
+            IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForDomain();
+            using IsolatedStorageFileStream stream = storage.OpenFile(PERSISTED_FILENAME, FileMode.Create, FileAccess.Write);
+            using StreamWriter writer = new(stream);
 
-    public Uri ApiUrl
-    {
-        get => new(_configService.GetValue<string>("API_URL")!);
-    }
-
-    public Uri WsUrl
-    {
-        get => new(_configService.GetValue<string>("WS_URL")!);
-    }
-
-    private void WriteApiKey()
-    {
-        IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForDomain();
-        using IsolatedStorageFileStream stream = storage.OpenFile(PERSISTED_FILENAME, FileMode.Create, FileAccess.Write);
-        using StreamWriter writer = new(stream);
-
-        var encodedAccessToken = System.Text.Encoding.UTF8.GetBytes(_apiKey);
-        writer.WriteLine("{0},{1}", API_KEY, System.Convert.ToBase64String(encodedAccessToken));
+            var encodedAccessToken = System.Text.Encoding.UTF8.GetBytes(ApiKey);
+            writer.WriteLine("{0},{1}", API_KEY, Convert.ToBase64String(encodedAccessToken));
+        });
     }
 
     private static string? ReadApiKey()
@@ -73,5 +60,15 @@ public partial class ConfigProxy(IConfiguration configService)
         }
 
         return null;
+    }
+
+    public Uri ApiUrl
+    {
+        get => new(_configService.GetValue<string>("API_URL")!);
+    }
+
+    public Uri WsUrl
+    {
+        get => new(_configService.GetValue<string>("WS_URL")!);
     }
 }

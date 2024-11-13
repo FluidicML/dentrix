@@ -2,7 +2,6 @@ namespace FluidicML.Gain;
 
 public sealed class WindowsBackgroundService(
     ILogger<WindowsBackgroundService> _logger,
-    ConfigProxy _configProxy,
     DatabaseAdapter _database,
     SocketAdapter _socket,
     PipeAdapter _pipe
@@ -19,8 +18,8 @@ public sealed class WindowsBackgroundService(
             // The order we initialize things is important. This reflects the
             // order of our dependency chain.
 
-            await _database.Initialize(stoppingToken);
-            await _socket.Initialize(_configProxy.ApiKey, stoppingToken);
+            _database.Initialize(stoppingToken);
+            await _socket.Initialize(stoppingToken);
             await _pipe.Initialize(stoppingToken);
         }
         catch (OperationCanceledException)
