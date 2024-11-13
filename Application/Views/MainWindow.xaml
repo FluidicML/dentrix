@@ -13,6 +13,7 @@
     Icon="pack://application:,,,/Assets/Images/taskbar.png"
     Loaded="MainWindow_Loaded"
     Title="MainWindow"
+    ResizeMode="NoResize"
     Height="600"
     Width="400"
     WindowBackdropType="Mica"
