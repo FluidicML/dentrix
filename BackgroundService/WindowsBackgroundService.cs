@@ -13,9 +13,6 @@ public sealed class WindowsBackgroundService(
     DatabaseAdapter adapter
 ) : BackgroundService
 {
-    // TODO: We need to secure this. As of now, anyone could write to this
-    // server and we blindly accept this. How we go about securing this isn't
-    // exactly clear though.
     private static readonly string NAMED_PIPE_SERVER = "gain-dentrix";
 
     private SocketIOClient.SocketIO? _socketIO = null;
@@ -104,7 +101,8 @@ public sealed class WindowsBackgroundService(
         {
             logger.LogInformation("Service started at: {time}", DateTimeOffset.Now);
 
-            // If we already have an API key available, we can immediately initialize our connection.
+            await adapter.Initialize();
+
             {
                 var apiKey = configProxy.ApiKey;
                 if (!string.IsNullOrEmpty(apiKey))
@@ -135,7 +133,7 @@ public sealed class WindowsBackgroundService(
                         pipeSecurity
                     );
 
-                    logger.LogInformation("Waiting for frontend connection: {time}.", DateTimeOffset.Now);
+                    logger.LogInformation("Waiting for frontend connection at: {time}.", DateTimeOffset.Now);
 
                     await server.WaitForConnectionAsync(stoppingToken);
 
@@ -165,7 +163,7 @@ public sealed class WindowsBackgroundService(
                 }
                 catch (Exception e)
                 {
-                    logger.LogError(e, "Encountered unknown exception.");
+                    logger.LogError(e, "Encountered unknown exception at: {time}.", DateTimeOffset.Now);
 
                     await Task.Delay(5000, stoppingToken);
                 }

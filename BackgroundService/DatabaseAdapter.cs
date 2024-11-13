@@ -5,8 +5,24 @@ using System.Text;
 
 namespace FluidicML.Gain;
 
+
+
 public sealed class DatabaseAdapter
 {
+    // DENTRIXAPI_RegisterUser status codes.
+    private const int RU_SUCCESS = 0;
+    private const int RU_USER_CANCELED = 1;
+    private const int RU_INVALID_AUTH = 2;
+    private const int RU_INVALID_FILE = 3;
+    private const int RU_NO_CONNECT = 4;
+    private const int RU_LOCAL_RIGHTS_UNSECURED = 5;
+    private const int RU_USER_INSERT_FAILED = 6;
+    private const int RU_USER_ACCESS_REVOKED = 7;
+    private const int RU_INVALID_CERT = 8;
+    private const int RU_DATABASE_EX = 9;
+    private const int RU_UNKNOWN_ERROR = -1;
+    private const int RU_UNSET = -2;
+
     [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
     private static extern IntPtr LoadLibrary(string dllName);
 
@@ -25,7 +41,7 @@ public sealed class DatabaseAdapter
 
     private readonly ILogger<DatabaseAdapter> _logger;
 
-    private readonly string _connectionStr = string.Empty;
+    private string _connectionStr = string.Empty;
 
     private const string DtxKey = "MNCN5L2G.dtxkey";
 
@@ -44,23 +60,117 @@ public sealed class DatabaseAdapter
         {
             throw new InvalidProgramException("Could not load Dentrix.API.dll.");
         }
+    }
 
-        _logger.LogInformation("Attempting to connect to Dentrix.");
+    public async Task Initialize()
+    {
+        var status = RU_UNSET;
 
-        DENTRIXAPI_RegisterUser(Path.GetFullPath(Path.Combine(".", "Assets", DtxKey)));
-
-        _logger.LogInformation("Registered user to Dentrix.API.");
-
-        var connectionStrBuilder = new StringBuilder(512);
-
-        DENTRIXAPI_GetConnectionString(DtxUser, DtxPassword, connectionStrBuilder, 512);
-
-        // This string is only set on a DDP-signed application.
-        _connectionStr = connectionStrBuilder.ToString();
-
-        if (string.IsNullOrEmpty(_connectionStr))
+        while (
+            status == RU_USER_CANCELED ||
+            status == RU_NO_CONNECT ||
+            status == RU_DATABASE_EX ||
+            status == RU_UNKNOWN_ERROR ||
+            status == RU_UNSET
+        )
         {
-            throw new InvalidOperationException("Empty connection string to Dentrix API.");
+            if (status != RU_UNSET)
+            {
+                await Task.Delay(5000);
+            }
+
+            status = DENTRIXAPI_RegisterUser(Path.GetFullPath(Path.Combine(".", "Assets", DtxKey)));
+
+            // Content of warning/error messages are taken from DDP documentation verbatim.
+            switch (status)
+            {
+                case RU_SUCCESS:
+                    {
+                        _logger.LogInformation("Successfully registered user to Dentrix.");
+                        break;
+                    }
+                default:
+                    {
+                        _logger.LogError(
+                            "Dentrix \"{message}\" at: {time}",
+                            RegisterUserErrorMessage(status),
+                            DateTimeOffset.Now
+                        );
+                        break;
+                    }
+            }
+        }
+
+        if (status != RU_SUCCESS)
+        {
+            throw new InvalidProgramException(RegisterUserErrorMessage(status));
+        }
+
+        lock (_connectionStr)
+        {
+            var builder = new StringBuilder(512);
+
+            DENTRIXAPI_GetConnectionString(DtxUser, DtxPassword, builder, 512);
+
+            // This string is only set on a DDP-signed application.
+            _connectionStr = builder.ToString();
+
+            if (string.IsNullOrEmpty(_connectionStr))
+            {
+                throw new InvalidOperationException("Empty connection string to Dentrix API.");
+            }
+        }
+    }
+
+    private static string RegisterUserErrorMessage(int status)
+    {
+        // Messages are copied from DDP documentation verbatim.
+        switch (status)
+        {
+            case RU_USER_CANCELED:
+                {
+                    return "User canceled Auth";
+                }
+            case RU_INVALID_AUTH:
+                {
+                    return "Invalid Auth request";
+                }
+            case RU_INVALID_FILE:
+                {
+                    return "Invalid File Auth File";
+                }
+            case RU_NO_CONNECT:
+                {
+                    return "Unable to connect to DB.";
+                }
+            case RU_LOCAL_RIGHTS_UNSECURED:
+                {
+                    return "Local admin rights could not be secured.";
+                }
+            case RU_USER_INSERT_FAILED:
+                {
+                    return "User insertion failed.";
+                }
+            case RU_USER_ACCESS_REVOKED:
+                {
+                    return "User access has been revoked.";
+                }
+            case RU_INVALID_CERT:
+                {
+                    return "Invalid Certificate.";
+                }
+            case RU_DATABASE_EX:
+                {
+                    return "Database is in exclusive mode.";
+                }
+            case RU_UNKNOWN_ERROR:
+                {
+                    return "General Failure to load local requirements";
+                }
+            default:
+                {
+                    return "";
+                }
         }
     }
 
