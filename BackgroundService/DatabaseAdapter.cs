@@ -65,6 +65,7 @@ public sealed class DatabaseAdapter
     public async Task Initialize()
     {
         var status = RU_UNSET;
+        var authFilePath = Path.GetFullPath(Path.Combine(".", "Assets", DtxKey));
 
         while (
             status == RU_USER_CANCELED ||
@@ -79,7 +80,7 @@ public sealed class DatabaseAdapter
                 await Task.Delay(5000);
             }
 
-            status = DENTRIXAPI_RegisterUser(Path.GetFullPath(Path.Combine(".", "Assets", DtxKey)));
+            status = DENTRIXAPI_RegisterUser(authFilePath);
 
             // Content of warning/error messages are taken from DDP documentation verbatim.
             switch (status)
@@ -93,7 +94,7 @@ public sealed class DatabaseAdapter
                     {
                         _logger.LogError(
                             "Dentrix \"{message}\" at: {time}",
-                            RegisterUserErrorMessage(status),
+                            RegisterUserErrorMessage(status, authFilePath),
                             DateTimeOffset.Now
                         );
                         break;
@@ -103,7 +104,7 @@ public sealed class DatabaseAdapter
 
         if (status != RU_SUCCESS)
         {
-            throw new InvalidProgramException(RegisterUserErrorMessage(status));
+            throw new InvalidProgramException(RegisterUserErrorMessage(status, authFilePath));
         }
 
         lock (_connectionStr)
@@ -122,7 +123,7 @@ public sealed class DatabaseAdapter
         }
     }
 
-    private static string RegisterUserErrorMessage(int status)
+    private static string RegisterUserErrorMessage(int status, string authFilePath)
     {
         // Messages are copied from DDP documentation verbatim.
         switch (status)
@@ -137,7 +138,7 @@ public sealed class DatabaseAdapter
                 }
             case RU_INVALID_FILE:
                 {
-                    return "Invalid File Auth File";
+                    return "Invalid File Auth File " + authFilePath;
                 }
             case RU_NO_CONNECT:
                 {
