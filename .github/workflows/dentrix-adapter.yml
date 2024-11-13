@@ -1,9 +1,6 @@
 name: Dentrix Adapter
 
-on:
-  push:
-    tags:
-      - "dentrix/v*.*.*"
+on: push
 
 jobs:
   build:
@@ -58,20 +55,3 @@ jobs:
         with:
           name: Installer.msi
           path: "Installer/bin/Release/en-US/Installer.msi"
-
-  release:
-    runs-on: windows-latest
-    needs: build
-    permissions:
-      contents: write
-
-    steps:
-      - name: Get Artifacts
-        uses: actions/download-artifact@v4
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-        with:
-          prerelease: true
-          files: |
-            - */*.msi
