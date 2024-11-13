@@ -5,8 +5,6 @@ using System.Text;
 
 namespace FluidicML.Gain;
 
-
-
 public sealed class DatabaseAdapter
 {
     // DENTRIXAPI_RegisterUser status codes.
@@ -82,7 +80,6 @@ public sealed class DatabaseAdapter
 
             status = DENTRIXAPI_RegisterUser(authFilePath);
 
-            // Content of warning/error messages are taken from DDP documentation verbatim.
             switch (status)
             {
                 case RU_SUCCESS:
