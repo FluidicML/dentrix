@@ -35,7 +35,7 @@
 			<Directory Id="FL_ParentInstallFolder" Name="!(bind.Property.Manufacturer)">
 				<Directory Id="FL_InstallFolder" Name="!(bind.Property.ProductName)">
 					<Directory Id="FL_AppInstallFolder" Name="Application" />
-					<Directory Id="FL_ServiceInstallFolder" Name="Service" />
+					<Directory Id="FL_ServiceInstallFolder" Name="BackgroundService" />
 				</Directory>
 			</Directory>
 		</StandardDirectory>
