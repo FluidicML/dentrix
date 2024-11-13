@@ -33,10 +33,10 @@ jobs:
           -kvc "${{ secrets.AZURE_CERT_NAME }}"
           -tr http://timestamp.digicert.com
           -v
-          "Application/bin/Release/net8.0-windows/**/*.dll"
-          "Application/bin/Release/net8.0-windows/**/*.exe"
-          "BackgroundService/bin/Release/net8.0-windows/**/*.dll"
-          "BackgroundService/bin/Release/net8.0-windows/**/*.exe"
+          "Application/bin/Release/**/*.dll"
+          "Application/bin/Release/**/*.exe"
+          "BackgroundService/bin/Release/**/*.dll"
+          "BackgroundService/bin/Release/**/*.exe"
 
       - name: Build Installer
         run: dotnet build -c Release Installer
@@ -51,13 +51,13 @@ jobs:
           -kvc "${{ secrets.AZURE_CERT_NAME }}"
           -tr http://timestamp.digicert.com
           -v
-          "Installer/bin/x64/Release/en-US/Installer.msi"
+          "Installer/bin/Release/en-US/Installer.msi"
 
       - name: Upload MSI
         uses: actions/upload-artifact@v4
         with:
           name: Installer.msi
-          path: "Installer/bin/x64/Release/en-US/Installer.msi"
+          path: "Installer/bin/Release/en-US/Installer.msi"
 
   release:
     runs-on: windows-latest
