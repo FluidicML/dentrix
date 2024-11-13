@@ -35,10 +35,7 @@ public sealed class SocketAdapter(
             ConnectionTimeout = TimeSpan.FromSeconds(10.0),
             AutoUpgrade = true,
             Transport = SocketIOClient.Transport.TransportProtocol.WebSocket,
-            Auth = new Dictionary<string, string>()
-                {
-                    { "apiKey", apiKey }
-            }
+            Auth = new Dictionary<string, string>() { { "apiKey", apiKey } }
         });
 
         _socketIO.OnConnected += (sender, e) =>

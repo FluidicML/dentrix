@@ -41,6 +41,8 @@ public sealed class DatabaseAdapter
 
     private string _connectionStr = string.Empty;
 
+    public bool IsConnected { get => !String.IsNullOrEmpty(_connectionStr); }
+
     private const string DtxKey = "MNCN5L2G.dtxkey";
 
     private const string DtxUser = "MNCN5L2G";
