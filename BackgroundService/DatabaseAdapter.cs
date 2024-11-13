@@ -1,34 +1,28 @@
 ﻿using Microsoft.Win32;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace FluidicML.Gain;
 
 public sealed class DatabaseAdapter(ILogger<DatabaseAdapter> logger)
 {
+    // TODO: This should be specified at installation.
+    private const string DtxAPI = "C:\\Program Files (x86)\\Dentrix\\Dentrix.API.dll";
+    
+    [DllImport(DtxAPI, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)]
+    private static extern int DENTRIXAPI_RegisterUser([MarshalAs(UnmanagedType.LPStr)] string szKeyFilePath);
+
+    [DllImport(DtxAPI, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)]
+    private static extern void DENTRIXAPI_GetConnectionString(
+        [MarshalAs(UnmanagedType.LPStr)] string szUserId,
+        [MarshalAs(UnmanagedType.LPStr)] string szPassword,
+        StringBuilder szConnectionsString,
+        int ConnectionStringSize
+    );
+
     public async Task ConnectAsync()
     {
-        if (!OperatingSystem.IsWindows())
-        {
-            throw new InvalidProgramException("Attempting to run on a non-Windows machine.");
-        }
-
-        // TODO: This has to be specified at installation time.
-        var exePath = "C:\\Program Files (x86)\\Dentrix";
-
-        if (exePath is string exe)
-        {
-            logger.LogInformation("Dentrix found at {path}.", exe);
-
-            var DLL = Assembly.LoadFile(Path.Combine(exe, "Dentrix.API.dll"));
-
-            foreach (Type type in DLL.GetExportedTypes())
-            {
-                logger.LogDebug("DLL exports type {name}.", type.Name);
-            }
-        }
-        else
-        {
-            throw new InvalidProgramException("Unexpected Dentrix registry key format.");
-        }
+        DENTRIXAPI_RegisterUser("test");
     }
 }
