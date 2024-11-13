@@ -15,6 +15,7 @@
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.1" />
 		<PackageReference Include="SocketIOClient" Version="3.1.2" />
+		<PackageReference Include="System.Data.Odbc" Version="9.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

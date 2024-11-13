@@ -1,5 +1,5 @@
-﻿using Microsoft.Win32;
-using System.Reflection;
+﻿using System.Data.Odbc;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -23,7 +23,15 @@ public sealed class DatabaseAdapter
         int ConnectionStringSize
     );
 
-    private ILogger<DatabaseAdapter> _logger;
+    private readonly ILogger<DatabaseAdapter> _logger;
+
+    private readonly string _connectionStr = string.Empty;
+
+    private const string DtxKey = "MNCN5L2G.dtxkey";
+
+    private const string DtxUser = "MNCN5L2G";
+
+    private const string DtxPassword = "MNCN5L2G5";
 
     public DatabaseAdapter(ILogger<DatabaseAdapter> logger)
     {
@@ -34,31 +42,57 @@ public sealed class DatabaseAdapter
 
         if (hModule == IntPtr.Zero)
         {
-            _logger.LogError("Could not load Dentrix.API.dll.");
-            return;
+            throw new InvalidProgramException("Could not load Dentrix.API.dll.");
         }
-    }
 
-    private const string DtxKey = "MNCN5L2G.dtxkey";
-
-    private const string DtxUser = "MNCN5L2G";
-
-    private const string DtxPassword = "MNCN5L2G5";
-
-    public async Task ConnectAsync()
-    {
         _logger.LogInformation("Attempting to connect to Dentrix.");
 
         DENTRIXAPI_RegisterUser(Path.Combine(".", "Assets", DtxKey));
 
         _logger.LogInformation("Registered user to Dentrix.API.");
 
-        var connectionStr = new StringBuilder(512);
+        var connectionStrBuilder = new StringBuilder(512);
 
-        DENTRIXAPI_GetConnectionString(DtxUser, DtxPassword, connectionStr, 512);
+        DENTRIXAPI_GetConnectionString(DtxUser, DtxPassword, connectionStrBuilder, 512);
 
-        var result = connectionStr.ToString();
+        // This string is only set on a DDP-signed application.
+        _connectionStr = connectionStrBuilder.ToString();
 
-        _logger.LogError(result);
+        if (string.IsNullOrEmpty(_connectionStr))
+        {
+            throw new InvalidOperationException("Empty connection string to Dentrix API.");
+        }
+    }
+
+    private const int MAX_COLUMNS = 256;
+
+    public async IAsyncEnumerable<IDictionary<string, object>> Query(
+        string query,
+        [EnumeratorCancellation] CancellationToken stoppingToken
+    )
+    {
+        using var conn = new OdbcConnection(_connectionStr);
+
+        await conn.OpenAsync(stoppingToken);
+
+        using var command = new OdbcCommand(query, conn);
+        using var reader = command.ExecuteReader();
+
+        object[] columns = new object[MAX_COLUMNS];
+
+        while (await reader.ReadAsync(stoppingToken))
+        {
+            int NumberOfColums = reader.GetValues(columns);
+
+            var json = new Dictionary<string, object> { };
+
+            for (int i = 0; i < NumberOfColums; i++)
+            {
+                var type = reader.GetFieldType(i);
+                json[reader.GetName(i)] = Convert.ChangeType(columns[i], type);
+            }
+
+            yield return json;
+        }
     }
 }
