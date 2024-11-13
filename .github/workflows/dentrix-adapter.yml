@@ -31,11 +31,7 @@ jobs:
             -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" \
             -kvc "${{ secrets.AZURE_CERT_NAME }}" \
             -tr http://timestamp.digicert.com \
-            -v \
-            "Application/bin/Release/net8.0-windows/**/*.dll" \
-            "Application/bin/Release/net8.0-windows/**/*.exe" \
-            "BackgroundService/bin/Release/net8.0-windows/**/*.dll" \
-            "BackgroundService/bin/Release/net8.0-windows/**/*.exe"
+            -v "Application/bin/Release/net8.0-windows/**/*.dll" "Application/bin/Release/net8.0-windows/**/*.exe" "BackgroundService/bin/Release/net8.0-windows/**/*.dll" "BackgroundService/bin/Release/net8.0-windows/**/*.exe"
 
       - name: Build Installer
         run: |
