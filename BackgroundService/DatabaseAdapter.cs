@@ -59,6 +59,6 @@ public sealed class DatabaseAdapter
 
         var result = connectionStr.ToString();
 
-        throw new Exception(result);
+        _logger.LogError(result);
     }
 }
