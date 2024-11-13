@@ -8,7 +8,9 @@ namespace FluidicML.Gain;
 public sealed class DatabaseAdapter(ILogger<DatabaseAdapter> logger)
 {
     // TODO: This should be specified at installation.
-    private const string DtxAPI = "C:\\Program Files (x86)\\Dentrix\\Dentrix.API.dll";
+    // TODO: See if copying is sufficient. Test by moving after installation.
+    // 
+    private const string DtxAPI = "Dentrix.API.dll";
     
     [DllImport(DtxAPI, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)]
     private static extern int DENTRIXAPI_RegisterUser([MarshalAs(UnmanagedType.LPStr)] string szKeyFilePath);
