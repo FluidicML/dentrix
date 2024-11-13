@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - jrpotter/dentrix-api
 
 jobs:
   build:
