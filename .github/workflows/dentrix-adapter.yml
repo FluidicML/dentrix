@@ -20,8 +20,10 @@ jobs:
           dotnet build -c Release Application
           dotnet build -c Release BackgroundService
 
-      - name: Sign Application and BackgroundService
+      - name: Install AzureSignTool
         run: dotnet tool install --global AzureSignTool
+
+      - name: Sign Application and BackgroundService
         run: >
           AzureSignTool sign
             -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}"
