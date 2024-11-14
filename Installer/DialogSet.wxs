@@ -28,14 +28,12 @@
 
 	<Fragment>
 		<UI Id="file FL_DialogSet">
-			<!-- Font names are references by the Wix Toolset dialogs. -->
 			<TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
 			<TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
 			<TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
 
 			<Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
 
-			<!-- Wix Toolset provides these dialogs out of the box. -->
 			<DialogRef Id="BrowseDlg" />
 			<DialogRef Id="DiskCostDlg" />
 			<DialogRef Id="ErrorDlg" />
@@ -46,21 +44,6 @@
 			<DialogRef Id="ProgressDlg" />
 			<DialogRef Id="ResumeDlg" />
 			<DialogRef Id="UserExit" />
-
-			<Publish
-				Dialog="BrowseDlg"
-				Control="OK"
-				Event="SpawnDialog"
-				Value="InvalidDirDlg"
-				Order="4"
-				Condition="NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID&lt;&gt;&quot;1&quot;" />
-
-			<Publish
-				Dialog="ExitDialog"
-				Control="Finish"
-				Event="EndDialog"
-				Value="Return"
-				Order="999" />
 
 			<Publish
 				Dialog="WelcomeDlg"
@@ -100,6 +83,18 @@
 				Order="1" />
 			<Publish
 				Dialog="InstallDirDlg"
+				Control="ChangeFolder"
+				Property="_BrowseProperty"
+				Value="[WIXUI_INSTALLDIR]"
+				Order="1" />
+			<Publish
+				Dialog="InstallDirDlg"
+				Control="ChangeFolder"
+				Event="SpawnDialog"
+				Value="BrowseDlg"
+				Order="2" />
+			<Publish
+				Dialog="InstallDirDlg"
 				Control="Next"
 				Event="SpawnDialog"
 				Value="InvalidDirDlg"
@@ -112,18 +107,14 @@
 				Value="VerifyReadyDlg"
 				Order="4"
 				Condition="WIXUI_DONTVALIDATEPATH OR WIXUI_INSTALLDIR_VALID=&quot;1&quot;" />
+
 			<Publish
-				Dialog="InstallDirDlg"
-				Control="ChangeFolder"
-				Property="_BrowseProperty"
-				Value="[WIXUI_INSTALLDIR]"
-				Order="1" />
-			<Publish
-				Dialog="InstallDirDlg"
-				Control="ChangeFolder"
+				Dialog="BrowseDlg"
+				Control="OK"
 				Event="SpawnDialog"
-				Value="BrowseDlg"
-				Order="2" />
+				Value="InvalidDirDlg"
+				Order="4"
+				Condition="NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID&lt;&gt;&quot;1&quot;" />
 
 			<Publish
 				Dialog="VerifyReadyDlg"
@@ -168,6 +159,13 @@
 				Control="Back"
 				Event="NewDialog"
 				Value="MaintenanceWelcomeDlg" />
+
+			<Publish
+				Dialog="ExitDialog"
+				Control="Finish"
+				Event="EndDialog"
+				Value="Return"
+				Order="999" />
 
 			<Property Id="ARPNOMODIFY" Value="1" />
 		</UI>
