@@ -1,28 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
 	<Fragment>
-		<!--
-		<Property Id="FL_DentrixDir" />
-		-->
-
-		<!-- Keep name shorter here to work around modularization error (warning WIX1000). -->
+		<!-- Keep id shorter here to work around modularization error (warning WIX1000). -->
 		<Binary
 			Id="FL_DtxDlgBinary"
 			SourceFile="$(var.DentrixDlg.TargetDir)\$(var.DentrixDlg.TargetName).CA.dll" />
 
+		<!--
+		The choice of "After" is important. Too early and you end up with [ProgramFiles6432Folder]
+		undefined (which yields error code 2343). Used Orca to come up with choice "CostFinalize".
+		-->
+		<SetProperty
+			Action="FL_DentrixDirDefaultAction"
+			Id="FL_DentrixDir"
+			Value="[ProgramFiles6432Folder]"
+			Sequence="ui"
+			After="CostFinalize" />
+
 		<CustomAction
-			Id="FL_DentrixDlgActionFind"
-			DllEntry="FindDentrix"
+			Id="FL_DentrixDirOverrideAction"
+			DllEntry="FL_DentrixDirSetAction"
 			BinaryRef="FL_DtxDlgBinary"
-			Execute="immediate"
+			Execute="firstSequence"
 			Impersonate="yes" />
 
 		<!--
-		<CustomAction
-			Id="FL_DentrixDlgActionProperty"
-			Property="FL_DentrixDir"
-			Value="[INSTALLDIR]" />
+		We need our custom action to run during the UI sequence (i.e. the sequence of dialogs),
+		not the Execute sequence (i.e. all steps that run after the install Wizard is complete).
+		This way we can prepopulate a possible candidate for where Dentrix was already installed.
 		-->
+		<InstallUISequence>
+			<!-- https://learn.microsoft.com/en-us/windows/win32/msi/importing-the-installuisequence -->
+			<Custom Action="FL_DentrixDirOverrideAction" After="FL_DentrixDirDefaultAction" />
+		</InstallUISequence>
 
 		<UI>
 			<Dialog Id="DentrixDlg" Width="370" Height="270" Title="!(loc.DentrixDlg_Title)">
@@ -38,11 +48,9 @@
 				<Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
 				<Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
 
-				<!--
 				<Control Id="FolderLabel" Type="Text" X="20" Y="60" Width="290" Height="30" NoPrefix="yes" Text="!(loc.DentrixDlgFolderLabel)" />
-				<Control Id="Folder" Type="PathEdit" X="20" Y="100" Width="320" Height="18" Property="FL_DentrixDir" Indirect="yes" />
-				<Control Id="ChangeFolder" Type="PushButton" X="20" Y="120" Width="56" Height="17" Text="!(loc.DentrixDlgChange)" />
-				-->
+				<Control Id="Folder" Type="PathEdit" X="20" Y="100" Width="320" Height="18" Property="FL_DentrixDir" Text="[FL_DentrixDir]" />
+				<!-- <Control Id="ChangeFolder" Type="PushButton" X="20" Y="120" Width="56" Height="17" Text="!(loc.DentrixDlgChange)" /> -->
 			</Dialog>
 		</UI>
 	</Fragment>

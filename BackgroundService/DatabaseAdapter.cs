@@ -39,6 +39,8 @@ public sealed class DatabaseAdapter
         }
     }
 
+    private const string AuthFilePath = @"Software\Fluidic ML, INC.\Gain";
+    private const string AuthFileKey = "auth_key_path";
     private const string DtxKey = "MNCN5L2G.dtxkey";
     private const string DtxUser = "MNCN5L2G";
     private const string DtxPassword = "MNCN5L2G5";
@@ -104,12 +106,21 @@ public sealed class DatabaseAdapter
 
         try
         {
-            var keyPath = @"SOFTWARE\Fluidic ML, INC.\Gain\auth_key_file";
-            var authFilePath = Registry.LocalMachine.GetValue(keyPath)?.ToString();
+            var authFilePath = string.Empty;
 
-            if (authFilePath == null)
+            var hKey = Registry.LocalMachine.OpenSubKey(AuthFilePath);
+            if (hKey != null)
             {
-                throw new InvalidProgramException($"Missing registry key \"{keyPath}\".");
+                Object? value = hKey.GetValue(AuthFileKey);
+                if (value != null)
+                {
+                    authFilePath = value.ToString();
+                }
+            }
+
+            if (string.IsNullOrEmpty(authFilePath))
+            {
+                throw new InvalidProgramException($"Missing registry key \"{AuthFilePath}\\{AuthFileKey}\".");
             }
 
             var status = DENTRIXAPI_RegisterUser(authFilePath);

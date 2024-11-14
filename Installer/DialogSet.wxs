@@ -79,9 +79,8 @@
 			<Publish
 				Dialog="DentrixDlg"
 				Control="Next"
-				Event="DoAction"
-				Value="FL_DentrixDlgActionFind"
-				Order="1" />
+				Event="SpawnDialog"
+				Value="InvalidDirDlg" />
 			<!--
 			<Publish
 				Dialog="DentrixDlg"
@@ -95,20 +94,6 @@
 				Event="SpawnDialog"
 				Value="BrowseDlg"
 				Order="2" />
-			<Publish
-				Dialog="DentrixDlg"
-				Control="Next"
-				Event="SpawnDialog"
-				Value="InvalidDirDlg"
-				Order="3"
-				Condition="NOT WIXUI_DONTVALIDATEPATH AND FL_DentrixDir_VALID&lt;&gt;&quot;1&quot;" />
-			<Publish
-				Dialog="DentrixDlg"
-				Control="Next"
-				Event="NewDialog"
-				Value="InstallDirDlg"
-				Order="4"
-				Condition="WIXUI_DONTVALIDATEPATH OR FL_DentrixDir_VALID=&quot;1&quot;" />
 			-->
 
 			<Publish
