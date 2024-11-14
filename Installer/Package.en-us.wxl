@@ -5,4 +5,11 @@ This file contains the declaration of all the localizable strings.
 
 	<String Id="DowngradeError" Value="A newer version of the Gain/Dentrix service is already installed." />
 
+	<String Id="DentrixDlg_Title" Value="Dentrix Integration" />
+	<String Id="DentrixDlgTitle" Value="{\WixUI_Font_Title}Dentrix Installation Folder" />
+	<String Id="DentrixDlgDescription" Value="Specify where your Dentrix installation is." />
+	<String Id="DentrixDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
+	<String Id="DentrixDlgFolderLabel" Overridable="yes" Value="Dentrix installed at:" />
+	<String Id="DentrixDlgChange" Overridable="yes" Value="&amp;Change..." />
+
 </WixLocalization>

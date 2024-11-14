@@ -35,6 +35,7 @@
 			<Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
 
 			<DialogRef Id="BrowseDlg" />
+			<DialogRef Id="DentrixDlg" />
 			<DialogRef Id="DiskCostDlg" />
 			<DialogRef Id="ErrorDlg" />
 			<DialogRef Id="FatalError" />
@@ -67,14 +68,54 @@
 				Dialog="LicenseAgreementDlg"
 				Control="Next"
 				Event="NewDialog"
-				Value="InstallDirDlg"
+				Value="DentrixDlg"
 				Condition="LicenseAccepted = &quot;1&quot;" />
+
+			<Publish
+				Dialog="DentrixDlg"
+				Control="Back"
+				Event="NewDialog"
+				Value="LicenseAgreementDlg" />
+			<Publish
+				Dialog="DentrixDlg"
+				Control="Next"
+				Event="DoAction"
+				Value="FL_DentrixDlgActionFind"
+				Order="1" />
+			<!--
+			<Publish
+				Dialog="DentrixDlg"
+				Control="ChangeFolder"
+				Property="_BrowseProperty"
+				Value="[FL_DentrixDir]"
+				Order="1" />
+			<Publish
+				Dialog="DentrixDlg"
+				Control="ChangeFolder"
+				Event="SpawnDialog"
+				Value="BrowseDlg"
+				Order="2" />
+			<Publish
+				Dialog="DentrixDlg"
+				Control="Next"
+				Event="SpawnDialog"
+				Value="InvalidDirDlg"
+				Order="3"
+				Condition="NOT WIXUI_DONTVALIDATEPATH AND FL_DentrixDir_VALID&lt;&gt;&quot;1&quot;" />
+			<Publish
+				Dialog="DentrixDlg"
+				Control="Next"
+				Event="NewDialog"
+				Value="InstallDirDlg"
+				Order="4"
+				Condition="WIXUI_DONTVALIDATEPATH OR FL_DentrixDir_VALID=&quot;1&quot;" />
+			-->
 
 			<Publish
 				Dialog="InstallDirDlg"
 				Control="Back"
 				Event="NewDialog"
-				Value="LicenseAgreementDlg" />
+				Value="DentrixDlg" />
 			<Publish
 				Dialog="InstallDirDlg"
 				Control="Next"

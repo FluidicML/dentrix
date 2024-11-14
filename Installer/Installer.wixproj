@@ -14,5 +14,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Application\Application.csproj" />
     <ProjectReference Include="..\BackgroundService\BackgroundService.csproj" />
+    <ProjectReference Include="..\DentrixDlg\DentrixDlg.csproj" />
   </ItemGroup>
 </Project>
