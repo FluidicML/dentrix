@@ -12,49 +12,52 @@ public sealed class PipeAdapter(
 {
     private const string NAMED_PIPE_SERVER = "DB3B88B2-AC72-4B06-893A-89E69E73E134";
 
-    public async Task Initialize(CancellationToken stoppingToken)
+    public void Initialize(CancellationToken stoppingToken)
     {
-        // TODO: I don't have a full sense of the implications of this security rule.
-        // Actually explore this once the design of the application is settled.
-        PipeSecurity pipeSecurity = new();
-        var sid = new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null);
-        pipeSecurity.SetAccessRule(new PipeAccessRule(sid, PipeAccessRights.ReadWrite, AccessControlType.Allow));
-
-        await using var pipeServer = NamedPipeServerStreamAcl.Create(
-            NAMED_PIPE_SERVER,
-            PipeDirection.InOut,
-            NamedPipeServerStream.MaxAllowedServerInstances,
-            PipeTransmissionMode.Message,
-            PipeOptions.Asynchronous,
-            1024,
-            1024,
-            pipeSecurity
-        );
-
-        while (!stoppingToken.IsCancellationRequested)
+        _ = Task.Run(async () =>
         {
-            try
+            // TODO: I don't have a full sense of the implications of this security rule.
+            // Actually explore this once the design of the application is settled.
+            PipeSecurity pipeSecurity = new();
+            var sid = new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null);
+            pipeSecurity.SetAccessRule(new PipeAccessRule(sid, PipeAccessRights.ReadWrite, AccessControlType.Allow));
+
+            await using var pipeServer = NamedPipeServerStreamAcl.Create(
+                NAMED_PIPE_SERVER,
+                PipeDirection.InOut,
+                NamedPipeServerStream.MaxAllowedServerInstances,
+                PipeTransmissionMode.Message,
+                PipeOptions.Asynchronous,
+                1024,
+                1024,
+                pipeSecurity
+            );
+
+            while (!stoppingToken.IsCancellationRequested)
             {
-                await pipeServer.WaitForConnectionAsync(stoppingToken);
-
-                var writer = new StreamWriter(pipeServer);
-                var reader = new StreamReader(pipeServer);
-
-                string? buffer = await reader.ReadLineAsync(stoppingToken);
-                if (!string.IsNullOrEmpty(buffer))
+                try
                 {
-                    await Dispatch(buffer, writer, reader, stoppingToken);
+                    await pipeServer.WaitForConnectionAsync(stoppingToken);
+
+                    var writer = new StreamWriter(pipeServer);
+                    var reader = new StreamReader(pipeServer);
+
+                    string? buffer = await reader.ReadLineAsync(stoppingToken);
+                    if (!string.IsNullOrEmpty(buffer))
+                    {
+                        await Dispatch(buffer, writer, reader, stoppingToken);
+                    }
+                }
+                catch (Exception e) when (e is not OperationCanceledException)
+                {
+                    _logger.LogError(e, "Could not read/write to named pipe at: {time}.", DateTimeOffset.Now);
+                }
+                finally
+                {
+                    pipeServer.Disconnect();
                 }
             }
-            catch (Exception e) when (e is not OperationCanceledException)
-            {
-                _logger.LogError(e, "Could not read/write to named pipe at: {time}.", DateTimeOffset.Now);
-            }
-            finally
-            {
-                pipeServer.Disconnect();
-            }
-        }
+        }, stoppingToken);
     }
 
     private async Task Dispatch(String buffer, StreamWriter writer, StreamReader reader, CancellationToken stoppingToken)

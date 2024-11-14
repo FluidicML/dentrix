@@ -148,7 +148,7 @@ public sealed class DatabaseAdapter
             }
 #endif
         }
-        catch (Exception e)
+        catch (Exception e) when (e is not OperationCanceledException)
         {
             _logger.LogError(e, "Failed to connect to Dentrix database at: {time}", DateTimeOffset.Now);
         }
@@ -250,7 +250,7 @@ public sealed class DatabaseAdapter
         {
             reader = command.ExecuteReader();
         }
-        catch (Exception e)
+        catch (Exception e) when (e is not OperationCanceledException)
         {
             _logger.LogError(e, "Could not execute Dentrix database reader at: {time}", DateTimeOffset.Now);
 

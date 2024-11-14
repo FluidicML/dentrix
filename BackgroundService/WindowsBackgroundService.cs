@@ -13,12 +13,17 @@ public sealed class WindowsBackgroundService(
         {
             _logger.LogInformation("Service started at: {time}", DateTimeOffset.Now);
 
-            // The order we initialize things is important. This reflects the
-            // order of our dependency chain.
-
+            // Each adapter runs in their own task. This makes the service possible to
+            // stop (e.g. during uninstallation).
             _database.Initialize(stoppingToken);
             _socket.Initialize(stoppingToken);
-            await _pipe.Initialize(stoppingToken);
+            _pipe.Initialize(stoppingToken);
+
+            await Task.Delay(Timeout.Infinite, stoppingToken);
+        }
+        catch (OperationCanceledException)
+        {
+            // Intentionally empty.
         }
         catch (Exception ex)
         {

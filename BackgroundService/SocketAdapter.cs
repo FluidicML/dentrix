@@ -227,7 +227,7 @@ public sealed class SocketAdapter
                 }
             }
         }
-        catch (Exception e)
+        catch (Exception e) when (e is not OperationCanceledException)
         {
             _logger.LogError(e, "Could not read from isolated storage at: {time}", DateTimeOffset.Now);
         }
