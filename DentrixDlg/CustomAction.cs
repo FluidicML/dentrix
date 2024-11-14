@@ -7,11 +7,11 @@ namespace DentrixDlg
 {
     public class CustomActions
     {
-        private const string PROPERTY = "FL_DentrixDir";
+        private const string PROPERTY = "FL_DentrixDirProperty";
         private const string DtxApiDll = "Dentrix.API.dll";
 
         [CustomAction]
-        public static ActionResult FL_DentrixDirSetAction(Session session)
+        public static ActionResult FL_DentrixDirSetProperty(Session session)
         {
             var exePath = string.Empty;
 

@@ -46,152 +46,38 @@
 			<DialogRef Id="ResumeDlg" />
 			<DialogRef Id="UserExit" />
 
-			<Publish
-				Dialog="WelcomeDlg"
-				Control="Next"
-				Event="NewDialog"
-				Value="LicenseAgreementDlg"
-				Condition="NOT Installed" />
-			<Publish
-				Dialog="WelcomeDlg"
-				Control="Next"
-				Event="NewDialog"
-				Value="VerifyReadyDlg"
-				Condition="Installed AND PATCH" />
+			<Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg" Condition="NOT Installed" />
+			<Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Condition="Installed AND PATCH" />
 
-			<Publish
-				Dialog="LicenseAgreementDlg"
-				Control="Back"
-				Event="NewDialog"
-				Value="WelcomeDlg" />
-			<Publish
-				Dialog="LicenseAgreementDlg"
-				Control="Next"
-				Event="NewDialog"
-				Value="DentrixDlg"
-				Condition="LicenseAccepted = &quot;1&quot;" />
+			<Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" />
+			<Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="DentrixDlg" Condition="LicenseAccepted = &quot;1&quot;" />
 
-			<Publish
-				Dialog="DentrixDlg"
-				Control="Back"
-				Event="NewDialog"
-				Value="LicenseAgreementDlg" />
-			<Publish
-				Dialog="DentrixDlg"
-				Control="Next"
-				Event="SpawnDialog"
-				Value="InvalidDirDlg" />
-			<!--
-			<Publish
-				Dialog="DentrixDlg"
-				Control="ChangeFolder"
-				Property="_BrowseProperty"
-				Value="[FL_DentrixDir]"
-				Order="1" />
-			<Publish
-				Dialog="DentrixDlg"
-				Control="ChangeFolder"
-				Event="SpawnDialog"
-				Value="BrowseDlg"
-				Order="2" />
-			-->
+			<!-- Custom dialogs. These are used to search for the Dentrix installation. -->
+			<Publish Dialog="DentrixDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg" />
+			<Publish Dialog="DentrixDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg" />
+			<Publish Dialog="DentrixDlg" Control="ChangeFolder" Property="FL_DentrixDirProperty" Value="[FL_DentrixDirProperty]" Order="1" />
+			<Publish Dialog="DentrixDlg" Control="ChangeFolder" Event="SpawnDialog" Value="DentrixBrowseDlg" Order="2" />
 
-			<Publish
-				Dialog="InstallDirDlg"
-				Control="Back"
-				Event="NewDialog"
-				Value="DentrixDlg" />
-			<Publish
-				Dialog="InstallDirDlg"
-				Control="Next"
-				Event="SetTargetPath"
-				Value="[WIXUI_INSTALLDIR]"
-				Order="1" />
-			<Publish
-				Dialog="InstallDirDlg"
-				Control="ChangeFolder"
-				Property="_BrowseProperty"
-				Value="[WIXUI_INSTALLDIR]"
-				Order="1" />
-			<Publish
-				Dialog="InstallDirDlg"
-				Control="ChangeFolder"
-				Event="SpawnDialog"
-				Value="BrowseDlg"
-				Order="2" />
-			<Publish
-				Dialog="InstallDirDlg"
-				Control="Next"
-				Event="SpawnDialog"
-				Value="InvalidDirDlg"
-				Order="3"
-				Condition="NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID&lt;&gt;&quot;1&quot;" />
-			<Publish
-				Dialog="InstallDirDlg"
-				Control="Next"
-				Event="NewDialog"
-				Value="VerifyReadyDlg"
-				Order="4"
-				Condition="WIXUI_DONTVALIDATEPATH OR WIXUI_INSTALLDIR_VALID=&quot;1&quot;" />
+			<Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="DentrixDlg" />
+			<Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1" />
+			<Publish Dialog="InstallDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="1" />
+			<Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2" />
+			<Publish Dialog="InstallDirDlg" Control="Next" Event="SpawnDialog" Value="InvalidDirDlg" Order="3" Condition="NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID&lt;&gt;&quot;1&quot;" />
+			<Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="4" Condition="WIXUI_DONTVALIDATEPATH OR WIXUI_INSTALLDIR_VALID=&quot;1&quot;" />
 
-			<Publish
-				Dialog="BrowseDlg"
-				Control="OK"
-				Event="SpawnDialog"
-				Value="InvalidDirDlg"
-				Order="4"
-				Condition="NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID&lt;&gt;&quot;1&quot;" />
+			<Publish Dialog="BrowseDlg" Control="OK" Event="SpawnDialog" Value="InvalidDirDlg" Order="4" Condition="NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID&lt;&gt;&quot;1&quot;" />
 
-			<Publish
-				Dialog="VerifyReadyDlg"
-				Control="Back"
-				Event="NewDialog"
-				Value="InstallDirDlg"
-				Order="1"
-				Condition="NOT Installed" />
-			<Publish
-				Dialog="VerifyReadyDlg"
-				Control="Back"
-				Event="NewDialog"
-				Value="MaintenanceTypeDlg"
-				Order="2"
-				Condition="Installed AND NOT PATCH" />
-			<Publish
-				Dialog="VerifyReadyDlg"
-				Control="Back"
-				Event="NewDialog"
-				Value="WelcomeDlg"
-				Order="2"
-				Condition="Installed AND PATCH" />
+			<Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg" Order="1" Condition="NOT Installed" />
+			<Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2" Condition="Installed AND NOT PATCH" />
+			<Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2" Condition="Installed AND PATCH" />
 
-			<Publish
-				Dialog="MaintenanceWelcomeDlg"
-				Control="Next"
-				Event="NewDialog"
-				Value="MaintenanceTypeDlg" />
+			<Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg" />
 
-			<Publish
-				Dialog="MaintenanceTypeDlg"
-				Control="RepairButton"
-				Event="NewDialog"
-				Value="VerifyReadyDlg" />
-			<Publish
-				Dialog="MaintenanceTypeDlg"
-				Control="RemoveButton"
-				Event="NewDialog"
-				Value="VerifyReadyDlg" />
-			<Publish
-				Dialog="MaintenanceTypeDlg"
-				Control="Back"
-				Event="NewDialog"
-				Value="MaintenanceWelcomeDlg" />
+			<Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg" />
+			<Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg" />
+			<Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg" />
 
-			<Publish
-				Dialog="ExitDialog"
-				Control="Finish"
-				Event="EndDialog"
-				Value="Return"
-				Order="999" />
+			<Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999" />
 
 			<Property Id="ARPNOMODIFY" Value="1" />
 		</UI>
