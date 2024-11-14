@@ -18,10 +18,4 @@
 		<PackageReference Include="System.Data.Odbc" Version="9.0.0" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <None Update="Assets\MNCN5L2G.dtxkey">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	</ItemGroup>
-
 </Project>

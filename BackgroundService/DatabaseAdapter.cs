@@ -1,4 +1,5 @@
-﻿using System.Data.Odbc;
+﻿using Microsoft.Win32;
+using System.Data.Odbc;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -103,7 +104,14 @@ public sealed class DatabaseAdapter
 
         try
         {
-            var authFilePath = Path.GetFullPath(Path.Combine(".", "Assets", DtxKey));
+            var keyPath = @"SOFTWARE\Fluidic ML, INC.\Gain\auth_key_file";
+            var authFilePath = Registry.LocalMachine.GetValue(keyPath)?.ToString();
+
+            if (authFilePath == null)
+            {
+                throw new InvalidProgramException($"Missing registry key \"{keyPath}\".");
+            }
+
             var status = DENTRIXAPI_RegisterUser(authFilePath);
 
             switch (status)
