@@ -54,7 +54,7 @@ namespace DentrixDlg
         /// <param name="session"></param>
         /// <returns></returns>
         [CustomAction]
-        public static ActionResult FL_x86_DentrixDirOverrideAction(Session session)
+        public static ActionResult FL_x86_DentrixDirSetProperty(Session session)
         {
             return FL_MaybeFindDentrixDir(session, Environment.SpecialFolder.ProgramFilesX86);
         }
@@ -65,7 +65,7 @@ namespace DentrixDlg
         /// <param name="session"></param>
         /// <returns></returns>
         [CustomAction]
-        public static ActionResult FL_x64_DentrixDirOverrideAction(Session session)
+        public static ActionResult FL_x64_DentrixDirSetProperty(Session session)
         {
             return FL_MaybeFindDentrixDir(session, Environment.SpecialFolder.ProgramFiles);
         }
