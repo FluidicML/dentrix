@@ -56,7 +56,7 @@ jobs:
           dotnet build -c Release -p:PlatformTarget=x86 Installer
           dotnet build -c Release -p:PlatformTarget=x64 Installer
 
-      - name: Sign Installer
+      - name: Sign Installer (x86)
         run: >
           AzureSignTool sign
           -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}"
@@ -67,13 +67,24 @@ jobs:
           -tr http://timestamp.digicert.com
           -v
           Installer/bin/Release/x86/en-US/Installer.msi
-          Installer/bin/Release/x64/en-US/Installer.msi
 
       - name: Upload MSI (x86)
         uses: actions/upload-artifact@v4
         with:
           name: Installer (x86).msi
           path: Installer/bin/Release/x86/en-US/Installer.msi
+
+      - name: Sign Installer (x64)
+        run: >
+          AzureSignTool sign
+          -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}"
+          -kvt "${{ secrets.AZURE_TENANT_ID }}"
+          -kvi "${{ secrets.AZURE_CLIENT_ID }}"
+          -kvs "${{ secrets.AZURE_CLIENT_SECRET }}"
+          -kvc "${{ secrets.AZURE_CERT_NAME }}"
+          -tr http://timestamp.digicert.com
+          -v
+          Installer/bin/Release/x64/en-US/Installer.msi
 
       - name: Upload MSI (x64)
         uses: actions/upload-artifact@v4
