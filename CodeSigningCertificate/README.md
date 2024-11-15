@@ -2,11 +2,11 @@
 
 ## Quickstart
 
-Push to master to produce a new signed version of the SQL browser. You can zip
-the produced `DtxSQLBrowser.exe` file and send to Dentrix (through their
-developer portal) for them to extract the public key and add it to their
-servers. Henry Schein One should send a notification to us when that is
-finished.
+Push to the `dtx-sql-browser` branch to produce a new signed version of the SQL
+browser. You can zip the produced `DtxSQLBrowser.exe` file and send to Dentrix
+(through their developer portal) for them to extract the public key and add it
+to their servers. Henry Schein One should send a notification to us when that
+is finished.
 
 ## Code Signing Certificate Creation
 
