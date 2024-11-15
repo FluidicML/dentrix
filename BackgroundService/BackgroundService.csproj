@@ -8,7 +8,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>FluidicML.Gain</RootNamespace>
 		<StartupObject>FluidicML.Gain.Program</StartupObject>
-		<OutputPath>$(ProjectDir)bin\$(Configuration)\$(PlatformTarget)\</OutputPath>
+		<OutputPath>$(ProjectDir)bin\$(Configuration)\$(Platform)\</OutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>

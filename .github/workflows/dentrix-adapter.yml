@@ -21,12 +21,12 @@ jobs:
 
       - name: Build Projects
         run: |
-          dotnet build -c Release -p:PlatformTarget=x86 Application
-          dotnet build -c Release -p:PlatformTarget=x64 Application
-          dotnet build -c Release -p:PlatformTarget=x86 BackgroundService
-          dotnet build -c Release -p:PlatformTarget=x64 BackgroundService
-          dotnet build -c Release -p:PlatformTarget=x86 DentrixDlg
-          dotnet build -c Release -p:PlatformTarget=x64 DentrixDlg
+          dotnet build -c Release -p:Platform=x86 Application
+          dotnet build -c Release -p:Platform=x64 Application
+          dotnet build -c Release -p:Platform=x86 BackgroundService
+          dotnet build -c Release -p:Platform=x64 BackgroundService
+          dotnet build -c Release -p:Platform=x86 DentrixDlg
+          dotnet build -c Release -p:Platform=x64 DentrixDlg
 
       - name: Sign Projects
         run: >
@@ -53,8 +53,8 @@ jobs:
 
       - name: Build Installer
         run: |
-          dotnet build -c Release -p:PlatformTarget=x86 Installer
-          dotnet build -c Release -p:PlatformTarget=x64 Installer
+          dotnet build -c Release -p:Platform=x86 Installer
+          dotnet build -c Release -p:Platform=x64 Installer
 
       - name: Sign Installer (x86)
         run: >

@@ -7,7 +7,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UseWPF>true</UseWPF>
 		<StartupObject>FluidicML.Gain.App</StartupObject>
-		<OutputPath>$(ProjectDir)bin\$(Configuration)\$(PlatformTarget)\</OutputPath>
+		<OutputPath>$(ProjectDir)bin\$(Configuration)\$(Platform)\</OutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="WixToolset.Sdk/5.0.2">
 	<PropertyGroup>
-		<OutputPath>$(ProjectDir)bin\$(Configuration)\$(PlatformTarget)\</OutputPath>
+		<OutputPath>$(ProjectDir)bin\$(Configuration)\$(Platform)\</OutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>

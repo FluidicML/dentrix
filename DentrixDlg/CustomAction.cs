@@ -10,13 +10,7 @@ namespace DentrixDlg
         private const string PROPERTY = "FL_DENTRIX_DIR";
         private const string DtxApiDll = "Dentrix.API.dll";
 
-        /// <summary>
-        /// Attempts to find the the Dentrix installation automatically.
-        /// </summary>
-        /// <param name="session"></param>
-        /// <returns></returns>
-        [CustomAction]
-        public static ActionResult FL_DentrixDirSetProperty(Session session)
+        private static ActionResult FL_MaybeFindDentrixDir(Session session, Environment.SpecialFolder folder)
         {
             var exePath = string.Empty;
 
@@ -44,23 +38,36 @@ namespace DentrixDlg
                 return ActionResult.Success;
             }
 
-            var dir1 = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Dentrix");
+            var fallback = Path.Combine(Environment.GetFolderPath(folder), "Dentrix");
 
-            if (File.Exists(Path.Combine(dir1, DtxApiDll)))
+            if (File.Exists(Path.Combine(fallback, DtxApiDll)))
             {
-                session[PROPERTY] = dir1;
-
-                return ActionResult.Success;
-            }
-
-            var dir2 = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Dentrix");
-
-            if (File.Exists(Path.Combine(dir2, DtxApiDll)))
-            {
-                session[PROPERTY] = dir2;
+                session[PROPERTY] = fallback;
             }
 
             return ActionResult.Success;
+        }
+
+        /// <summary>
+        /// Attempts to find the the Dentrix (32-bit) installation automatically.
+        /// </summary>
+        /// <param name="session"></param>
+        /// <returns></returns>
+        [CustomAction]
+        public static ActionResult FL_x86_DentrixDirOverrideAction(Session session)
+        {
+            return FL_MaybeFindDentrixDir(session, Environment.SpecialFolder.ProgramFilesX86);
+        }
+
+        /// <summary>
+        /// Attempts to find the the Dentrix (64-bit) installation automatically.
+        /// </summary>
+        /// <param name="session"></param>
+        /// <returns></returns>
+        [CustomAction]
+        public static ActionResult FL_x64_DentrixDirOverrideAction(Session session)
+        {
+            return FL_MaybeFindDentrixDir(session, Environment.SpecialFolder.ProgramFiles);
         }
 
         /// <summary>
