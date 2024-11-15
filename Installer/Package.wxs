@@ -77,6 +77,8 @@
 		
 		2. At the time when the installation sequence is processed, the installer will write the
 		   value of property X into the execution script as the value of the property CustomActionData.
+		   
+		https://learn.microsoft.com/en-us/windows/win32/msi/obtaining-context-information-for-deferred-execution-custom-actions
 		-->
 		<CustomAction
 			Id="FL_DENTRIX_DIR"
