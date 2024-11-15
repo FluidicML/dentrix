@@ -68,6 +68,7 @@
             <TextBlock
                 DockPanel.Dock="Left"
                 Margin="0,4,0,0"
+                MaxWidth="300"
                 TextWrapping="wrap"
                 Text="{Binding ViewModel.Message}"
                 Visibility="{Binding ViewModel.MessageVisibility}"
