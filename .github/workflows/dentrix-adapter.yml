@@ -15,7 +15,7 @@ jobs:
         with:
           submodules: true
 
-      - name: Build Application and BackgroundService
+      - name: Build Solution
         run: |
           dotnet build -c Release Application
           dotnet build -c Release BackgroundService
