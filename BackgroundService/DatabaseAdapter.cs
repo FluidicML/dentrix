@@ -24,14 +24,34 @@ public sealed class DatabaseAdapter
         int ConnectionStringSize
     );
 
+    private const string RegistryPath = @"Software\Fluidic ML, INC.\Gain";
+    private const string RegistryAuthFile = "auth_key_path";
+    private const string RegistryDtxPath = "dentrix_exe_path";
+
     private readonly ILogger<DatabaseAdapter> _logger;
 
     public DatabaseAdapter(ILogger<DatabaseAdapter> logger)
     {
         _logger = logger;
 
-        // TODO: Use DtxApi and find location from installation.
-        IntPtr hModule = LoadLibrary("C:\\Program Files (x86)\\Dentrix\\Dentrix.API.dll");
+        var dtxPath = string.Empty;
+
+        var hKey = Registry.LocalMachine.OpenSubKey(RegistryPath);
+        if (hKey != null)
+        {
+            Object? value = hKey.GetValue(RegistryDtxPath);
+            if (value != null)
+            {
+                dtxPath = value.ToString();
+            }
+        }
+
+        if (string.IsNullOrEmpty(dtxPath))
+        {
+            throw new InvalidProgramException($"Missing registry key \"{RegistryPath}\\{RegistryDtxPath}\".");
+        }
+
+        IntPtr hModule = LoadLibrary(Path.Combine(dtxPath, DtxAPI));
 
         if (hModule == IntPtr.Zero)
         {
@@ -39,8 +59,6 @@ public sealed class DatabaseAdapter
         }
     }
 
-    private const string AuthFilePath = @"Software\Fluidic ML, INC.\Gain";
-    private const string AuthFileKey = "auth_key_path";
     private const string DtxKey = "MNCN5L2G.dtxkey";
     private const string DtxUser = "MNCN5L2G";
     private const string DtxPassword = "MNCN5L2G5";
@@ -108,10 +126,10 @@ public sealed class DatabaseAdapter
         {
             var authFilePath = string.Empty;
 
-            var hKey = Registry.LocalMachine.OpenSubKey(AuthFilePath);
+            var hKey = Registry.LocalMachine.OpenSubKey(RegistryPath);
             if (hKey != null)
             {
-                Object? value = hKey.GetValue(AuthFileKey);
+                Object? value = hKey.GetValue(RegistryAuthFile);
                 if (value != null)
                 {
                     authFilePath = value.ToString();
@@ -120,7 +138,7 @@ public sealed class DatabaseAdapter
 
             if (string.IsNullOrEmpty(authFilePath))
             {
-                throw new InvalidProgramException($"Missing registry key \"{AuthFilePath}\\{AuthFileKey}\".");
+                throw new InvalidProgramException($"Missing registry key \"{RegistryPath}\\{RegistryAuthFile}\".");
             }
 
             var status = DENTRIXAPI_RegisterUser(authFilePath);
