@@ -56,9 +56,10 @@
 		We need our custom action to run during the UI sequence (i.e. the sequence of dialogs),
 		not the Execute sequence (i.e. all steps that run after the install Wizard is complete).
 		This way we can prepopulate a possible candidate for where Dentrix was already installed.
+		
+		https://learn.microsoft.com/en-us/windows/win32/msi/importing-the-installuisequence
 		-->
 		<InstallUISequence>
-			<!-- https://learn.microsoft.com/en-us/windows/win32/msi/importing-the-installuisequence -->
 			<Custom Action="FL_DentrixDirOverrideAction" After="FL_DentrixDirDefaultAction" />
 		</InstallUISequence>
 
@@ -82,9 +83,9 @@
 		-->
 		<CustomAction
 			Id="FL_DENTRIX_DIR"
-            BinaryRef="FL_DtxDlgBinary"
-            DllEntry="FL_DentrixDirReadProperty"
-            Execute="deferred" />
+			BinaryRef="FL_DtxDlgBinary"
+			DllEntry="FL_DentrixDirReadProperty"
+			Execute="deferred" />
 
 		<InstallExecuteSequence>
 			<Custom Action="FL_DENTRIX_DIR" Before="InstallFinalize" />
