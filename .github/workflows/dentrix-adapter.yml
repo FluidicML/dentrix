@@ -22,11 +22,16 @@ jobs:
       - name: Install AzureSignTool
         run: dotnet tool install --global AzureSignTool
 
-      - name: Build Solution
+      - name: Build Projects
         run: |
-          dotnet build -c Release -p:PlatformTarget={x86,x64} {Application,BackgroundService,DentrixDlg}
+          dotnet build -c Release -p:PlatformTarget=x86 Application
+          dotnet build -c Release -p:PlatformTarget=x64 Application
+          dotnet build -c Release -p:PlatformTarget=x86 BackgroundService
+          dotnet build -c Release -p:PlatformTarget=x64 BackgroundService
+          dotnet build -c Release -p:PlatformTarget=x86 DentrixDlg
+          dotnet build -c Release -p:PlatformTarget=x64 DentrixDlg
 
-      - name: Sign Solution
+      - name: Sign Projects
         run: >
           AzureSignTool sign
           -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}"
@@ -36,12 +41,17 @@ jobs:
           -kvc "${{ secrets.AZURE_CERT_NAME }}"
           -tr http://timestamp.digicert.com
           -v
-          Application/bin/Release/{x86,x64}/**/*.{dll,exe}
-          BackgroundService/bin/Release/{x86,x64}/**/*.{dll,exe}
-          DentrixDlg/bin/Release/{x86,x64}/**/*.{dll,exe}
+          Application/bin/Release/x86/**/*.(dll|exe)
+          Application/bin/Release/x64/**/*.(dll|exe)
+          BackgroundService/bin/Release/x86/**/*.(dll|exe)
+          BackgroundService/bin/Release/x64/**/*.(dll|exe)
+          DentrixDlg/bin/Release/x86/**/*.(dll|exe)
+          DentrixDlg/bin/Release/x64/**/*.(dll|exe)
 
       - name: Build Installer
-        run: dotnet build -c Release -p:PlatformTarget={x86,x64} Installer
+        run: |
+          dotnet build -c Release -p:PlatformTarget=x86 Installer
+          dotnet build -c Release -p:PlatformTarget=x64 Installer
 
       - name: Sign Installer
         run: >
@@ -53,7 +63,8 @@ jobs:
           -kvc "${{ secrets.AZURE_CERT_NAME }}"
           -tr http://timestamp.digicert.com
           -v
-          Installer/bin/Release/{x86,x64}/en-US/Installer.msi
+          Installer/bin/Release/x86/en-US/Installer.msi
+          Installer/bin/Release/x64/en-US/Installer.msi
 
       - name: Upload MSI (x86)
         uses: actions/upload-artifact@v4
