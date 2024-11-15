@@ -91,6 +91,9 @@
 			<Custom Action="FL_DENTRIX_DIR" Before="InstallFinalize" />
 		</InstallExecuteSequence>
 
+		<!-- I did encounter this annoying error: https://stackoverflow.com/a/6380750 -->
+		<WixVariable Id="WixUILicenseRtf" Value="Assets\LICENSE.rtf" />
+
 		<ui:WixUI Id="FL_DialogSet" InstallDirectory="FL_InstallFolder" />
 
 		<Feature Id="FL_AppFeature" Title="Application">

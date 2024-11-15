@@ -6,6 +6,7 @@
     <None Include="Assets\MNCN5L2G.dtxkey">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Content Include="Assets\LICENSE.rtf" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
