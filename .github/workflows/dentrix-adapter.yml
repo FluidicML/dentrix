@@ -41,12 +41,18 @@ jobs:
           -kvc "${{ secrets.AZURE_CERT_NAME }}"
           -tr http://timestamp.digicert.com
           -v
-          Application/bin/Release/x86/**/*.(dll|exe)
-          Application/bin/Release/x64/**/*.(dll|exe)
-          BackgroundService/bin/Release/x86/**/*.(dll|exe)
-          BackgroundService/bin/Release/x64/**/*.(dll|exe)
-          DentrixDlg/bin/Release/x86/**/*.(dll|exe)
-          DentrixDlg/bin/Release/x64/**/*.(dll|exe)
+          Application/bin/Release/x86/**/*.dll
+          Application/bin/Release/x86/**/*.exe
+          Application/bin/Release/x64/**/*.dll
+          Application/bin/Release/x64/**/*.exe
+          BackgroundService/bin/Release/x86/**/*.dll
+          BackgroundService/bin/Release/x86/**/*.exe
+          BackgroundService/bin/Release/x64/**/*.dll
+          BackgroundService/bin/Release/x64/**/*.exe
+          DentrixDlg/bin/Release/x86/**/*.dll
+          DentrixDlg/bin/Release/x86/**/*.exe
+          DentrixDlg/bin/Release/x64/**/*.dll
+          DentrixDlg/bin/Release/x64/**/*.exe
 
       - name: Build Installer
         run: |
