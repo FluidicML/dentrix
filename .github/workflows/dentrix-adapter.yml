@@ -19,6 +19,7 @@ jobs:
         run: |
           dotnet build -c Release Application
           dotnet build -c Release BackgroundService
+          dotnet build -c Release DentrixDlg
 
       - name: Install AzureSignTool
         run: dotnet tool install --global AzureSignTool
@@ -37,6 +38,8 @@ jobs:
           "Application/bin/Release/**/*.exe"
           "BackgroundService/bin/Release/**/*.dll"
           "BackgroundService/bin/Release/**/*.exe"
+          "DentrixDlg/bin/Release/**/*.dll"
+          "DentrixDlg/bin/Release/**/*.exe"
 
       - name: Build Installer
         run: dotnet build -c Release Installer
