@@ -24,9 +24,71 @@
 
 		<Property Id="ARPPRODUCTICON" Value="FL_AppShortcut.Ico" />
 
-		<ui:WixUI
-			Id="FL_DialogSet"
-			InstallDirectory="FL_InstallFolder" />
+		<!-- Keep id shorter here to work around modularization error (warning WIX1000). -->
+		<Binary
+			Id="FL_DtxDlgBinary"
+			SourceFile="$(var.DentrixDlg.TargetDir)\$(var.DentrixDlg.TargetName).CA.dll" />
+
+		<!--
+		Notice this property is in all caps. This indicates the property is public. Properties that
+		are to be set by the user interface during the installation and then passed to the execution
+		phase of the installation *must* be public.
+		https://learn.microsoft.com/en-us/windows/win32/msi/public-properties
+
+		The choice of "After" is important. Too early and you end up with [ProgramFiles6432Folder]
+		undefined (which yields error code 2343). Used Orca to come up with choice "CostFinalize".
+		-->
+		<SetProperty
+			Action="FL_DentrixDirDefaultAction"
+			Id="FL_DENTRIX_DIR"
+			Value="[ProgramFiles6432Folder]"
+			Sequence="ui"
+			After="CostFinalize" />
+
+		<CustomAction
+			Id="FL_DentrixDirOverrideAction"
+			DllEntry="FL_DentrixDirSetProperty"
+			BinaryRef="FL_DtxDlgBinary"
+			Execute="immediate"
+			Impersonate="yes" />
+
+		<!--
+		We need our custom action to run during the UI sequence (i.e. the sequence of dialogs),
+		not the Execute sequence (i.e. all steps that run after the install Wizard is complete).
+		This way we can prepopulate a possible candidate for where Dentrix was already installed.
+		-->
+		<InstallUISequence>
+			<!-- https://learn.microsoft.com/en-us/windows/win32/msi/importing-the-installuisequence -->
+			<Custom Action="FL_DentrixDirOverrideAction" After="FL_DentrixDirDefaultAction" />
+		</InstallUISequence>
+
+		<!--
+		This particular action exists for demonstration purposes. To write the value of a property
+		into the installation script for use during a deferred execution custom action requires
+		two steps:
+		
+		1. Insert a small custom action into the installation sequence that sets the property of
+		   interest to a property having the same name as the deferred execution custom action. For
+		   example, if the primary key for the deferred execution custom action is "MyAction" set
+		   a property named "MyAction" to the property X which you need to retrieve. You must set
+		   the "MyAction" property in the installation sequence before the "MyAction" custom action.
+		   Although any type of custom action can set the context data, the simplest method is to
+		   use a property assignment custom action (for example Custom Action Type 51).
+		
+		2. At the time when the installation sequence is processed, the installer will write the
+		   value of property X into the execution script as the value of the property CustomActionData.
+		-->
+		<CustomAction
+			Id="FL_DENTRIX_DIR"
+            BinaryRef="FL_DtxDlgBinary"
+            DllEntry="FL_DentrixDirReadProperty"
+            Execute="deferred" />
+
+		<InstallExecuteSequence>
+			<Custom Action="FL_DENTRIX_DIR" Before="InstallFinalize" />
+		</InstallExecuteSequence>
+
+		<ui:WixUI Id="FL_DialogSet" InstallDirectory="FL_InstallFolder" />
 
 		<Feature Id="FL_AppFeature" Title="Application">
 			<ComponentGroupRef Id="FL_AppFiles" />

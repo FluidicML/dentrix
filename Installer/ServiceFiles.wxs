@@ -39,14 +39,6 @@
 				Id="FL_ServiceAuth"
 				Guid="{9CE04592-A302-4D1B-A555-E481662D1BD4}"
 				Directory="FL_ServiceInstallFolder">
-
-				<RegistryValue
-					Root="HKLM"
-					Key="Software\!(bind.Property.Manufacturer)\!(bind.Property.ProductName)"
-					Name="dentrix_exe_path"
-					Type="string"
-					Value="[FL_DentrixDirProperty]" />
-
 				<File Source="Assets\MNCN5L2G.dtxkey" />
 
 				<RegistryValue
@@ -56,7 +48,15 @@
 					Type="string"
 					Value="[FL_ServiceInstallFolder]Assets\MNCN5L2G.dtxkey"
 					KeyPath="yes" />
+			</Component>
 
+			<Component Id="FL_DentrixDir" Guid="{4BA51E81-FD5E-4749-BC28-A6803753F6EF}">
+				<RegistryValue
+					Root="HKLM"
+					Key="Software\!(bind.Property.Manufacturer)\!(bind.Property.ProductName)"
+					Name="dentrix_exe_path"
+					Type="string"
+					Value="[FL_DENTRIX_DIR]" />
 			</Component>
 		</ComponentGroup>
 	</Fragment>
