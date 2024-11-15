@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+	<Fragment>
+		<Component
+			Id="FL_ServiceAuthDtxKey"
+			Guid="{9CE04592-A302-4D1B-A555-E481662D1BD4}"
+			Directory="FL_ServiceInstallFolder">
+			<File Source="Assets\MNCN5L2G.dtxkey" />
+
+			<RegistryValue
+				Root="HKLM"
+				Key="Software\!(bind.Property.Manufacturer)\!(bind.Property.ProductName)"
+				Name="auth_key_file"
+				Type="string"
+				Value="[FL_ServiceInstallFolder]Assets\MNCN5L2G.dtxkey"
+				KeyPath="yes" />
+		</Component>
+	</Fragment>
+</Wix>

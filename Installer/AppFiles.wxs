@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Be explicit we want the .exe file. $TargetPath may specify something different, e.g. a DLL. -->
-<?define FL_AppTarget = "$(var.Application.TargetDir)\$(var.Application.TargetName).exe" ?>
+<?include Variables.wxi?>
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
 	<Fragment>
@@ -9,24 +8,6 @@
 			<Files Include="$(var.Application.TargetDir)\**">
 				<Exclude Files="$(var.FL_AppTarget)" />
 			</Files>
-			<File Source="$(var.FL_AppTarget)" KeyPath="yes">
-				<Shortcut
-					Id="FL_AppDesktopShortcut"
-					Name="Gain"
-					Icon="FL_AppShortcut.Ico"
-					Advertise="yes"
-					Description="Gain - Dentrix Adapter"
-					Directory="DesktopFolder"
-					WorkingDirectory="FL_AppInstallFolder" />
-				<Shortcut
-					Id="FL_AppProgramMenuShortcut"
-					Name="Gain"
-					Icon="FL_AppShortcut.Ico"
-					Advertise="yes"
-					Description="Gain - Dentrix Adapter"
-					Directory="ProgramMenuFolder"
-					WorkingDirectory="FL_AppInstallFolder" />
-			</File>
 		</ComponentGroup>
 	</Fragment>
 </Wix>

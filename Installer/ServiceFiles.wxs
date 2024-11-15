@@ -1,63 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Be explicit we want the .exe file. $TargetPath may specify something different, e.g. a DLL. -->
-<?define FL_ServiceTarget = "$(var.BackgroundService.TargetDir)\$(var.BackgroundService.TargetName).exe" ?>
+<?include Variables.wxi?>
 
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
-	 xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
 	<Fragment>
 		<ComponentGroup Id="FL_ServiceFiles" Directory="FL_ServiceInstallFolder">
 			<Files Include="$(var.BackgroundService.TargetDir)\**">
 				<Exclude Files="$(var.FL_ServiceTarget)" />
 			</Files>
-
-			<Component Id="FL_ServiceComponent" Guid="{011E5106-D965-4133-9D71-C207467927DA}">
-				<File Source="$(var.FL_ServiceTarget)" KeyPath="yes" />
-
-				<ServiceInstall
-					Name="Gain - Dentrix Adapter"
-					DisplayName="Gain - Dentrix Adapter"
-					Description="Service for triggering Gain workflows"
-					Type="ownProcess"
-					Start="auto"
-					ErrorControl="normal">
-					<util:ServiceConfig
-						FirstFailureActionType="restart"
-						SecondFailureActionType="restart"
-						ThirdFailureActionType="restart" />
-				</ServiceInstall>
-
-				<ServiceControl
-					Id="FL_ServiceControl"
-					Name="Gain - Dentrix Adapter"
-					Start="install"
-					Stop="both"
-					Remove="uninstall" />
-			</Component>
-
-			<Component
-				Id="FL_ServiceAuth"
-				Guid="{9CE04592-A302-4D1B-A555-E481662D1BD4}"
-				Directory="FL_ServiceInstallFolder">
-				<File Source="Assets\MNCN5L2G.dtxkey" />
-
-				<RegistryValue
-					Root="HKLM"
-					Key="Software\!(bind.Property.Manufacturer)\!(bind.Property.ProductName)"
-					Name="auth_key_file"
-					Type="string"
-					Value="[FL_ServiceInstallFolder]Assets\MNCN5L2G.dtxkey"
-					KeyPath="yes" />
-			</Component>
-
-			<Component Id="FL_DentrixDir" Guid="{4BA51E81-FD5E-4749-BC28-A6803753F6EF}">
-				<RegistryValue
-					Root="HKLM"
-					Key="Software\!(bind.Property.Manufacturer)\!(bind.Property.ProductName)"
-					Name="dentrix_exe_path"
-					Type="string"
-					Value="[FL_DENTRIX_DIR]" />
-			</Component>
 		</ComponentGroup>
 	</Fragment>
 </Wix>

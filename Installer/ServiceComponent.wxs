@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?include Variables.wxi?>
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+	<Fragment>
+		<Component Id="FL_ServiceComponent">
+			<File Source="$(var.FL_ServiceTarget)" KeyPath="yes" />
+
+			<ServiceInstall
+				Name="Gain - Dentrix Adapter"
+				DisplayName="Gain - Dentrix Adapter"
+				Description="Service for triggering Gain workflows"
+				Type="ownProcess"
+				Start="auto"
+				ErrorControl="normal">
+				<util:ServiceConfig
+					FirstFailureActionType="restart"
+					SecondFailureActionType="restart"
+					ThirdFailureActionType="restart" />
+			</ServiceInstall>
+
+			<ServiceControl
+				Id="FL_ServiceControl"
+				Name="Gain - Dentrix Adapter"
+				Start="install"
+				Stop="both"
+				Remove="uninstall" />
+		</Component>
+	</Fragment>
+</Wix>

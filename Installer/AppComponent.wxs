@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?include Variables.wxi?>
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+	<Fragment>
+		<Component Id="FL_AppComponent">
+			<File Source="$(var.FL_AppTarget)" KeyPath="yes">
+				<Shortcut
+					Id="FL_AppDesktopShortcut"
+					Name="Gain"
+					Icon="FL_AppShortcut.Ico"
+					Advertise="yes"
+					Description="Gain - Dentrix Adapter"
+					Directory="DesktopFolder"
+					WorkingDirectory="FL_AppInstallFolder" />
+				<Shortcut
+					Id="FL_AppProgramMenuShortcut"
+					Name="Gain"
+					Icon="FL_AppShortcut.Ico"
+					Advertise="yes"
+					Description="Gain - Dentrix Adapter"
+					Directory="ProgramMenuFolder"
+					WorkingDirectory="FL_AppInstallFolder" />
+			</File>
+		</Component>
+	</Fragment>
+</Wix>
