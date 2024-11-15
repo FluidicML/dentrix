@@ -6,13 +6,12 @@ on:
       - main
       - jrpotter/bitness
 
-defaults:
-  run:
-    shell: bash
-
 jobs:
   build:
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
 
     steps:
       - name: Checkout Code
