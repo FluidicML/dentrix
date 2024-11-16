@@ -115,13 +115,11 @@
 		<ui:WixUI Id="FL_DialogSet" InstallDirectory="FL_InstallFolder" />
 
 		<Feature Id="FL_AppFeature" Title="Application">
-			<ComponentGroupRef Id="FL_AppFiles" />
-			<ComponentRef Id="FL_AppComponent" />
+			<ComponentGroupRef Id="FL_AppComponent" />
 		</Feature>
 
 		<Feature Id="FL_ServiceFeature" Title="Background Service">
-			<ComponentGroupRef Id="FL_ServiceFiles" />
-			<ComponentRef Id="FL_ServiceComponent" />
+			<ComponentGroupRef Id="FL_ServiceComponent" />
 			<ComponentRef Id="FL_ServiceAuthDtxKey" />
 			<ComponentRef Id="FL_ServiceRegDtxDir" />
 		</Feature>
