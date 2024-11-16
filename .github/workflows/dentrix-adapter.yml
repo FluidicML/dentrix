@@ -21,12 +21,13 @@ jobs:
 
       - name: Build Projects
         run: |
-          dotnet build -c Release -p:PlatformTarget=x86 Application
-          dotnet build -c Release -p:PlatformTarget=x64 Application
-          dotnet build -c Release -p:PlatformTarget=x86 BackgroundService
-          dotnet build -c Release -p:PlatformTarget=x64 BackgroundService
-          dotnet build -c Release -p:PlatformTarget=x86 DentrixDlg
-          dotnet build -c Release -p:PlatformTarget=x64 DentrixDlg
+          dotnet build -c:Release -p:"Platform=x86;PlatformTarget=x86" -r:win-x86 Application
+          dotnet build -c:Release -p:"Platform=x86;PlatformTarget=x86" -r:win-x86 BackgroundService
+          dotnet build -c:Release -p:"Platform=x86;PlatformTarget=x86" -r:win-x86 DentrixDlg
+
+          dotnet build -c:Release -p:"Platform=x64;PlatformTarget=x64" -r:win-x64 Application
+          dotnet build -c:Release -p:"Platform=x64;PlatformTarget=x64" -r:win-x64 BackgroundService
+          dotnet build -c:Release -p:"Platform=x64;PlatformTarget=x64" -r:win-x64 DentrixDlg
 
       - name: Sign Projects
         run: >
@@ -38,23 +39,17 @@ jobs:
           -kvc "${{ secrets.AZURE_CERT_NAME }}"
           -tr http://timestamp.digicert.com
           -v
-          Application/bin/Release/x86/**/*.dll
-          Application/bin/Release/x86/**/*.exe
-          Application/bin/Release/x64/**/*.dll
-          Application/bin/Release/x64/**/*.exe
-          BackgroundService/bin/Release/x86/**/*.dll
-          BackgroundService/bin/Release/x86/**/*.exe
-          BackgroundService/bin/Release/x64/**/*.dll
-          BackgroundService/bin/Release/x64/**/*.exe
-          DentrixDlg/bin/Release/x86/**/*.dll
-          DentrixDlg/bin/Release/x86/**/*.exe
-          DentrixDlg/bin/Release/x64/**/*.dll
-          DentrixDlg/bin/Release/x64/**/*.exe
+          Application/bin/Release/**/*.dll
+          Application/bin/Release/**/*.exe
+          BackgroundService/bin/Release/**/*.dll
+          BackgroundService/bin/Release/**/*.exe
+          DentrixDlg/bin/Release/**/*.dll
+          DentrixDlg/bin/Release/**/*.exe
 
       - name: Build Installer
         run: |
-          dotnet build -c Release -p:PlatformTarget=x86 Installer
-          dotnet build -c Release -p:PlatformTarget=x64 Installer
+          dotnet build -c:Release -p:"Platform=x86;PlatformTarget=x86" -r:win-x86 Installer
+          dotnet build -c:Release -p:"Platform=x64;PlatformTarget=x64" -r:win-x64 Installer
 
       - name: Sign Installer (x86)
         run: >
@@ -66,25 +61,13 @@ jobs:
           -kvc "${{ secrets.AZURE_CERT_NAME }}"
           -tr http://timestamp.digicert.com
           -v
-          Installer/bin/Release/x86/en-US/Installer.msi
+          Installer/bin/Release/**/*.msi
 
       - name: Upload MSI (x86)
         uses: actions/upload-artifact@v4
         with:
           name: Installer (x86).msi
           path: Installer/bin/Release/x86/en-US/Installer.msi
-
-      - name: Sign Installer (x64)
-        run: >
-          AzureSignTool sign
-          -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}"
-          -kvt "${{ secrets.AZURE_TENANT_ID }}"
-          -kvi "${{ secrets.AZURE_CLIENT_ID }}"
-          -kvs "${{ secrets.AZURE_CLIENT_SECRET }}"
-          -kvc "${{ secrets.AZURE_CERT_NAME }}"
-          -tr http://timestamp.digicert.com
-          -v
-          Installer/bin/Release/x64/en-US/Installer.msi
 
       - name: Upload MSI (x64)
         uses: actions/upload-artifact@v4
