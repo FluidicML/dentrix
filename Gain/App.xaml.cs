@@ -41,11 +41,11 @@ public partial class App : Application
                 {
                     _ = services.AddHostedService<ApplicationHostService>();
                     _ = services.AddSingleton(_configService);
-                    _ = services.AddSingleton<StatusViewModel>();
                     _ = services.AddSingleton<PipeService>();
                     _ = services.AddSingleton<RegistryService>();
                     _ = services.AddSingleton<DentrixService>();
                     _ = services.AddView<SettingsPage, SettingsViewModel>();
+                    _ = services.AddSingleton<MainWindowViewModel>();
                     _ = services.AddSingleton<IWindow, MainWindow>();
                 }
             )

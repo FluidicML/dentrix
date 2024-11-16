@@ -20,19 +20,19 @@ public partial class SettingsPage : INavigableView<SettingsViewModel>
     private readonly HttpClient _httpClient;
 
     public SettingsViewModel ViewModel { get; }
-    public StatusViewModel StatusViewModel { get; }
+    public MainWindowViewModel MainWindowViewModel { get; }
 
     public SettingsPage(
         IConfiguration configService,
         SettingsViewModel settingsViewModel,
-        StatusViewModel statusViewModel
+        MainWindowViewModel mainWindowViewModel
     )
     {
         _baseAddress = new Uri(configService.GetValue<string>("API_URL")!);
         _httpClient = new HttpClient() { BaseAddress = _baseAddress };
 
         ViewModel = settingsViewModel;
-        StatusViewModel = statusViewModel;
+        MainWindowViewModel = mainWindowViewModel;
 
         DataContext = this;
         InitializeComponent();

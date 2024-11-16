@@ -2,7 +2,7 @@
 
 namespace FluidicML.Gain.ViewModels;
 
-public partial class StatusViewModel : BaseViewModel
+public partial class MainWindowViewModel : BaseViewModel
 {
     // Null indicates an indeterminate value.
 

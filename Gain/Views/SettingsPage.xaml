@@ -61,7 +61,7 @@
                 <CheckBox
                     IsThreeState="True"
                     IsEnabled="False"
-                    IsChecked="{Binding StatusViewModel.StatusBackgroundService}" />
+                    IsChecked="{Binding MainWindowViewModel.StatusBackgroundService}" />
 
                 <Label
                     VerticalAlignment="Center"
@@ -74,7 +74,7 @@
                 <CheckBox
                     IsThreeState="True"
                     IsEnabled="False"
-                    IsChecked="{Binding StatusViewModel.StatusWebSocket}" />
+                    IsChecked="{Binding MainWindowViewModel.StatusWebSocket}" />
 
                 <Label
                     VerticalAlignment="Center"
@@ -87,7 +87,7 @@
                 <CheckBox
                     IsThreeState="True"
                     IsEnabled="False"
-                    IsChecked="{Binding StatusViewModel.StatusDentrix}" />
+                    IsChecked="{Binding MainWindowViewModel.StatusDentrix}" />
 
                 <Label
                     VerticalAlignment="Center"

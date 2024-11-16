@@ -1,14 +1,21 @@
-﻿using FluidicML.Gain.ViewModels;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System.IO;
 using System.IO.Pipes;
 
 namespace FluidicML.Gain.Hosting;
 
+public enum QueryStatus
+{
+    SUCCESS = 0,
+    FAILURE = 1,
+    INDETERMINATE = 2,
+    LOCKED = 3,
+}
+
 /// <summary>
 /// Primary means of communicating to and from the background service.
 /// </summary>
-public sealed class PipeService(ILogger<PipeService> logger, StatusViewModel statusViewModel)
+public sealed class PipeService(ILogger<PipeService> logger)
 {
     private const string NAMED_PIPE_SERVER = "DB3B88B2-AC72-4B06-893A-89E69E73E134";
 
@@ -18,27 +25,29 @@ public sealed class PipeService(ILogger<PipeService> logger, StatusViewModel sta
     /// Verifies our application can connect to the background service.
     /// </summary>
     /// <returns></returns>
-    public async Task QueryBackgroundServiceStatus(CancellationToken stoppingToken)
+    public async Task<QueryStatus> QueryBackgroundServiceStatus(CancellationToken stoppingToken)
     {
         var locked = await _backgroundServiceSemaphore.WaitAsync(0, stoppingToken);
 
         if (!locked)
         {
-            return;
+            return QueryStatus.LOCKED;
         }
 
         try
         {
             await using var pipeClient = new NamedPipeClientStream(".", NAMED_PIPE_SERVER, PipeDirection.InOut);
             await pipeClient.ConnectAsync(2500, stoppingToken); // Milliseconds timeout
+            return QueryStatus.SUCCESS;
         }
         catch (TimeoutException)
         {
-            statusViewModel.StatusBackgroundService = false;
+            return QueryStatus.FAILURE;
         }
         catch (Exception e) when (e is not OperationCanceledException)
         {
-            statusViewModel.StatusBackgroundService = null;
+            logger.LogError(e, "Unexpected error at: {time}", DateTimeOffset.Now);
+            return QueryStatus.INDETERMINATE;
         }
         finally
         {
@@ -52,19 +61,13 @@ public sealed class PipeService(ILogger<PipeService> logger, StatusViewModel sta
     /// Queries our background service on its connection status to Gain servers.
     /// </summary>
     /// <returns></returns>
-    public async Task QueryWebSocketStatus(CancellationToken stoppingToken)
+    public async Task<QueryStatus> QueryWebSocketStatus(CancellationToken stoppingToken)
     {
-        if (statusViewModel.StatusBackgroundService != true)
-        {
-            statusViewModel.StatusWebSocket = null;
-            return;
-        }
-
         var locked = await _webSocketSemaphore.WaitAsync(0, stoppingToken);
 
         if (!locked)
         {
-            return;
+            return QueryStatus.LOCKED;
         }
 
         try
@@ -76,27 +79,30 @@ public sealed class PipeService(ILogger<PipeService> logger, StatusViewModel sta
             var reader = new StreamReader(pipeClient);
 
             await writer.WriteLineAsync("StatusWebSocket");
-            await writer.FlushAsync();
+            await writer.FlushAsync(stoppingToken);
 
-            var status = await reader.ReadLineAsync();
+            var status = await reader.ReadLineAsync(stoppingToken);
 
             if (status == "1")
             {
-                statusViewModel.StatusWebSocket = true;
+                return QueryStatus.SUCCESS;
             }
             else if (status == "0")
             {
-                statusViewModel.StatusWebSocket = false;
+                return QueryStatus.FAILURE;
             }
-            else
-            {
-                logger.LogError("Unexpected response on `StatusWebSocket` request.");
-                statusViewModel.StatusWebSocket = null;
-            }
+
+            logger.LogError("Unexpected response on `StatusWebSocket` request.");
+            return QueryStatus.INDETERMINATE;
+        }
+        catch (TimeoutException)
+        {
+            return QueryStatus.INDETERMINATE;
         }
         catch (Exception e) when (e is not OperationCanceledException)
         {
-            statusViewModel.StatusWebSocket = null;
+            logger.LogError(e, "Unexpected error at: {time}", DateTimeOffset.Now);
+            return QueryStatus.INDETERMINATE;
         }
         finally
         {
@@ -110,19 +116,13 @@ public sealed class PipeService(ILogger<PipeService> logger, StatusViewModel sta
     /// Queries our background service on its connection to the Dentrix database.
     /// </summary>
     /// <returns></returns>
-    public async Task QueryDentrixStatus(CancellationToken stoppingToken)
+    public async Task<QueryStatus> QueryDentrixStatus(CancellationToken stoppingToken)
     {
-        if (statusViewModel.StatusBackgroundService != true)
-        {
-            statusViewModel.StatusDentrix = null;
-            return;
-        }
-
         var locked = await _dentrixSemaphore.WaitAsync(0, stoppingToken);
 
         if (!locked)
         {
-            return;
+            return QueryStatus.LOCKED;
         }
 
         try
@@ -134,27 +134,30 @@ public sealed class PipeService(ILogger<PipeService> logger, StatusViewModel sta
             var reader = new StreamReader(pipeClient);
 
             await writer.WriteLineAsync("StatusDentrix");
-            await writer.FlushAsync();
+            await writer.FlushAsync(stoppingToken);
 
-            var status = await reader.ReadLineAsync();
+            var status = await reader.ReadLineAsync(stoppingToken);
 
             if (status == "1")
             {
-                statusViewModel.StatusDentrix = true;
+                return QueryStatus.SUCCESS;
             }
             else if (status == "0")
             {
-                statusViewModel.StatusDentrix = false;
+                return QueryStatus.FAILURE;
             }
-            else
-            {
-                logger.LogError("Unexpected response on `StatusDentrix` request.");
-                statusViewModel.StatusDentrix = null;
-            }
+
+            logger.LogError("Unexpected response on `StatusDentrix` request.");
+            return QueryStatus.INDETERMINATE;
+        }
+        catch (TimeoutException)
+        {
+            return QueryStatus.INDETERMINATE;
         }
         catch (Exception e) when (e is not OperationCanceledException)
         {
-            statusViewModel.StatusDentrix = null;
+            logger.LogError(e, "Unexpected error at: {time}", DateTimeOffset.Now);
+            return QueryStatus.INDETERMINATE;
         }
         finally
         {
