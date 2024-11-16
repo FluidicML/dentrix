@@ -5,12 +5,12 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
 	<Fragment>
 		<ComponentGroup Id="FL_AppComponent" Directory="FL_AppInstallFolder">
-			<Files Include="$(var.Application.TargetDir)\**">
-				<Exclude Files="$(var.FL_AppTarget)" />
+			<Files Include="$(var.FL_AppTargetDir)\**">
+				<Exclude Files="$(var.FL_AppTargetPath)" />
 			</Files>
 
 			<Component Id="FL_AppComponentTarget">
-				<File Source="$(var.FL_AppTarget)" KeyPath="yes">
+				<File Source="$(var.FL_AppTargetPath)" KeyPath="yes">
 					<Shortcut
 						Id="FL_AppDesktopShortcut"
 						Name="Gain"

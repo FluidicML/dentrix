@@ -5,16 +5,16 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
 	<Fragment>
 		<ComponentGroup Id="FL_ServiceComponent" Directory="FL_ServiceInstallFolder">
-			<Files Include="$(var.BackgroundService.TargetDir)\**">
-				<Exclude Files="$(var.FL_ServiceTarget)" />
+			<Files Include="$(var.FL_ServiceTargetDir)\**">
+				<Exclude Files="$(var.FL_ServiceTargetPath)" />
 			</Files>
 
 			<Component Id="FL_ServiceComponentTarget">
-				<File Source="$(var.FL_ServiceTarget)" KeyPath="yes" />
+				<File Source="$(var.FL_ServiceTargetPath)" KeyPath="yes" />
 
 				<ServiceInstall
-					Name="Gain - Dentrix Adapter"
-					DisplayName="Gain - Dentrix Adapter"
+					Name="Gain Service - Dentrix Adapter"
+					DisplayName="Gain Service - Dentrix Adapter"
 					Description="Service for triggering Gain workflows"
 					Type="ownProcess"
 					Start="auto"
@@ -29,7 +29,7 @@
 
 				<ServiceControl
 					Id="FL_ServiceControl"
-					Name="Gain - Dentrix Adapter"
+					Name="Gain Service - Dentrix Adapter"
 					Start="install"
 					Stop="both"
 					Remove="uninstall" />

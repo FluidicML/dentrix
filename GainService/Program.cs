@@ -20,7 +20,7 @@ public class Program
 #if !DEBUG
         builder.Services.AddWindowsService(options =>
         {
-            options.ServiceName = "Gain - Dentrix Adapter";
+            options.ServiceName = "Gain Service - Dentrix Adapter";
         });
 #endif
 

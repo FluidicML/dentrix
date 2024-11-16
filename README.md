@@ -7,12 +7,13 @@ and query results returned from the locally installed Dentrix instance. Though
 our adapter is intended to be small, there are a few moving parts necessary to
 get things working:
 
-- The `BackgroundService` is a [Windows Service](https://learn.microsoft.com/en-us/dotnet/core/extensions/windows-service)
+- `GainService` is a [Windows Service](https://learn.microsoft.com/en-us/dotnet/core/extensions/windows-service)
   that maintains a websocket connection to the Gain backend. Queries are
   received along this connection and proxied to/from the locally installed
   Dentrix instance.
-- The `Application` is a small WPF-based project useful for updating API keys
-  and checking (at a very high-level) the state of the `BackgroundService`.
+- `Gain` is a small WPF-based project useful for updating API keys, initiating
+  the connection to Dentrix, and checking (at a very high-level) the state of
+  the `GainService`.
 - The `Installer` is a [WiX](https://wixtoolset.org/) project defining our
   installer. The resulting installation script adds the necessary registry
   keys, boots and configures our service, installs all signed .dlls and .exes,
@@ -37,8 +38,8 @@ signed application. This unfortunately makes the dev cycle pretty slow.
 At the top-level of this repository exist multiple **projects** created using
 [Visual Studio](https://visualstudio.microsoft.com/):
 
-- `Application`
-- `BackgroundService`
+- `Gain`
+- `GainService`
 - `DentrixDlg`
 - `Installer`
 
@@ -110,11 +111,11 @@ and
 The `TargetFramework` specifies which version of the .NET platform the project
 should build against and run on. In other words, it specifies the APIs that
 should be made available to the project. For example, we specify
-`net8.0-windows` in `Application.csproj` and `BackgroundService.csproj` since
-we need access to Windows-based .NET APIs (used to run a Windows GUI and
-service respectively). In contrast, our `DentrixDlg.csproj` file specifies a
-`net472` `TargetFramework` since this particular framework is necessary for use
-by our installer.
+`net8.0-windows` in `Gain.csproj` and `GainService.csproj` since we need access
+to Windows-based .NET APIs (used to run a Windows GUI and service
+respectively). In contrast, our `DentrixDlg.csproj` file specifies a `net472`
+`TargetFramework` since this particular framework is necessary for use by our
+installer.
 
 > `net472` is a .NET Framework library meaning it only works on Windows. That's
 > why the `net472` moniker doesn't have a `-windows` suffix like the other two
@@ -157,19 +158,19 @@ To muddy matters, .NET projects also have a concept of `Configuration` and
 usually something like `Debug` or `Release` whereas `Platform` is usually
 something like `x86` or `x64`. Together they form a so-called project
 configuration. But keep in mind, `Platform` is *just a name* used to
-disambiguate what set of configurations you want to use. It doesn't really
-mean anything.
+disambiguate what set of configurations you want to use. It doesn't really mean
+anything.
 
 For example, I could define a "Release x86" project configuration (a
 `Configuration` of `Release` and a `Platform` of `x86`) that sets the
-`PlatformTarget` property to `x86`. But I could've also defined "Release
-x86" to (confusingly) set the `PlatformTarget` to `x64`. I could also define
-a project configuration called "Release blahblahblah".
+`PlatformTarget` property to `x86`. But I could've also defined "Release x86"
+to (confusingly) set the `PlatformTarget` to `x64`. I could also define a
+project configuration called "Release blahblahblah".
 
 Use of a project configuration can be convenient since they can be used to
 switch between values the other three properties may be set to. Furthermore,
-the defaults are sensible. For example, `Release` configurations tend to
-have properties set that enable optimization and strip out debugging symbols.
+the defaults are sensible. For example, `Release` configurations tend to have
+properties set that enable optimization and strip out debugging symbols.
 Ultimately, if we choose to use a project configuration for builds, we must
-also make sure the configuration is set appropriately. It's probably easiest
-to do that within Visual Studio.
+also make sure the configuration is set appropriately. It's probably easiest to
+do that within Visual Studio.
