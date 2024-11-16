@@ -5,9 +5,27 @@
 <Wix
 	xmlns="http://wixtoolset.org/schemas/v4/wxs"
 	xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+	
+	<!--
+	Our preferred `Manufacturer` name is "Fluidic ML, INC." but the trailing
+	period is stripped in certain contexts and not others. Don't include for
+	consistency sake.
+	
+	As a concrete example, consider what would happen if we *did* specify
+	`Manufacturer="Fluidic ML, INC."`. We use this manufacturer value as
+	an intermediate installation folder. Depending on the filesystem though,
+	folder names aren't allowed to end with trailing periods. The directory
+	actually created on disk may have the period stripped, yielding e.g.:
+	`C:\Program Files\Fluidic ML, INC`.
+	
+	But we also use the manufacturer value in the registry to tell our
+	application where to look for certain files. The registry value would
+	then be something like: `C:\Program Files\Fluidic ML, INC.`. This is a
+	problem though - this latter path doesn't actually exist.
+	-->
 	<Package
 	    Name="Gain"
-	    Manufacturer="Fluidic ML, INC."
+	    Manufacturer="Fluidic ML, INC"
 	    Version="1.0.0.0"
 	    UpgradeCode="{f68cb4b7-7e79-4d25-984f-08a980e2af4f}">
 
