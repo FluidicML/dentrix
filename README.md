@@ -135,20 +135,6 @@ needed by our end users.
 > runtime decides to run our executables with an incompatible bit mode, our
 > processes will fail.
 
-To muddy matters, .NET projects also have a concept of `Configuration` and
-`Platform` (not to be confused with `PlatformTarget`). `Configuration` is
-usually something like `Debug` or `Release` whereas `Platform` is usually
-something like `x86` or `x64`. Together they form a so-called configuration
-set. But keep in mind, `Platform` is *just a name* used to disambiguate what
-set of configurations you want to use. It doesn't really mean anything.
-
-For example, I could define a "Release x86" configuration set (a
-`Configuration` of `Release` and a `Platform` of `x86`) that sets the
-`PlatformTarget` property to `x86`. But I could've also defined "Release x86"
-to (confusingly) set the `PlatformTarget` to `x64`. I could also define a
-configuration set called "Release blahblahblah". Ultimately, don't depend on it
-when telling MSBuild how it should compile our project.
-
 #### RuntimeIdentifier
 
 The `RuntimeIdentifier` is usually some moniker consisting of a target OS and
@@ -163,3 +149,27 @@ While the other two properties are specified to `dotnet` or `MSBuild.exe` with
 the `--property` command line argument, this property can be specified with
 either the `--runtime` or `--arch` arguments. Read about their differences
 [here](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build).
+
+#### Project Configurations
+
+To muddy matters, .NET projects also have a concept of `Configuration` and
+`Platform` (not to be confused with `PlatformTarget`). `Configuration` is
+usually something like `Debug` or `Release` whereas `Platform` is usually
+something like `x86` or `x64`. Together they form a so-called project
+configuration. But keep in mind, `Platform` is *just a name* used to
+disambiguate what set of configurations you want to use. It doesn't really
+mean anything.
+
+For example, I could define a "Release x86" project configuration (a
+`Configuration` of `Release` and a `Platform` of `x86`) that sets the
+`PlatformTarget` property to `x86`. But I could've also defined "Release
+x86" to (confusingly) set the `PlatformTarget` to `x64`. I could also define
+a project configuration called "Release blahblahblah".
+
+Use of a project configuration can be convenient since they can be used to
+switch between values the other three properties may be set to. Furthermore,
+the defaults are sensible. For example, `Release` configurations tend to
+have properties set that enable optimization and strip out debugging symbols.
+Ultimately, if we choose to use a project configuration for builds, we must
+also make sure the configuration is set appropriately. It's probably easiest
+to do that within Visual Studio.
