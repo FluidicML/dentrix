@@ -63,8 +63,6 @@ public sealed class DatabaseAdapter
 
     private Object? HKLUSoftwareGetValue(string key)
     {
-        
-
         try
         {
             using var subKey = Registry.LocalMachine.OpenSubKey(RegCommonPath);
@@ -73,7 +71,6 @@ public sealed class DatabaseAdapter
 
             if (value != null)
             {
-                System.Diagnostics.Debugger.Launch();
                 return value;
             }
         }
@@ -81,41 +78,6 @@ public sealed class DatabaseAdapter
         {
             _logger.LogError(e, "Registry (original) error at: {time}", DateTimeOffset.Now);
         }
-        
-
-        //try
-        //{
-        //    using var hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-        //    using var subKey = hklm.OpenSubKey(RegCommonPath);
-
-        //    var value = subKey?.GetValue(key);
-
-        //    if (value != null)
-        //    {
-        //        return value;
-        //    }
-        //}
-        //catch (Exception e)
-        //{
-        //    _logger.LogError(e, "Registry (original) error at: {time}", DateTimeOffset.Now);
-        //}
-
-        //try
-        //{
-        //    using var hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
-        //    using var subKey = hklm.OpenSubKey(RegCommonPath);
-
-        //    var value = subKey?.GetValue(key);
-
-        //    if (value != null)
-        //    {
-        //        return value;
-        //    }
-        //}
-        //catch (Exception e)
-        //{
-        //    _logger.LogError(e, "Registry (redirected) error at: {time}", DateTimeOffset.Now);
-        //}
 
         return null;
     }

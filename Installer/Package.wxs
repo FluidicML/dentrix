@@ -54,15 +54,8 @@
 			After="CostFinalize" />
 
 		<CustomAction
-			Id="FL_x86_DentrixDirOverrideAction"
-			DllEntry="FL_x86_DentrixDirSetProperty"
-			BinaryRef="FL_DtxDlgBinary"
-			Execute="immediate"
-			Impersonate="yes" />
-
-		<CustomAction
-			Id="FL_x64_DentrixDirOverrideAction"
-			DllEntry="FL_x64_DentrixDirSetProperty"
+			Id="FL_DentrixDirOverrideAction"
+			DllEntry="FL_DentrixDirSetProperty"
 			BinaryRef="FL_DtxDlgBinary"
 			Execute="immediate"
 			Impersonate="yes" />
@@ -76,13 +69,8 @@
 		-->
 		<InstallUISequence>
 			<Custom
-				Action="FL_x86_DentrixDirOverrideAction"
-				After="FL_DentrixDirDefaultAction"
-				Condition="$(var.Platform) = x86" />
-			<Custom
-				Action="FL_x64_DentrixDirOverrideAction"
-				After="FL_DentrixDirDefaultAction"
-				Condition="$(var.Platform) = x64" />
+				Action="FL_DentrixDirOverrideAction"
+				After="FL_DentrixDirDefaultAction" />
 		</InstallUISequence>
 
 		<!--
