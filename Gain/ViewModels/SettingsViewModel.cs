@@ -32,15 +32,6 @@ public partial class SettingsViewModel : BaseViewModel
     public string MessageColor =>
         IsError ? "#dc2626" : "#10b981";
 
-    [ObservableProperty]
-    private bool? _statusService;
-
-    [ObservableProperty]
-    private bool? _statusWebSocket;
-
-    [ObservableProperty]
-    private bool? _statusDatabase;
-
     public SettingsViewModel()
     {
         _apiKey = string.Empty;
@@ -49,9 +40,5 @@ public partial class SettingsViewModel : BaseViewModel
         _isError = false;
         _isDirty = false;
         _isLoading = false;
-
-        _statusService = null;
-        _statusWebSocket = null;
-        _statusDatabase = null;
     }
 }

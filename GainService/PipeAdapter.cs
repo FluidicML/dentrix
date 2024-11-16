@@ -6,24 +6,23 @@ namespace FluidicML.Gain;
 
 public sealed class PipeAdapter(
     ILogger<SocketAdapter> _logger,
-    DatabaseAdapter _database,
+    IConfiguration _config,
+    DentrixAdapter _dentrix,
     SocketAdapter _socket
 )
 {
-    private const string NAMED_PIPE_SERVER = "DB3B88B2-AC72-4B06-893A-89E69E73E134";
-
     public void Initialize(CancellationToken stoppingToken)
     {
         _ = Task.Run(async () =>
         {
-            // TODO: I don't have a full sense of the implications of this security rule.
-            // Actually explore this once the design of the application is settled.
+            // TODO: We need to update this so that only a Fluidic ML, INC. verified
+            // program can read/write to this pipe.
             PipeSecurity pipeSecurity = new();
             var sid = new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null);
             pipeSecurity.SetAccessRule(new PipeAccessRule(sid, PipeAccessRights.ReadWrite, AccessControlType.Allow));
 
             await using var pipeServer = NamedPipeServerStreamAcl.Create(
-                NAMED_PIPE_SERVER,
+                _config.GetValue<string>("PipeServer")!,
                 PipeDirection.InOut,
                 NamedPipeServerStream.MaxAllowedServerInstances,
                 PipeTransmissionMode.Message,
@@ -60,22 +59,31 @@ public sealed class PipeAdapter(
         }, stoppingToken);
     }
 
-    private async Task Dispatch(String buffer, StreamWriter writer, StreamReader reader, CancellationToken stoppingToken)
+    private async Task Dispatch(
+        String buffer,
+        StreamWriter writer,
+        StreamReader reader,
+        CancellationToken stoppingToken
+    )
     {
         if (buffer.StartsWith("Api "))
         {
-            _logger.LogInformation("Updated API key at: {time}.", DateTimeOffset.Now);
+            _logger.LogInformation("Api message at: {time}.", DateTimeOffset.Now);
 
-            await _socket.Initialize(buffer["Api ".Length..], stoppingToken);
+            await _socket.Connect(buffer["Api ".Length..], stoppingToken);
         }
-        else if (buffer == "Status")
+        else if (buffer == "StatusWebSocket")
         {
-            _logger.LogInformation("Requested status at: {time}.", DateTimeOffset.Now);
+            _logger.LogInformation("StatusWebSocket message at: {time}.", DateTimeOffset.Now);
 
-            var IsWsConnected = _socket.IsConnected ? 1 : 0;
-            var IsDbConnected = _database.IsConnected ? 1 : 0;
+            await writer.WriteLineAsync((_socket.IsConnected ? 1 : 0).ToString());
+            await writer.FlushAsync(stoppingToken);
+        }
+        else if (buffer == "StatusDentrix")
+        {
+            _logger.LogInformation("StatusDentrix message at: {time}.", DateTimeOffset.Now);
 
-            await writer.WriteLineAsync($"Ws={IsWsConnected},Db={IsDbConnected}");
+            await writer.WriteLineAsync((_dentrix.IsConnected ? 1 : 0).ToString());
             await writer.FlushAsync(stoppingToken);
         }
         else

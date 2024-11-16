@@ -5,7 +5,7 @@ namespace FluidicML.Gain;
 
 public class Program
 {
-    private static readonly IConfiguration configService = new ConfigurationBuilder()
+    private static readonly IConfiguration config = new ConfigurationBuilder()
         .AddJsonFile("appsettings.json")
 #if DEBUG
         .AddJsonFile("appsettings.Staging.json")
@@ -28,8 +28,8 @@ public class Program
             EventLogSettings, EventLogLoggerProvider>(builder.Services);
 
         builder.Services.AddHostedService<WindowsBackgroundService>();
-        builder.Services.AddSingleton<IConfiguration>(configService);
-        builder.Services.AddSingleton<DatabaseAdapter>();
+        builder.Services.AddSingleton<IConfiguration>(config);
+        builder.Services.AddSingleton<DentrixAdapter>();
         builder.Services.AddSingleton<SocketAdapter>();
         builder.Services.AddSingleton<PipeAdapter>();
 

@@ -2,9 +2,11 @@
 
 namespace FluidicML.Gain.DTO;
 
-public sealed class ResultsDto
+public sealed class QueryResultDto
 {
     public required int id { get; set; }
 
-    public required object[] results { get; set; }
+    public required object? value { get; set; }
+
+    public required int status { get; set; }
 }
