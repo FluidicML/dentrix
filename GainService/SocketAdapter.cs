@@ -19,6 +19,11 @@ public sealed class SocketAdapter
     /// </summary>
     private CancellationTokenSource? _emitTokenSource;
 
+    public bool IsConnected
+    {
+        get => !string.IsNullOrEmpty(_apiKey) && _socket?.Connected == true;
+    }
+
     public SocketAdapter(
         ILogger<SocketAdapter> logger,
         IConfiguration config,

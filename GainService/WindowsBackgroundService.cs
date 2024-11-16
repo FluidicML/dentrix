@@ -15,7 +15,7 @@ public sealed class WindowsBackgroundService(
             // Each adapter runs in their own task. This makes the service possible to
             // stop (e.g. during uninstallation).
             _socket.Initialize(stoppingToken);
-            //_pipe.Initialize(stoppingToken);
+            _pipe.Initialize(stoppingToken);
 
             await Task.Delay(Timeout.Infinite, stoppingToken);
         }

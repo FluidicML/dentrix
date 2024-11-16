@@ -1,5 +1,6 @@
 ﻿using System.Data.Odbc;
 using System.IO.IsolatedStorage;
+using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 
 namespace FluidicML.Gain;
@@ -32,6 +33,10 @@ public sealed class DentrixAdapter
     private readonly IConfiguration _config;
 
     private string _databaseConnStr;
+    public bool IsConnected
+    {
+        get => !string.IsNullOrEmpty(_databaseConnStr);
+    }
 
     public DentrixAdapter(ILogger<DentrixAdapter> logger, IConfiguration config)
     {

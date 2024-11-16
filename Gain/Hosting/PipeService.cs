@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System.IO;
 using System.IO.Pipes;
 
@@ -15,18 +16,23 @@ public enum QueryStatus
 /// <summary>
 /// Primary means of communicating to and from the background service.
 /// </summary>
-public sealed class PipeService(ILogger<PipeService> logger)
+public sealed class PipeService(
+    ILogger<PipeService> _logger,
+    IConfiguration _config
+)
 {
-    private const string NAMED_PIPE_SERVER = "DB3B88B2-AC72-4B06-893A-89E69E73E134";
-
     private const int TIMEOUT_MILLIS = 2500;
 
-    public static async Task SendApiKey(string apiKey)
+    public async Task SendApiKey(string apiKey)
     {
-        await using var pipeClient = new NamedPipeClientStream(".", NAMED_PIPE_SERVER, PipeDirection.Out);
+        await using var pipeClient = new NamedPipeClientStream(
+            ".",
+            _config.GetValue<string>("PipeServer")!,
+            PipeDirection.Out
+        );
         await pipeClient.ConnectAsync(TIMEOUT_MILLIS);
 
-        using var writer = new StreamWriter(pipeClient);
+        var writer = new StreamWriter(pipeClient);
         await writer.WriteLineAsync($"Api {apiKey}");
         await writer.FlushAsync();
     }
@@ -48,7 +54,11 @@ public sealed class PipeService(ILogger<PipeService> logger)
 
         try
         {
-            await using var pipeClient = new NamedPipeClientStream(".", NAMED_PIPE_SERVER, PipeDirection.InOut);
+            await using var pipeClient = new NamedPipeClientStream(
+                ".",
+                _config.GetValue<string>("PipeServer")!,
+                PipeDirection.InOut
+            );
             await pipeClient.ConnectAsync(TIMEOUT_MILLIS, stoppingToken);
             return QueryStatus.SUCCESS;
         }
@@ -58,7 +68,7 @@ public sealed class PipeService(ILogger<PipeService> logger)
         }
         catch (Exception e) when (e is not OperationCanceledException)
         {
-            logger.LogError(e, "Unexpected error at: {time}", DateTimeOffset.Now);
+            _logger.LogError(e, "Unexpected error at: {time}", DateTimeOffset.Now);
             return QueryStatus.INDETERMINATE;
         }
         finally
@@ -84,7 +94,11 @@ public sealed class PipeService(ILogger<PipeService> logger)
 
         try
         {
-            await using var pipeClient = new NamedPipeClientStream(".", NAMED_PIPE_SERVER, PipeDirection.InOut);
+            await using var pipeClient = new NamedPipeClientStream(
+                ".",
+                _config.GetValue<string>("PipeServer")!,
+                PipeDirection.InOut
+            );
             await pipeClient.ConnectAsync(TIMEOUT_MILLIS, stoppingToken);
 
             var writer = new StreamWriter(pipeClient);
@@ -104,7 +118,7 @@ public sealed class PipeService(ILogger<PipeService> logger)
                 return QueryStatus.FAILURE;
             }
 
-            logger.LogError("Unexpected response on `StatusWebSocket` request.");
+            _logger.LogError("Unexpected response on `StatusWebSocket` request.");
             return QueryStatus.INDETERMINATE;
         }
         catch (TimeoutException)
@@ -113,7 +127,7 @@ public sealed class PipeService(ILogger<PipeService> logger)
         }
         catch (Exception e) when (e is not OperationCanceledException)
         {
-            logger.LogError(e, "Unexpected error at: {time}", DateTimeOffset.Now);
+            _logger.LogError(e, "Unexpected error at: {time}", DateTimeOffset.Now);
             return QueryStatus.INDETERMINATE;
         }
         finally
@@ -139,7 +153,11 @@ public sealed class PipeService(ILogger<PipeService> logger)
 
         try
         {
-            await using var pipeClient = new NamedPipeClientStream(".", NAMED_PIPE_SERVER, PipeDirection.InOut);
+            await using var pipeClient = new NamedPipeClientStream(
+                ".",
+                _config.GetValue<string>("PipeServer")!,
+                PipeDirection.InOut
+            );
             await pipeClient.ConnectAsync(TIMEOUT_MILLIS, stoppingToken);
 
             var writer = new StreamWriter(pipeClient);
@@ -159,7 +177,7 @@ public sealed class PipeService(ILogger<PipeService> logger)
                 return QueryStatus.FAILURE;
             }
 
-            logger.LogError("Unexpected response on `StatusDentrix` request.");
+            _logger.LogError("Unexpected response on `StatusDentrix` request.");
             return QueryStatus.INDETERMINATE;
         }
         catch (TimeoutException)
@@ -168,7 +186,7 @@ public sealed class PipeService(ILogger<PipeService> logger)
         }
         catch (Exception e) when (e is not OperationCanceledException)
         {
-            logger.LogError(e, "Unexpected error at: {time}", DateTimeOffset.Now);
+            _logger.LogError(e, "Unexpected error at: {time}", DateTimeOffset.Now);
             return QueryStatus.INDETERMINATE;
         }
         finally

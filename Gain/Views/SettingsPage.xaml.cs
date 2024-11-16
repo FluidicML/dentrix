@@ -17,18 +17,21 @@ public partial class SettingsPage : INavigableView<SettingsViewModel>
 {
     private readonly Uri _baseAddress;
     private readonly HttpClient _httpClient;
+    private readonly PipeService _pipeService;
 
     public SettingsViewModel ViewModel { get; }
     public MainWindowViewModel MainWindowViewModel { get; }
 
     public SettingsPage(
-        IConfiguration configService,
+        IConfiguration config,
+        PipeService pipeService,
         SettingsViewModel settingsViewModel,
         MainWindowViewModel mainWindowViewModel
     )
     {
-        _baseAddress = new Uri(configService.GetValue<string>("ApiUrl")!);
+        _baseAddress = new Uri(config.GetValue<string>("ApiUrl")!);
         _httpClient = new HttpClient() { BaseAddress = _baseAddress };
+        _pipeService = pipeService;
 
         ViewModel = settingsViewModel;
         MainWindowViewModel = mainWindowViewModel;
@@ -73,7 +76,7 @@ public partial class SettingsPage : INavigableView<SettingsViewModel>
             {
                 response.EnsureSuccessStatusCode();
 
-                await PipeService.SendApiKey(ViewModel.ApiKey);
+                await _pipeService.SendApiKey(ViewModel.ApiKey);
 
                 ViewModel.Message = "Success.";
                 ViewModel.IsError = false;
