@@ -74,7 +74,7 @@
 			<Custom
 				Action="FL_x86_DentrixDirOverrideAction"
 				After="FL_DentrixDirDefaultAction"
-				Condition="$(var.Platform) &lt;&gt; x64" />
+				Condition="$(var.Platform) = x86" />
 			<Custom
 				Action="FL_x64_DentrixDirOverrideAction"
 				After="FL_DentrixDirDefaultAction"
