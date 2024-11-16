@@ -26,7 +26,7 @@ public sealed class DatabaseAdapter
 
     private readonly ILogger<DatabaseAdapter> _logger;
 
-    private const string RegCommonPath = @"SOFTWARE\Fluidic ML, INC.\Gain";
+    private const string RegCommonPath = @"SOFTWARE\Fluidic ML, INC\Gain";
     private const string RegKeyAuthFile = "auth_key_file";
     private const string RegKeyDtxPath = "dentrix_exe_path";
 
