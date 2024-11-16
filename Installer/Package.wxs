@@ -17,23 +17,7 @@
 
 		<!--
 		We can coerce the value of ProgramFiles6432Folder by specifying the
-		architecture when invoking `dotnet build` on the Installer project. What
-		we can't coerce though is where registry values are written. Consider the
-		following scenario:
-
-		Imagine we are running a 32-bit instance of Dentrix on a 64-bit machine. In
-		fact, this might be common. To accommodate, we need to supply a 32-bit installer
-		that installs x86 variants of our projects. Since our installer is 32-bit,
-		any registry keys that we write to may automatically undergo registry redirection:
-		https://learn.microsoft.com/en-us/windows/win32/winprog64/shared-registry-keys
-
-		This means a registry key written under `Software\Fluidic ML, INC.` would
-		transparently and automatically be written to `Software\WOW6432Node\Fluidic ML, INC.`
-		instead. This also means any code in our projects that may query for a registry
-		key should actually check both the intended destination as well as the redirected
-		destination. Note that not all registry subkeys are subject to redirection (check
-		referenced link to confirm). It's up to you to verify where the 32- and 64-bit
-		versions of our application need to look.
+		architecture when invoking `dotnet build` on the Installer project.
 		-->
 		<StandardDirectory Id="ProgramFiles6432Folder">
 			<Directory Id="FL_ParentInstallFolder" Name="!(bind.Property.Manufacturer)">
