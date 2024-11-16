@@ -12,7 +12,7 @@
 				Key="Software\!(bind.Property.Manufacturer)\!(bind.Property.ProductName)"
 				Name="auth_key_file"
 				Type="string"
-				Value="[FL_ServiceInstallFolder]Assets\MNCN5L2G.dtxkey"
+				Value="[FL_ServiceInstallFolder]MNCN5L2G.dtxkey"
 				KeyPath="yes" />
 		</Component>
 	</Fragment>
