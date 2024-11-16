@@ -1,8 +1,6 @@
 ﻿using FluidicML.Gain.Hosting;
 using FluidicML.Gain.ViewModels;
 using Microsoft.Extensions.Configuration;
-using System.IO;
-using System.IO.Pipes;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Windows.Media;
@@ -77,6 +75,8 @@ public partial class SettingsPage : INavigableView<SettingsViewModel>
                 response.EnsureSuccessStatusCode();
 
                 await _pipeService.SendApiKey(ViewModel.ApiKey);
+
+                MainWindowViewModel.StatusWebSocket = true;
 
                 ViewModel.Message = "Success.";
                 ViewModel.IsError = false;
