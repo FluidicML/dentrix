@@ -92,10 +92,11 @@ public partial class MainWindow : IWindow
                 if (!string.IsNullOrEmpty(result))
                 {
                     await _pipeService.SendDentrixConnStr(result, _stoppingToken);
+                    await Task.Delay(5_000, _stoppingToken);
+                    continue;
                 }
             }
 
-            // TODO: If status is failed, we should try reconnecting to Dentrix.
             await Task.Delay(30_000, _stoppingToken);
         }
     }

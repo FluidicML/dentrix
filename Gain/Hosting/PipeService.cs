@@ -121,18 +121,23 @@ public sealed class PipeService(
             await writer.WriteLineAsync("StatusWebSocket");
             await writer.FlushAsync(stoppingToken);
 
-            var status = await reader.ReadLineAsync(stoppingToken);
+            var response = await reader.ReadLineAsync(stoppingToken);
 
-            if (status == "1")
+            if (response == "1")
             {
                 return Status.HEALTHY;
             }
-            else if (status == "0")
+            else if (response == "0")
             {
                 return Status.UNHEALTHY;
             }
 
-            _logger.LogError("Unexpected response on `StatusWebSocket` request.");
+            _logger.LogWarning(
+                "Unexpected response {response} on `StatusWebSocket` request at: {time}.",
+                response,
+                DateTimeOffset.Now
+            );
+
             return Status.INDETERMINATE;
         }
         catch (TimeoutException)
@@ -180,18 +185,23 @@ public sealed class PipeService(
             await writer.WriteLineAsync("StatusDentrix");
             await writer.FlushAsync(stoppingToken);
 
-            var status = await reader.ReadLineAsync(stoppingToken);
+            var response = await reader.ReadLineAsync(stoppingToken);
 
-            if (status == "1")
+            if (response == "1")
             {
                 return Status.HEALTHY;
             }
-            else if (status == "0")
+            else if (response == "0")
             {
                 return Status.UNHEALTHY;
             }
 
-            _logger.LogError("Unexpected response on `StatusDentrix` request.");
+            _logger.LogWarning(
+                "Unexpected response {response} on `StatusDentrix` request at: {time}.",
+                response,
+                DateTimeOffset.Now
+            );
+
             return Status.INDETERMINATE;
         }
         catch (TimeoutException)
