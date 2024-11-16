@@ -17,14 +17,47 @@
 
             <ui:PasswordBox
                 x:Name="ApiKeyPasswordBox"
+                HorizontalAlignment="Stretch"
                 Password="{Binding ViewModel.ApiKey}"
                 PasswordChanged="SettingsPage_ApiKeyChanged"
                 PasswordChar="•"
                 PlaceholderText="DX••••••••••••••••••••••••••••••••••••••" />
 
-            <StackPanel
-                Orientation="Horizontal"
-                Margin="0,24,0,0">
+            <DockPanel Margin="0,12,0,0">
+                <TextBlock
+                    DockPanel.Dock="Left"
+                    Margin="0,4,0,0"
+                    MaxWidth="300"
+                    TextWrapping="wrap"
+                    Text="{Binding ViewModel.Message}"
+                    Visibility="{Binding ViewModel.MessageVisibility}"
+                    Foreground="{Binding ViewModel.MessageColor}" />
+
+                <StackPanel
+                    DockPanel.Dock="Right"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+                    <ui:ProgressRing
+                        Width="24"
+                        Height="24"
+                        Margin="0,0,12,0"
+                        IsIndeterminate="True"
+                        Visibility="{Binding ViewModel.IsLoading, Converter={StaticResource BoolToCollapsedConverter}}" />
+
+                    <ui:Button
+                        Content="Save"
+                        IsEnabled="{Binding ViewModel.SaveButtonIsEnabled}"
+                        Click="SettingsPage_SaveClick" />
+                </StackPanel>
+            </DockPanel>
+        </StackPanel>
+
+        <StackPanel
+            DockPanel.Dock="Bottom"
+            VerticalAlignment="Bottom">
+            <RibbonSeparator Margin="0,0,0,12"/>
+
+            <StackPanel Orientation="Horizontal">
                 <CheckBox
                     IsThreeState="True"
                     IsEnabled="False"
@@ -63,36 +96,5 @@
                 </Label>
             </StackPanel>
         </StackPanel>
-
-        <DockPanel DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
-            <TextBlock
-                DockPanel.Dock="Left"
-                Margin="0,4,0,0"
-                MaxWidth="300"
-                TextWrapping="wrap"
-                Text="{Binding ViewModel.Message}"
-                Visibility="{Binding ViewModel.MessageVisibility}"
-                Foreground="{Binding ViewModel.MessageColor}" />
-
-            <StackPanel
-                DockPanel.Dock="Right"
-                Orientation="Horizontal"
-                HorizontalAlignment="Right">
-
-                <ui:ProgressRing
-                    Width="24"
-                    Height="24"
-                    Margin="0,0,12,0"
-                    IsIndeterminate="True"
-                    Visibility="{Binding ViewModel.IsLoading, Converter={StaticResource BoolToCollapsedConverter}}" />
-
-                <ui:Button
-                    DockPanel.Dock="Bottom"
-                    Content="Save"
-                    IsEnabled="{Binding ViewModel.SaveButtonIsEnabled}"
-                    Click="SettingsPage_SaveClick" />
-            </StackPanel>
-        </DockPanel>
-        
     </DockPanel>
 </Page>
