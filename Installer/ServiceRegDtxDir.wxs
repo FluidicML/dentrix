@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
 	<Fragment>
-		<Component Id="FL_ServiceRegDtxDir" Bitness="always32">
+		<Component Id="FL_ServiceRegDtxDir">
 			<RegistryValue
 				Root="HKLM"
 				Key="Software\!(bind.Property.Manufacturer)\!(bind.Property.ProductName)"

@@ -9,20 +9,25 @@ namespace DentrixDlg
     {
         private const string PROPERTY = "FL_DENTRIX_DIR";
         private const string DtxApiDll = "Dentrix.API.dll";
+        private const string DtxRegPath = @"\Dentrix Dental Systems, Inc.\Dentrix\General";
 
-        private static ActionResult FL_MaybeFindDentrixDir(Session session, Environment.SpecialFolder folder)
+        private static ActionResult FL_MaybeFindDentrixDir(
+            Session session,
+            Environment.SpecialFolder specialFolder
+        )
         {
-            var exePath = string.Empty;
-
             try
             {
-                var hKey = Registry.CurrentUser.OpenSubKey(@"Software\Dentrix Dental Systems, Inc.\Dentrix\General");
-                if (hKey != null)
+                var subKey = Registry.CurrentUser.OpenSubKey(Path.Combine("Software", DtxRegPath));
+
+                if (subKey != null)
                 {
-                    Object value = hKey.GetValue("ExePath");
+                    Object value = subKey.GetValue("ExePath");
                     if (value != null)
                     {
-                        exePath = value.ToString();
+                        session[PROPERTY] = value.ToString();
+
+                        return ActionResult.Success;
                     }
                 }
             }
@@ -31,14 +36,28 @@ namespace DentrixDlg
                 session.Log("Encountered error when accessing registry: {msg}", e.Message);
             }
 
-            if (!string.IsNullOrEmpty(exePath))
+            try
             {
-                session[PROPERTY] = exePath;
+                var subKey = Registry.CurrentUser.OpenSubKey(
+                    Path.Combine("Software", "WOW6432Node", DtxRegPath));
 
-                return ActionResult.Success;
+                if (subKey != null)
+                {
+                    Object value = subKey.GetValue("ExePath");
+                    if (value != null)
+                    {
+                        session[PROPERTY] = value.ToString();
+
+                        return ActionResult.Success;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                session.Log("Encountered error when accessing registry: {msg}", e.Message);
             }
 
-            var fallback = Path.Combine(Environment.GetFolderPath(folder), "Dentrix");
+            var fallback = Path.Combine(Environment.GetFolderPath(specialFolder), "Dentrix");
 
             if (File.Exists(Path.Combine(fallback, DtxApiDll)))
             {

@@ -24,34 +24,55 @@ public sealed class DatabaseAdapter
         int ConnectionStringSize
     );
 
-    private const string RegistryPath = @"Software\Fluidic ML, INC.\Gain";
-    private const string RegistryAuthFile = "auth_key_path";
-    private const string RegistryDtxPath = "dentrix_exe_path";
+    private static Object? HKLUSoftwareGetValue(string key)
+    {
+        var commonPath = @"Fluidic ML, INC.\Gain";
+
+        var subKey = Registry.LocalMachine.OpenSubKey(Path.Combine("Software", commonPath));
+
+        if (subKey != null)
+        {
+            var value = subKey.GetValue(key);
+
+            if (value != null)
+            {
+                return value;
+            }
+        }
+
+        var redirKey = Registry.LocalMachine.OpenSubKey(
+            Path.Combine("Software", "WOW6432Node", commonPath));
+
+        return redirKey?.GetValue(key);
+    }
 
     private readonly ILogger<DatabaseAdapter> _logger;
+
+    private const string RegKeyAuthFile = "auth_key_path";
+    private const string RegKeyDtxPath = "dentrix_exe_path";
+
+    private readonly string _regAuthFile;
+    private readonly string _regDtxPath;
 
     public DatabaseAdapter(ILogger<DatabaseAdapter> logger)
     {
         _logger = logger;
 
-        var dtxPath = string.Empty;
+        _regAuthFile = HKLUSoftwareGetValue(RegKeyAuthFile)?.ToString() ?? string.Empty;
 
-        var hKey = Registry.LocalMachine.OpenSubKey(RegistryPath);
-        if (hKey != null)
+        if (string.IsNullOrEmpty(_regAuthFile))
         {
-            Object? value = hKey.GetValue(RegistryDtxPath);
-            if (value != null)
-            {
-                dtxPath = value.ToString();
-            }
+            throw new InvalidProgramException($"Missing registry key \"{RegKeyAuthFile}\".");
         }
 
-        if (string.IsNullOrEmpty(dtxPath))
+        _regDtxPath = HKLUSoftwareGetValue(RegKeyDtxPath)?.ToString() ?? string.Empty;
+
+        if (string.IsNullOrEmpty(_regDtxPath))
         {
-            throw new InvalidProgramException($"Missing registry key \"{RegistryPath}\\{RegistryDtxPath}\".");
+            throw new InvalidProgramException($"Missing registry key \"{RegKeyDtxPath}\".");
         }
 
-        IntPtr hModule = LoadLibrary(Path.Combine(dtxPath, DtxAPI));
+        IntPtr hModule = LoadLibrary(Path.Combine(_regDtxPath, DtxAPI));
 
         if (hModule == IntPtr.Zero)
         {
@@ -124,24 +145,7 @@ public sealed class DatabaseAdapter
 
         try
         {
-            var authFilePath = string.Empty;
-
-            var hKey = Registry.LocalMachine.OpenSubKey(RegistryPath);
-            if (hKey != null)
-            {
-                Object? value = hKey.GetValue(RegistryAuthFile);
-                if (value != null)
-                {
-                    authFilePath = value.ToString();
-                }
-            }
-
-            if (string.IsNullOrEmpty(authFilePath))
-            {
-                throw new InvalidProgramException($"Missing registry key \"{RegistryPath}\\{RegistryAuthFile}\".");
-            }
-
-            var status = DENTRIXAPI_RegisterUser(authFilePath);
+            var status = DENTRIXAPI_RegisterUser(_regAuthFile);
 
             switch (status)
             {
@@ -154,7 +158,7 @@ public sealed class DatabaseAdapter
                     {
                         _logger.LogError(
                             "Dentrix \"{message}\" at: {time}",
-                            RegisterUserErrorMessage(status, authFilePath),
+                            RegisterUserErrorMessage(status, _regAuthFile),
                             DateTimeOffset.Now
                         );
                         break;
@@ -164,7 +168,7 @@ public sealed class DatabaseAdapter
 #if !DEBUG
             if (status != RU_SUCCESS)
             {
-                throw new InvalidProgramException(RegisterUserErrorMessage(status, authFilePath));
+                throw new InvalidProgramException(RegisterUserErrorMessage(status, _regAuthFile));
             }
 
             var builder = new StringBuilder(512);
