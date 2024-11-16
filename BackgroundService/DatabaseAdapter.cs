@@ -24,28 +24,6 @@ public sealed class DatabaseAdapter
         int ConnectionStringSize
     );
 
-    private static Object? HKLUSoftwareGetValue(string key)
-    {
-        var commonPath = @"Fluidic ML, INC.\Gain";
-
-        var subKey = Registry.LocalMachine.OpenSubKey(Path.Combine("Software", commonPath));
-
-        if (subKey != null)
-        {
-            var value = subKey.GetValue(key);
-
-            if (value != null)
-            {
-                return value;
-            }
-        }
-
-        var redirKey = Registry.LocalMachine.OpenSubKey(
-            Path.Combine("Software", "WOW6432Node", commonPath));
-
-        return redirKey?.GetValue(key);
-    }
-
     private readonly ILogger<DatabaseAdapter> _logger;
 
     private const string RegKeyAuthFile = "auth_key_path";
@@ -57,6 +35,8 @@ public sealed class DatabaseAdapter
     public DatabaseAdapter(ILogger<DatabaseAdapter> logger)
     {
         _logger = logger;
+
+        // HKLUSoftwareGetValue depends on logger. Make sure its set first.
 
         _regAuthFile = HKLUSoftwareGetValue(RegKeyAuthFile)?.ToString() ?? string.Empty;
 
@@ -78,6 +58,40 @@ public sealed class DatabaseAdapter
         {
             throw new InvalidProgramException("Could not load Dentrix.API.dll.");
         }
+    }
+
+    private Object? HKLUSoftwareGetValue(string key)
+    {
+        var commonPath = @"Fluidic ML, INC.\Gain";
+
+        try
+        {
+            var subKey = Registry.LocalMachine.OpenSubKey(Path.Combine("Software", commonPath));
+
+            var value = subKey?.GetValue(key);
+
+            if (value != null)
+            {
+                return value;
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Registry (original) error at: {time}", DateTimeOffset.Now);
+        }
+
+        try
+        {
+            var redirKey = Registry.LocalMachine.OpenSubKey(Path.Combine("Software", "WOW6432Node", commonPath));
+
+            return redirKey?.GetValue(key);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Registry (redirected) error at: {time}", DateTimeOffset.Now);
+        }
+
+        return null;
     }
 
     private const string DtxKey = "MNCN5L2G.dtxkey";

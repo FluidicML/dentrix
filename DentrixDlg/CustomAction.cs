@@ -20,15 +20,13 @@ namespace DentrixDlg
             {
                 var subKey = Registry.CurrentUser.OpenSubKey(Path.Combine("Software", DtxRegPath));
 
-                if (subKey != null)
-                {
-                    Object value = subKey.GetValue("ExePath");
-                    if (value != null)
-                    {
-                        session[PROPERTY] = value.ToString();
+                var value = subKey?.GetValue("ExePath");
 
-                        return ActionResult.Success;
-                    }
+                if (value != null)
+                {
+                    session[PROPERTY] = value.ToString();
+
+                    return ActionResult.Success;
                 }
             }
             catch (Exception e)
@@ -38,18 +36,16 @@ namespace DentrixDlg
 
             try
             {
-                var subKey = Registry.CurrentUser.OpenSubKey(
-                    Path.Combine("Software", "WOW6432Node", DtxRegPath));
+                // This lookup will always fail when building against an x64 platform.
+                var subKey = Registry.CurrentUser.OpenSubKey(Path.Combine("Software", "WOW6432Node", DtxRegPath));
 
-                if (subKey != null)
+                var value = subKey?.GetValue("ExePath");
+
+                if (value != null)
                 {
-                    Object value = subKey.GetValue("ExePath");
-                    if (value != null)
-                    {
-                        session[PROPERTY] = value.ToString();
+                    session[PROPERTY] = value.ToString();
 
-                        return ActionResult.Success;
-                    }
+                    return ActionResult.Success;
                 }
             }
             catch (Exception e)
