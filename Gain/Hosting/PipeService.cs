@@ -17,11 +17,11 @@ public enum QueryStatus
 /// </summary>
 public sealed class PipeService(ILogger<PipeService> logger)
 {
-    private const int TIMEOUT_MILLIS = 2500;
-
     private const string NAMED_PIPE_SERVER = "DB3B88B2-AC72-4B06-893A-89E69E73E134";
 
-    private async Task SendApiKey(string apiKey)
+    private const int TIMEOUT_MILLIS = 2500;
+
+    public static async Task SendApiKey(string apiKey)
     {
         await using var pipeClient = new NamedPipeClientStream(".", NAMED_PIPE_SERVER, PipeDirection.Out);
         await pipeClient.ConnectAsync(TIMEOUT_MILLIS);
