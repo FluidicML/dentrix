@@ -25,9 +25,9 @@ jobs:
           dotnet build --configuration:Release --property:"Platform=x86;PlatformTarget=x86" --arch:x86 BackgroundService
           dotnet build --configuration:Release --property:"Platform=x86;PlatformTarget=x86" --arch:x86 DentrixDlg
 
-          dotnet build --configuration:Release --property:"Platform=x64;PlatformTarget=x64" --arch:x64 Application
-          dotnet build --configuration:Release --property:"Platform=x64;PlatformTarget=x64" --arch:x64 BackgroundService
-          dotnet build --configuration:Release --property:"Platform=x64;PlatformTarget=x64" --arch:x64 DentrixDlg
+          # dotnet build --configuration:Release --property:"Platform=x64;PlatformTarget=x64" --arch:x64 Application
+          # dotnet build --configuration:Release --property:"Platform=x64;PlatformTarget=x64" --arch:x64 BackgroundService
+          # dotnet build --configuration:Release --property:"Platform=x64;PlatformTarget=x64" --arch:x64 DentrixDlg
 
       - name: Sign Projects
         run: >
@@ -50,7 +50,7 @@ jobs:
         run: |
           # https://wixtoolset.org/docs/development/wips/replace-win64-with-intuitive-attribute/
           dotnet build --configuration:Release --property:"Platform=x86;PlatformTarget=x86" --arch:x86 Installer
-          dotnet build --configuration:Release --property:"Platform=x64;PlatformTarget=x64" --arch:x64 Installer
+          # dotnet build --configuration:Release --property:"Platform=x64;PlatformTarget=x64" --arch:x64 Installer
 
       - name: Sign Installer (x86)
         run: >
@@ -70,8 +70,8 @@ jobs:
           name: Installer (x86).msi
           path: Installer/bin/Release/x86/en-US/Installer.msi
 
-      - name: Upload MSI (x64)
-        uses: actions/upload-artifact@v4
-        with:
-          name: Installer (x64).msi
-          path: Installer/bin/Release/x64/en-US/Installer.msi
+          # - name: Upload MSI (x64)
+          #   uses: actions/upload-artifact@v4
+          #   with:
+          #     name: Installer (x64).msi
+          #     path: Installer/bin/Release/x64/en-US/Installer.msi
