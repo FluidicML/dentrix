@@ -1,4 +1,8 @@
-﻿<Wix
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<?include Variables.wxi?>
+
+<Wix
 	xmlns="http://wixtoolset.org/schemas/v4/wxs"
 	xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
 	<Package
@@ -11,6 +15,10 @@
 
 		<MediaTemplate EmbedCab="yes" />
 
+		<!--
+		We can coerce the value of ProgramFiles6432Folder by specifying the
+		architecture when invoking `dotnet build` on the Installer project.
+		-->
 		<StandardDirectory Id="ProgramFiles6432Folder">
 			<Directory Id="FL_ParentInstallFolder" Name="!(bind.Property.Manufacturer)">
 				<Directory Id="FL_InstallFolder" Name="!(bind.Property.ProductName)">
@@ -60,7 +68,9 @@
 		https://learn.microsoft.com/en-us/windows/win32/msi/importing-the-installuisequence
 		-->
 		<InstallUISequence>
-			<Custom Action="FL_DentrixDirOverrideAction" After="FL_DentrixDirDefaultAction" />
+			<Custom
+				Action="FL_DentrixDirOverrideAction"
+				After="FL_DentrixDirDefaultAction" />
 		</InstallUISequence>
 
 		<!--
@@ -97,13 +107,11 @@
 		<ui:WixUI Id="FL_DialogSet" InstallDirectory="FL_InstallFolder" />
 
 		<Feature Id="FL_AppFeature" Title="Application">
-			<ComponentGroupRef Id="FL_AppFiles" />
-			<ComponentRef Id="FL_AppComponent" />
+			<ComponentGroupRef Id="FL_AppComponent" />
 		</Feature>
 
 		<Feature Id="FL_ServiceFeature" Title="Background Service">
-			<ComponentGroupRef Id="FL_ServiceFiles" />
-			<ComponentRef Id="FL_ServiceComponent" />
+			<ComponentGroupRef Id="FL_ServiceComponent" />
 			<ComponentRef Id="FL_ServiceAuthDtxKey" />
 			<ComponentRef Id="FL_ServiceRegDtxDir" />
 		</Feature>

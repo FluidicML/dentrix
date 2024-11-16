@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - jrpotter/bitness
 
 jobs:
   build:
@@ -15,16 +16,20 @@ jobs:
         with:
           submodules: true
 
-      - name: Build Solution
-        run: |
-          dotnet build -c Release Application
-          dotnet build -c Release BackgroundService
-          dotnet build -c Release DentrixDlg
-
       - name: Install AzureSignTool
         run: dotnet tool install --global AzureSignTool
 
-      - name: Sign Application and BackgroundService
+      - name: Build Projects
+        run: |
+          dotnet build --configuration:Release --property:"Platform=x86;PlatformTarget=x86" --arch:x86 Application
+          dotnet build --configuration:Release --property:"Platform=x86;PlatformTarget=x86" --arch:x86 BackgroundService
+          dotnet build --configuration:Release --property:"Platform=x86;PlatformTarget=x86" --arch:x86 DentrixDlg
+
+          dotnet build --configuration:Release --property:"Platform=x64;PlatformTarget=x64" --arch:x64 Application
+          dotnet build --configuration:Release --property:"Platform=x64;PlatformTarget=x64" --arch:x64 BackgroundService
+          dotnet build --configuration:Release --property:"Platform=x64;PlatformTarget=x64" --arch:x64 DentrixDlg
+
+      - name: Sign Projects
         run: >
           AzureSignTool sign
           -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}"
@@ -34,17 +39,20 @@ jobs:
           -kvc "${{ secrets.AZURE_CERT_NAME }}"
           -tr http://timestamp.digicert.com
           -v
-          "Application/bin/Release/**/*.dll"
-          "Application/bin/Release/**/*.exe"
-          "BackgroundService/bin/Release/**/*.dll"
-          "BackgroundService/bin/Release/**/*.exe"
-          "DentrixDlg/bin/Release/**/*.dll"
-          "DentrixDlg/bin/Release/**/*.exe"
+          Application/bin/Release/**/*.dll
+          Application/bin/Release/**/*.exe
+          BackgroundService/bin/Release/**/*.dll
+          BackgroundService/bin/Release/**/*.exe
+          DentrixDlg/bin/Release/**/*.dll
+          DentrixDlg/bin/Release/**/*.exe
 
       - name: Build Installer
-        run: dotnet build -c Release Installer
+        run: |
+          # https://wixtoolset.org/docs/development/wips/replace-win64-with-intuitive-attribute/
+          dotnet build --configuration:Release --property:"Platform=x86;PlatformTarget=x86" --arch:x86 Installer
+          dotnet build --configuration:Release --property:"Platform=x64;PlatformTarget=x64" --arch:x64 Installer
 
-      - name: Sign Installer
+      - name: Sign Installer (x86)
         run: >
           AzureSignTool sign
           -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}"
@@ -54,10 +62,16 @@ jobs:
           -kvc "${{ secrets.AZURE_CERT_NAME }}"
           -tr http://timestamp.digicert.com
           -v
-          "Installer/bin/Release/en-US/Installer.msi"
+          Installer/bin/Release/**/*.msi
 
-      - name: Upload MSI
+      - name: Upload MSI (x86)
         uses: actions/upload-artifact@v4
         with:
-          name: Installer.msi
-          path: "Installer/bin/Release/en-US/Installer.msi"
+          name: Installer (x86).msi
+          path: Installer/bin/Release/x86/en-US/Installer.msi
+
+      - name: Upload MSI (x64)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Installer (x64).msi
+          path: Installer/bin/Release/x64/en-US/Installer.msi

@@ -1,5 +1,6 @@
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using WixToolset.Dtf.WindowsInstaller;
 
@@ -9,55 +10,64 @@ namespace DentrixDlg
     {
         private const string PROPERTY = "FL_DENTRIX_DIR";
         private const string DtxApiDll = "Dentrix.API.dll";
+        private const string DtxRegPath = @"SOFTWARE\Dentrix Dental Systems, Inc.\Dentrix\General";
 
         /// <summary>
-        /// Attempts to find the the Dentrix installation automatically.
+        /// Attempts to find the the Dentrix (32-bit) installation automatically.
         /// </summary>
         /// <param name="session"></param>
         /// <returns></returns>
         [CustomAction]
         public static ActionResult FL_DentrixDirSetProperty(Session session)
         {
-            var exePath = string.Empty;
+            var regViews = new List<RegistryView>() { RegistryView.Registry64, RegistryView.Registry32 };
 
-            try
+            // When a 32-bit application accesses the Registry64 view, it receives the 32-bit
+            // registry. This might mean the second registry lookup is redundant.
+
+            foreach (RegistryView regView in regViews)
             {
-                var hKey = Registry.CurrentUser.OpenSubKey(@"Software\Dentrix Dental Systems, Inc.\Dentrix\General");
-                if (hKey != null)
+                RegistryKey hklm = null;
+                RegistryKey subKey = null;
+
+                try
                 {
-                    Object value = hKey.GetValue("ExePath");
+                    hklm = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, regView);
+                    subKey = Registry.CurrentUser.OpenSubKey(Path.Combine("Software", DtxRegPath));
+
+                    var value = subKey?.GetValue("ExePath");
                     if (value != null)
                     {
-                        exePath = value.ToString();
+                        session[PROPERTY] = value.ToString();
+                        return ActionResult.Success;
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                session.Log("Encountered error when accessing registry: {msg}", e.Message);
-            }
-
-            if (!string.IsNullOrEmpty(exePath))
-            {
-                session[PROPERTY] = exePath;
-
-                return ActionResult.Success;
+                catch (Exception e)
+                {
+                    session.Log("Encountered error when accessing registry: {msg}", e.Message);
+                }
+                finally
+                {
+                    hklm?.Dispose();
+                    subKey?.Dispose();
+                }
             }
 
-            var dir1 = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Dentrix");
+            var programFiles = new List<Environment.SpecialFolder>() {
+                Environment.SpecialFolder.ProgramFiles,
+                Environment.SpecialFolder.ProgramFilesX86
+            };
 
-            if (File.Exists(Path.Combine(dir1, DtxApiDll)))
+            foreach (Environment.SpecialFolder dir in programFiles)
             {
-                session[PROPERTY] = dir1;
+                var fallback = Path.Combine(Environment.GetFolderPath(dir), "Dentrix");
 
-                return ActionResult.Success;
-            }
+                if (File.Exists(Path.Combine(fallback, DtxApiDll)))
+                {
+                    session[PROPERTY] = fallback;
 
-            var dir2 = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Dentrix");
-
-            if (File.Exists(Path.Combine(dir2, DtxApiDll)))
-            {
-                session[PROPERTY] = dir2;
+                    return ActionResult.Success;
+                }
             }
 
             return ActionResult.Success;

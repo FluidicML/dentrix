@@ -7,8 +7,8 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>FluidicML.Gain</RootNamespace>
-		<PlatformTarget>x86</PlatformTarget>
 		<StartupObject>FluidicML.Gain.Program</StartupObject>
+		<OutputPath>$(ProjectDir)bin\$(Configuration)\$(Platform)\</OutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>

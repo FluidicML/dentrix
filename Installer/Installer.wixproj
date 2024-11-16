@@ -1,21 +1,28 @@
 ﻿<Project Sdk="WixToolset.Sdk/5.0.2">
-  <ItemGroup>
-    <Content Include="Assets\Images\shortcut.ico" />
-    <Content Include="Variables.wxi" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Assets\MNCN5L2G.dtxkey">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <Content Include="Assets\LICENSE.rtf" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
-    <PackageReference Include="WixToolset.Util.wixext" Version="5.0.2" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Application\Application.csproj" />
-    <ProjectReference Include="..\BackgroundService\BackgroundService.csproj" />
-    <ProjectReference Include="..\DentrixDlg\DentrixDlg.csproj" />
-  </ItemGroup>
+	<PropertyGroup>
+		<OutputPath>$(ProjectDir)bin\$(Configuration)\$(Platform)\</OutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Content Include="Assets\Images\shortcut.ico" />
+		<Content Include="Variables.wxi" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="Assets\MNCN5L2G.dtxkey">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<Content Include="Assets\LICENSE.rtf" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
+		<PackageReference Include="WixToolset.Util.wixext" Version="5.0.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Application\Application.csproj" />
+		<ProjectReference Include="..\BackgroundService\BackgroundService.csproj" />
+		<ProjectReference Include="..\DentrixDlg\DentrixDlg.csproj" />
+	</ItemGroup>
 </Project>
