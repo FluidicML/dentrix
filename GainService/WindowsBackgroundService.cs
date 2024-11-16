@@ -2,7 +2,6 @@ namespace FluidicML.Gain;
 
 public sealed class WindowsBackgroundService(
     ILogger<WindowsBackgroundService> _logger,
-    DentrixAdapter _dentrix,
     SocketAdapter _socket,
     PipeAdapter _pipe
 ) : BackgroundService
@@ -15,7 +14,7 @@ public sealed class WindowsBackgroundService(
 
             // Each adapter runs in their own task. This makes the service possible to
             // stop (e.g. during uninstallation).
-            //_socket.Initialize(stoppingToken);
+            _socket.Initialize(stoppingToken);
             //_pipe.Initialize(stoppingToken);
 
             await Task.Delay(Timeout.Infinite, stoppingToken);

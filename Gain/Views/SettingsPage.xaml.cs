@@ -27,7 +27,7 @@ public partial class SettingsPage : INavigableView<SettingsViewModel>
         MainWindowViewModel mainWindowViewModel
     )
     {
-        _baseAddress = new Uri(configService.GetValue<string>("API_URL")!);
+        _baseAddress = new Uri(configService.GetValue<string>("ApiUrl")!);
         _httpClient = new HttpClient() { BaseAddress = _baseAddress };
 
         ViewModel = settingsViewModel;

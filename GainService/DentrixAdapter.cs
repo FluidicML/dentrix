@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace FluidicML.Gain;
 
-public enum QueryStatus
+public enum QueryResultStatus
 {
     // A row was successfully retrieved from the database.
     RESULT = 0,
@@ -22,8 +22,8 @@ public enum QueryStatus
 
 public sealed class QueryResult
 {
-    public required QueryStatus status;
-    public required IDictionary<string, object>? result;
+    public required QueryResultStatus status;
+    public required IDictionary<string, object>? value;
 }
 
 public sealed class DentrixAdapter
@@ -99,7 +99,7 @@ public sealed class DentrixAdapter
         if (string.IsNullOrEmpty(_databaseConnStr))
         {
             _logger.LogError("Query made without Dentrix connection at: {time}", DateTimeOffset.Now);
-            yield return new() { status = QueryStatus.DISCONNECTED, result = null };
+            yield return new() { status = QueryResultStatus.DISCONNECTED, value = null };
             yield break;
         }
 
@@ -133,7 +133,7 @@ public sealed class DentrixAdapter
 
         if (conn == null)
         {
-            yield return new() { status = QueryStatus.CONNECT_FAILED, result = null };
+            yield return new() { status = QueryResultStatus.CONNECT_FAILED, value = null };
             yield break;
         }
 
@@ -161,7 +161,7 @@ public sealed class DentrixAdapter
 
             if (reader == null)
             {
-                yield return new() { status = QueryStatus.INVALID_QUERY, result = null };
+                yield return new() { status = QueryResultStatus.INVALID_QUERY, value = null };
                 yield break;
             }
 
@@ -202,17 +202,17 @@ public sealed class DentrixAdapter
 
                     if (!reading)
                     {
-                        yield return new() { status = QueryStatus.FINISHED, result = null };
+                        yield return new() { status = QueryResultStatus.FINISHED, value = null };
                         yield break;
                     }
 
                     if (canceled == null && json != null)
                     {
-                        yield return new() { status = QueryStatus.RESULT, result = json };
+                        yield return new() { status = QueryResultStatus.RESULT, value = json };
                         continue;
                     }
 
-                    yield return new() { status = QueryStatus.INTERRUPTED, result = null };
+                    yield return new() { status = QueryResultStatus.INTERRUPTED, value = null };
 
                     if (canceled != null)
                     {
