@@ -201,6 +201,12 @@ public sealed class SocketAdapter
                         },
                         emitToken
                     );
+
+                    // Too fast and we risk overflowing buffer queues in our websocket
+                    // server. Should probably play around with this value a bit. Better
+                    // fix is either batching results or building out infrastructure that
+                    // can handle large streams of data.
+                    await Task.Delay(500);
                 }
             });
 
