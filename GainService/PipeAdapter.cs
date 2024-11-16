@@ -6,7 +6,7 @@ namespace FluidicML.Gain;
 
 public sealed class PipeAdapter(
     ILogger<SocketAdapter> _logger,
-    DatabaseAdapter _database,
+    DentrixAdapter _database,
     SocketAdapter _socket
 )
 {

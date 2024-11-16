@@ -9,12 +9,7 @@ public sealed class SocketAdapter
 {
     private readonly ILogger<SocketAdapter> _logger;
     private readonly IConfiguration _configService;
-    private readonly DatabaseAdapter _database;
-
-    public bool IsConnected
-    {
-        get => _socket?.Connected == true && !string.IsNullOrEmpty(_apiKey);
-    }
+    private readonly DentrixAdapter _dentrix;
 
     private string _apiKey;
 
@@ -36,12 +31,12 @@ public sealed class SocketAdapter
     public SocketAdapter(
         ILogger<SocketAdapter> logger,
         IConfiguration configService,
-        DatabaseAdapter database
+        DentrixAdapter dentrix
     )
     {
         _logger = logger;
         _configService = configService;
-        _database = database;
+        _dentrix = dentrix;
 
         _apiKey = ReadApiKey() ?? string.Empty;
         _socket = null;
@@ -171,7 +166,7 @@ public sealed class SocketAdapter
         {
             var queryDto = response.GetValue<QueryDto>();
 
-            await foreach (var row in _database.Query(queryDto.query, emitToken))
+            await foreach (var row in _dentrix.Query(queryDto.query, emitToken))
             {
                 if (_socket?.Connected == true)
                 {
