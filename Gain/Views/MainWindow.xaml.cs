@@ -8,13 +8,16 @@ namespace FluidicML.Gain.Views;
 /// </summary>
 public partial class MainWindow : IWindow
 {
+    private readonly PipeService _pipeService;
     private readonly SettingsPage _settingsPage;
-    private readonly DentrixService _dentrixService;
 
-    public MainWindow(SettingsPage settingsPage, DentrixService dentrixService)
+    private readonly static CancellationTokenSource _cts = new();
+    private readonly static CancellationToken _stoppingToken = _cts.Token;
+
+    public MainWindow(PipeService pipeService, SettingsPage settingsPage)
     {
+        _pipeService = pipeService;
         _settingsPage = settingsPage;
-        _dentrixService = dentrixService;
 
         Application.Current.MainWindow = this;
 
@@ -22,18 +25,45 @@ public partial class MainWindow : IWindow
         InitializeComponent();
     }
 
-    private void MainWindow_Loaded(object sender, System.Windows.RoutedEventArgs e)
+    private void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
         SettingsPageFrame.Navigate(_settingsPage);
 
         _ = Task.Run(async () =>
         {
-            await _dentrixService.ConnectAsync();
-        });
+            while (!_stoppingToken.IsCancellationRequested)
+            {
+                await _pipeService.QueryBackgroundServiceStatus(_stoppingToken);
+                await Task.Delay(10_000, _stoppingToken);
+            }
+        }, _stoppingToken);
+
+        _ = Task.Run(async () =>
+        {
+            while (!_stoppingToken.IsCancellationRequested)
+            {
+                await _pipeService.QueryWebSocketStatus(_stoppingToken);
+                await Task.Delay(30_000, _stoppingToken);
+            }
+        }, _stoppingToken);
+
+        _ = Task.Run(async () =>
+        {
+            while (!_stoppingToken.IsCancellationRequested)
+            {
+                await _pipeService.QueryDentrixStatus(_stoppingToken);
+                await Task.Delay(30_000, _stoppingToken);
+            }
+        }, _stoppingToken);
     }
 
     private void MainWindow_TrayLeftClick(Wpf.Ui.Tray.Controls.NotifyIcon sender, RoutedEventArgs e)
     {
         Show();
+    }
+
+    private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    {
+        _cts.Cancel();
     }
 }

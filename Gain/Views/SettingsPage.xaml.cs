@@ -20,16 +20,19 @@ public partial class SettingsPage : INavigableView<SettingsViewModel>
     private readonly HttpClient _httpClient;
 
     public SettingsViewModel ViewModel { get; }
+    public StatusViewModel StatusViewModel { get; }
 
     public SettingsPage(
         IConfiguration configService,
-        SettingsViewModel settingsPageViewModel
+        SettingsViewModel settingsViewModel,
+        StatusViewModel statusViewModel
     )
     {
         _baseAddress = new Uri(configService.GetValue<string>("API_URL")!);
         _httpClient = new HttpClient() { BaseAddress = _baseAddress };
 
-        ViewModel = settingsPageViewModel;
+        ViewModel = settingsViewModel;
+        StatusViewModel = statusViewModel;
 
         DataContext = this;
         InitializeComponent();
@@ -37,59 +40,6 @@ public partial class SettingsPage : INavigableView<SettingsViewModel>
         // https://github.com/lepoco/wpfui/blob/950ade69bd123f605b507dc472796cb6ef9bfd59/src/Wpf.Ui/Controls/PasswordBox/PasswordBox.xaml#L186
         ApiKeyPasswordBox.Resources["TextControlPlaceholderForeground"] =
             new SolidColorBrush((Color)ColorConverter.ConvertFromString("#44F9FAFB"));
-
-        // Periodically poll for status updates.
-        var poll = new Task(async () =>
-        {
-            while (true)
-            {
-                try
-                {
-                    await using var pipeClient = new NamedPipeClientStream(".", NAMED_PIPE_SERVER, PipeDirection.InOut);
-                    await pipeClient.ConnectAsync(2500); // Milliseconds timeout
-
-                    ViewModel.StatusService = true;
-
-                    var writer = new StreamWriter(pipeClient);
-                    var reader = new StreamReader(pipeClient);
-
-                    await writer.WriteLineAsync("Status");
-                    await writer.FlushAsync();
-
-                    var status = await reader.ReadLineAsync();
-                    if (status != null)
-                    {
-                        foreach (string kv in status.Split(","))
-                        {
-                            if (kv.StartsWith("Ws="))
-                            {
-                                ViewModel.StatusWebSocket = kv == "Ws=1";
-                            }
-                            else if (kv.StartsWith("Db="))
-                            {
-                                ViewModel.StatusDatabase = kv == "Db=1";
-                            }
-                        }
-                    }
-                }
-                catch (TimeoutException)
-                {
-                    ViewModel.StatusService = false;
-                    ViewModel.StatusWebSocket = null;
-                    ViewModel.StatusDatabase = null;
-                }
-                catch (Exception)
-                {
-                    ViewModel.StatusService = null;
-                    ViewModel.StatusWebSocket = null;
-                    ViewModel.StatusDatabase = null;
-                }
-
-                await Task.Delay(2500);
-            }
-        });
-
-        poll.Start();
     }
 
     private void SettingsPage_ApiKeyChanged(object sender, EventArgs e)
@@ -124,6 +74,7 @@ public partial class SettingsPage : INavigableView<SettingsViewModel>
             {
                 response.EnsureSuccessStatusCode();
 
+                // TODO: Dispatch this through the pipe service.
                 await using var pipeClient = new NamedPipeClientStream(".", NAMED_PIPE_SERVER, PipeDirection.Out);
                 await pipeClient.ConnectAsync(2500); // Milliseconds
 

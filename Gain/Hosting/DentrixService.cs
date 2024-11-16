@@ -112,9 +112,6 @@ public sealed class DentrixService
     private const string DtxUser = "MNCN5L2G";
     private const string DtxPassword = "MNCN5L2G5";
 
-    /// <summary>
-    /// Ensures only one connection request happens at a time.
-    /// </summary>
     private static readonly SemaphoreSlim _connectSemaphore = new(1, 1);
 
     /// <summary>
