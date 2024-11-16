@@ -1,6 +1,5 @@
 ﻿using System.Data.Odbc;
 using System.IO.IsolatedStorage;
-using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 
 namespace FluidicML.Gain;

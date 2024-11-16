@@ -10,6 +10,7 @@ namespace FluidicML.Gain.Views;
 public partial class MainWindow : IWindow
 {
     private readonly PipeService _pipeService;
+    private readonly DentrixService _dentrixService;
     private readonly SettingsPage _settingsPage;
     private readonly MainWindowViewModel _mainWindowViewModel;
 
@@ -18,11 +19,13 @@ public partial class MainWindow : IWindow
 
     public MainWindow(
         PipeService pipeService,
+        DentrixService dentrixService,
         SettingsPage settingsPage,
         MainWindowViewModel mainWindowViewModel
     )
     {
         _pipeService = pipeService;
+        _dentrixService = dentrixService;
         _settingsPage = settingsPage;
         _mainWindowViewModel = mainWindowViewModel;
 
@@ -36,56 +39,77 @@ public partial class MainWindow : IWindow
     {
         SettingsPageFrame.Navigate(_settingsPage);
 
-        _ = Task.Run(async () =>
-        {
-            while (!_stoppingToken.IsCancellationRequested)
-            {
-                var status = await _pipeService.QueryBackgroundServiceStatus(_stoppingToken);
-                if (status != QueryStatus.LOCKED)
-                {
-                    _mainWindowViewModel.StatusBackgroundService = QueryStatusToBool(status);
-                }
-                await Task.Delay(10_000, _stoppingToken);
-            }
-        }, _stoppingToken);
-
-        _ = Task.Run(async () =>
-        {
-            while (!_stoppingToken.IsCancellationRequested)
-            {
-                var status = await _pipeService.QueryWebSocketStatus(_stoppingToken);
-                if (status != QueryStatus.LOCKED)
-                {
-                    _mainWindowViewModel.StatusWebSocket = QueryStatusToBool(status);
-                }
-                await Task.Delay(30_000, _stoppingToken);
-            }
-        }, _stoppingToken);
-
-        _ = Task.Run(async () =>
-        {
-            while (!_stoppingToken.IsCancellationRequested)
-            {
-                var status = await _pipeService.QueryDentrixStatus(_stoppingToken);
-                if (status != QueryStatus.LOCKED)
-                {
-                    _mainWindowViewModel.StatusDentrix = QueryStatusToBool(status);
-                }
-                // TODO: If status is failed, we should try reconnecting to Dentrix.
-                await Task.Delay(30_000, _stoppingToken);
-            }
-        }, _stoppingToken);
+        _ = Task.Run(CheckBackgroundService, _stoppingToken);
+        _ = Task.Run(CheckWebSocket, _stoppingToken);
+        _ = Task.Run(CheckDentrix, _stoppingToken);
     }
 
-    private static bool? QueryStatusToBool(QueryStatus status)
+    private async Task CheckBackgroundService()
+    {
+        while (!_stoppingToken.IsCancellationRequested)
+        {
+            var status = await _pipeService.QueryBackgroundServiceStatus(_stoppingToken);
+
+            if (status != Status.LOCKED)
+            {
+                _mainWindowViewModel.StatusBackgroundService = QueryStatusToBool(status);
+            }
+
+            await Task.Delay(10_000, _stoppingToken);
+        }
+    }
+
+    private async Task CheckWebSocket()
+    {
+        while (!_stoppingToken.IsCancellationRequested)
+        {
+            var status = await _pipeService.QueryWebSocketStatus(_stoppingToken);
+
+            if (status != Status.LOCKED)
+            {
+                _mainWindowViewModel.StatusWebSocket = QueryStatusToBool(status);
+            }
+
+            await Task.Delay(30_000, _stoppingToken);
+        }
+    }
+
+    private async Task CheckDentrix()
+    {
+        while (!_stoppingToken.IsCancellationRequested)
+        {
+            var status = await _pipeService.QueryDentrixStatus(_stoppingToken);
+
+            if (status != Status.LOCKED)
+            {
+                _mainWindowViewModel.StatusDentrix = QueryStatusToBool(status);
+            }
+
+            if (status == Status.UNHEALTHY)
+            {
+                var result = await _dentrixService.ConnectAsync(_stoppingToken);
+
+                if (!string.IsNullOrEmpty(result))
+                {
+                    await _pipeService.SendDentrixConnStr(result, _stoppingToken);
+                    await Task.Delay(5_000, _stoppingToken);
+                    continue;
+                }
+            }
+
+            await Task.Delay(30_000, _stoppingToken);
+        }
+    }
+
+    private static bool? QueryStatusToBool(Status status)
     {
         switch (status)
         {
-            case QueryStatus.SUCCESS:
+            case Status.HEALTHY:
                 {
                     return true;
                 }
-            case QueryStatus.FAILURE:
+            case Status.UNHEALTHY:
                 {
                     return false;
                 }

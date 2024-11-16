@@ -72,6 +72,12 @@ public sealed class PipeAdapter(
 
             await _socket.Connect(buffer["Api ".Length..], stoppingToken);
         }
+        else if (buffer.StartsWith("Dentrix "))
+        {
+            _logger.LogInformation("Dentrix message at: {time}.", DateTimeOffset.Now);
+
+            _dentrix.Connect(buffer["Dentrix ".Length..]);
+        }
         else if (buffer == "StatusWebSocket")
         {
             _logger.LogInformation("StatusWebSocket message at: {time}.", DateTimeOffset.Now);
