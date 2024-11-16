@@ -71,6 +71,7 @@ public partial class MainWindow : IWindow
                 {
                     _mainWindowViewModel.StatusDentrix = QueryStatusToBool(status);
                 }
+                // TODO: If status is failed, we should try reconnecting to Dentrix.
                 await Task.Delay(30_000, _stoppingToken);
             }
         }, _stoppingToken);

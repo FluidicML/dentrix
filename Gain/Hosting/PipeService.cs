@@ -17,7 +17,19 @@ public enum QueryStatus
 /// </summary>
 public sealed class PipeService(ILogger<PipeService> logger)
 {
+    private const int TIMEOUT_MILLIS = 2500;
+
     private const string NAMED_PIPE_SERVER = "DB3B88B2-AC72-4B06-893A-89E69E73E134";
+
+    private async Task SendApiKey(string apiKey)
+    {
+        await using var pipeClient = new NamedPipeClientStream(".", NAMED_PIPE_SERVER, PipeDirection.Out);
+        await pipeClient.ConnectAsync(TIMEOUT_MILLIS);
+
+        using var writer = new StreamWriter(pipeClient);
+        await writer.WriteLineAsync($"Api {apiKey}");
+        await writer.FlushAsync();
+    }
 
     private static readonly SemaphoreSlim _backgroundServiceSemaphore = new(1, 1);
 
@@ -37,7 +49,7 @@ public sealed class PipeService(ILogger<PipeService> logger)
         try
         {
             await using var pipeClient = new NamedPipeClientStream(".", NAMED_PIPE_SERVER, PipeDirection.InOut);
-            await pipeClient.ConnectAsync(2500, stoppingToken); // Milliseconds timeout
+            await pipeClient.ConnectAsync(TIMEOUT_MILLIS, stoppingToken);
             return QueryStatus.SUCCESS;
         }
         catch (TimeoutException)
@@ -73,7 +85,7 @@ public sealed class PipeService(ILogger<PipeService> logger)
         try
         {
             await using var pipeClient = new NamedPipeClientStream(".", NAMED_PIPE_SERVER, PipeDirection.InOut);
-            await pipeClient.ConnectAsync(2500, stoppingToken); // Milliseconds timeout
+            await pipeClient.ConnectAsync(TIMEOUT_MILLIS, stoppingToken);
 
             var writer = new StreamWriter(pipeClient);
             var reader = new StreamReader(pipeClient);
@@ -128,7 +140,7 @@ public sealed class PipeService(ILogger<PipeService> logger)
         try
         {
             await using var pipeClient = new NamedPipeClientStream(".", NAMED_PIPE_SERVER, PipeDirection.InOut);
-            await pipeClient.ConnectAsync(2500, stoppingToken); // Milliseconds timeout
+            await pipeClient.ConnectAsync(TIMEOUT_MILLIS, stoppingToken);
 
             var writer = new StreamWriter(pipeClient);
             var reader = new StreamReader(pipeClient);

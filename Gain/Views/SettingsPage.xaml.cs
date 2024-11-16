@@ -1,4 +1,5 @@
-﻿using FluidicML.Gain.ViewModels;
+﻿using FluidicML.Gain.Hosting;
+using FluidicML.Gain.ViewModels;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using System.IO.Pipes;
@@ -14,8 +15,6 @@ namespace FluidicML.Gain.Views;
 /// </summary>
 public partial class SettingsPage : INavigableView<SettingsViewModel>
 {
-    private const string NAMED_PIPE_SERVER = "DB3B88B2-AC72-4B06-893A-89E69E73E134";
-
     private readonly Uri _baseAddress;
     private readonly HttpClient _httpClient;
 
@@ -74,13 +73,7 @@ public partial class SettingsPage : INavigableView<SettingsViewModel>
             {
                 response.EnsureSuccessStatusCode();
 
-                // TODO: Dispatch this through the pipe service.
-                await using var pipeClient = new NamedPipeClientStream(".", NAMED_PIPE_SERVER, PipeDirection.Out);
-                await pipeClient.ConnectAsync(2500); // Milliseconds
-
-                using var writer = new StreamWriter(pipeClient);
-                await writer.WriteLineAsync($"Api {ViewModel.ApiKey}");
-                await writer.FlushAsync();
+                await PipeService.SendApiKey(ViewModel.ApiKey);
 
                 ViewModel.Message = "Success.";
                 ViewModel.IsError = false;
