@@ -119,12 +119,13 @@ public sealed class DentrixService
     /// </summary>
     /// <returns>
     /// 1. A null value if another connection request is already occurring.
-    /// 2. The connection string otherwise.
+    /// 2. An empty string if the DLL call fails.
+    /// 2. A valid connection string otherwise.
     /// </returns>
-    public async Task<string?> ConnectAsync()
+    public async Task<string?> ConnectAsync(CancellationToken stoppingToken)
     {
         // IMPORTANT! This is the only place we should acquire this semaphore.
-        var locked = await _connectSemaphore.WaitAsync(0);
+        var locked = await _connectSemaphore.WaitAsync(0, stoppingToken);
 
         if (!locked)
         {
@@ -174,11 +175,12 @@ public sealed class DentrixService
         catch (Exception e) when (e is not OperationCanceledException)
         {
             _logger.LogError(e, "Failed to connect to Dentrix database at: {time}", DateTimeOffset.Now);
-            throw;
         }
         finally
         {
             _connectSemaphore.Release();
         }
+
+        return string.Empty;
     }
 }
