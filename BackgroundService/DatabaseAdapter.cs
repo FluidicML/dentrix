@@ -26,7 +26,8 @@ public sealed class DatabaseAdapter
 
     private readonly ILogger<DatabaseAdapter> _logger;
 
-    private const string RegKeyAuthFile = "auth_key_path";
+    private const string RegCommonPath = @"SOFTWARE\Fluidic ML, INC.\Gain";
+    private const string RegKeyAuthFile = "auth_key_file";
     private const string RegKeyDtxPath = "dentrix_exe_path";
 
     private readonly string _regAuthFile;
@@ -62,16 +63,17 @@ public sealed class DatabaseAdapter
 
     private Object? HKLUSoftwareGetValue(string key)
     {
-        var commonPath = @"Fluidic ML, INC.\Gain";
+        
 
         try
         {
-            var subKey = Registry.LocalMachine.OpenSubKey(Path.Combine("Software", commonPath));
+            using var subKey = Registry.LocalMachine.OpenSubKey(RegCommonPath);
 
             var value = subKey?.GetValue(key);
 
             if (value != null)
             {
+                System.Diagnostics.Debugger.Launch();
                 return value;
             }
         }
@@ -79,17 +81,41 @@ public sealed class DatabaseAdapter
         {
             _logger.LogError(e, "Registry (original) error at: {time}", DateTimeOffset.Now);
         }
+        
 
-        try
-        {
-            var redirKey = Registry.LocalMachine.OpenSubKey(Path.Combine("Software", "WOW6432Node", commonPath));
+        //try
+        //{
+        //    using var hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+        //    using var subKey = hklm.OpenSubKey(RegCommonPath);
 
-            return redirKey?.GetValue(key);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Registry (redirected) error at: {time}", DateTimeOffset.Now);
-        }
+        //    var value = subKey?.GetValue(key);
+
+        //    if (value != null)
+        //    {
+        //        return value;
+        //    }
+        //}
+        //catch (Exception e)
+        //{
+        //    _logger.LogError(e, "Registry (original) error at: {time}", DateTimeOffset.Now);
+        //}
+
+        //try
+        //{
+        //    using var hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
+        //    using var subKey = hklm.OpenSubKey(RegCommonPath);
+
+        //    var value = subKey?.GetValue(key);
+
+        //    if (value != null)
+        //    {
+        //        return value;
+        //    }
+        //}
+        //catch (Exception e)
+        //{
+        //    _logger.LogError(e, "Registry (redirected) error at: {time}", DateTimeOffset.Now);
+        //}
 
         return null;
     }
