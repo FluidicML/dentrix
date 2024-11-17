@@ -191,6 +191,11 @@ public sealed class SocketAdapter
 
                 await foreach (var result in _dentrix.Query(queryDto.query, emitToken))
                 {
+                    // Calling this function with a cancellation token breaks for some reason.
+                    // Since emittance should be quick and the cancellation token is tested
+                    // on each iteration, seems safe to just remove. If you do decide to add
+                    // it though, keep in mind the token is the *second* argument, not the
+                    // last.
                     await _socket.EmitAsync(
                         "query-result",
                         new QueryResultDto()
@@ -198,8 +203,7 @@ public sealed class SocketAdapter
                             id = queryDto.id,
                             value = result.value,
                             status = (int)result.status
-                        },
-                        emitToken
+                        }
                     );
 
                     // Too fast and we risk overflowing buffer queues in our websocket
