@@ -167,7 +167,7 @@ public sealed class SocketAdapter
 
             _socket.OnReconnectAttempt += (sender, attempt) =>
             {
-                _logger.LogInformation("Reconnect attempt {attempt} at: {time}", attempt, DateTimeOffset.Now);
+                _logger.LogDebug("Reconnect attempt {attempt} at: {time}", attempt, DateTimeOffset.Now);
             };
 
             _socket.OnError += (sender, e) =>
@@ -177,12 +177,12 @@ public sealed class SocketAdapter
 
             _socket.OnPing += (sender, e) =>
             {
-                _logger.LogInformation("Ping at: {time}", DateTimeOffset.Now);
+                _logger.LogDebug("Ping at: {time}", DateTimeOffset.Now);
             };
 
             _socket.OnPong += (sender, e) =>
             {
-                _logger.LogInformation("Pong at: {time}", DateTimeOffset.Now);
+                _logger.LogDebug("Pong at: {time}", DateTimeOffset.Now);
             };
 
             _socket.On("query", async (response) =>
