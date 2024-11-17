@@ -6,28 +6,34 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UseWPF>true</UseWPF>
+		<DefineConstants>$(Configuration)</DefineConstants>
 		<RootNamespace>FluidicML.Gain</RootNamespace>
 		<StartupObject>FluidicML.Gain.App</StartupObject>
 		<OutputPath>$(ProjectDir)bin\$(Configuration)\$(Platform)\</OutputPath>
+		<Configurations>Debug;Release;Staging</Configurations>
 	</PropertyGroup>
 
 	<ItemGroup>
+		<None Remove="appsettings.Debug.json" />
 		<None Remove="appsettings.json" />
-		<None Remove="appsettings.Production.json" />
 		<None Remove="appsettings.Staging.json" />
+		<None Remove="appsettings.Production.json" />
 		<None Remove="Assets\Images\favicon.ico" />
 		<None Remove="Assets\Images\taskbar.png" />
 		<None Remove="Assets\Images\title.png" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<Content Include="appsettings.Debug.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 		<Content Include="appsettings.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
-		<Content Include="appsettings.Production.json">
+		<Content Include="appsettings.Staging.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
-		<Content Include="appsettings.Staging.json">
+		<Content Include="appsettings.Production.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>

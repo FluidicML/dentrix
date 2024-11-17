@@ -2,6 +2,7 @@
 	<PropertyGroup>
 		<TargetFramework>net472</TargetFramework>
 		<OutputPath>$(ProjectDir)bin\$(Configuration)\$(Platform)\</OutputPath>
+		<Configurations>Debug;Release;Staging</Configurations>
 	</PropertyGroup>
 
 	<ItemGroup>

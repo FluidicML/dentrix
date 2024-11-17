@@ -19,9 +19,11 @@ public partial class App : Application
     private static IConfiguration _configService { get; } =
         new ConfigurationBuilder()
             .AddJsonFile("appsettings.json")
-#if DEBUG
+#if Debug
+            .AddJsonFile("appsettings.Debug.json")
+#elif Staging
             .AddJsonFile("appsettings.Staging.json")
-#else
+#elif Release
             .AddJsonFile("appsettings.Production.json")
 #endif
         .Build();
