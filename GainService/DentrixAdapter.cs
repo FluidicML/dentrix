@@ -184,9 +184,9 @@ public sealed class DentrixAdapter
                         if (reading)
                         {
                             object[] columns = new object[MAX_COLUMNS];
-                            int NumberOfColums = reader.GetValues(columns);
+                            int numberOfColumns = reader.GetValues(columns);
 
-                            for (int i = 0; i < NumberOfColums; i++)
+                            for (int i = 0; i < numberOfColumns; i++)
                             {
                                 var type = reader.GetFieldType(i);
                                 json[reader.GetName(i)] = Convert.ChangeType(columns[i], type);
