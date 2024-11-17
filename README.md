@@ -56,7 +56,7 @@ summarize:
 - `GainService` is a Windows service that maintains a websocket connection to
   the Gain backend. Queries are received along this connection and proxied
   to/from the locally installed Dentrix instance.
-- `Gain` is a small [WPF](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/overview/?view=netdesktop-9.0)-based
+- `GainApp` is a small [WPF](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/overview/?view=netdesktop-9.0)-based
   project used to update API keys, initiate the connection to Dentrix, and
   check (at a very high-level) the state of the locally running `GainService`.
 - The `Installer` is a [WiX](https://wixtoolset.org/) project defining our
@@ -84,7 +84,7 @@ pretty slow.
 At the top-level of this repository exist multiple **projects** created using
 [Visual Studio](https://visualstudio.microsoft.com/):
 
-- `Gain`
+- `GainApp`
 - `GainService`
 - `DentrixDlg`
 - `Installer`
@@ -123,10 +123,10 @@ You may see the following around on the web:
   * The original, Windows-only, iteration of the .NET platform.
 - `.NET Core`
   * The cross-platform successor to `.NET Framework`.
-- .NET Standard
+- `.NET Standard`
   * A separate platform intended to be compatible with both `.NET Framework`
     and `.NET Core`.
-- .NET
+- `.NET`
   * Another name for later versions of `.NET Core`.
 
 All of these just refer to different versions of the .NET runtime. Why they

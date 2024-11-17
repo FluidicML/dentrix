@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
-	<?define FL_AppTargetDir = "$(var.Gain.TargetDir)" ?>
-	<?define FL_AppTargetPath = "$(var.FL_AppTargetDir)\$(var.Gain.TargetName).exe" ?>
+	<?define FL_AppTargetDir = "$(var.GainApp.TargetDir)" ?>
+	<?define FL_AppTargetPath = "$(var.FL_AppTargetDir)\$(var.GainApp.TargetName).exe" ?>
 	<?define FL_ServiceTargetDir = "$(var.GainService.TargetDir)" ?>
 	<?define FL_ServiceTargetPath = "$(var.FL_ServiceTargetDir)\$(var.GainService.TargetName).exe" ?>
 </Include>

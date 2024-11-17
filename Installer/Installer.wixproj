@@ -18,7 +18,7 @@
     <PackageReference Include="WixToolset.Util.wixext" Version="5.0.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Gain\Gain.csproj" />
+    <ProjectReference Include="..\GainApp\GainApp.csproj" />
     <ProjectReference Include="..\GainService\GainService.csproj" />
     <ProjectReference Include="..\DentrixDlg\DentrixDlg.csproj" />
   </ItemGroup>
