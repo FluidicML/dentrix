@@ -71,10 +71,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Bootstrapper (x86).msi
-          path: Bootstrapper/bin/Staging/x86/en-US/Bootstrapper.exe
+          path: Bootstrapper/bin/Staging/x86/Bootstrapper.exe
 
       - name: Upload Bundle (x64)
         uses: actions/upload-artifact@v4
         with:
           name: Bootstrapper (x64).msi
-          path: Bootstrapper/bin/Staging/x64/en-US/Bootstrapper.exe
+          path: Bootstrapper/bin/Staging/x64/Bootstrapper.exe
