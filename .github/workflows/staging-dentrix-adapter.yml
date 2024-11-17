@@ -21,14 +21,7 @@ jobs:
 
       - name: Build Projects
         run: |
-          dotnet build --configuration:Staging --property:"Platform=x86;PlatformTarget=x86" --arch:x86 Gain
-          dotnet build --configuration:Staging --property:"Platform=x86;PlatformTarget=x86" --arch:x86 GainService
-          dotnet build --configuration:Staging --property:"Platform=x86;PlatformTarget=x86" --arch:x86 DentrixDlg
           dotnet build --configuration:Staging --property:"Platform=x86;PlatformTarget=x86" --arch:x86 Installer
-
-          dotnet build --configuration:Staging --property:"Platform=x64;PlatformTarget=x64" --arch:x64 Gain
-          dotnet build --configuration:Staging --property:"Platform=x64;PlatformTarget=x64" --arch:x64 GainService
-          dotnet build --configuration:Staging --property:"Platform=x64;PlatformTarget=x64" --arch:x64 DentrixDlg
           dotnet build --configuration:Staging --property:"Platform=x64;PlatformTarget=x64" --arch:x64 Installer
 
       - name: Sign Projects
@@ -41,13 +34,9 @@ jobs:
           -kvc "${{ secrets.AZURE_CERT_NAME }}"
           -tr http://timestamp.digicert.com
           -v
-          Gain/bin/Staging/**/*.dll
-          Gain/bin/Staging/**/*.exe
-          GainService/bin/Staging/**/*.dll
-          GainService/bin/Staging/**/*.exe
-          DentrixDlg/bin/Staging/**/*.dll
-          DentrixDlg/bin/Staging/**/*.exe
-          Installer/bin/Staging/**/*.msi
+          */bin/Staging/**/*.dll
+          */bin/Staging/**/*.exe
+          */bin/Staging/**/*.msi
 
       - name: Build Bootstrapper
         run: |
@@ -70,11 +59,11 @@ jobs:
       - name: Upload Bundle (x86)
         uses: actions/upload-artifact@v4
         with:
-          name: Bootstrapper (x86).msi
+          name: Bootstrapper (x86)
           path: Bootstrapper/bin/Staging/x86/Bootstrapper.exe
 
       - name: Upload Bundle (x64)
         uses: actions/upload-artifact@v4
         with:
-          name: Bootstrapper (x64).msi
+          name: Bootstrapper (x64)
           path: Bootstrapper/bin/Staging/x64/Bootstrapper.exe
