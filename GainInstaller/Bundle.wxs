@@ -16,8 +16,13 @@
 
 		<Chain>
 			<PackageGroupRef Id="NetFx472Web"/>
+			<!--
+			WixBundleAction with value 6 means to only show the internal UI during
+			installation. Refer to the enum values found here:
+			https://github.com/wixtoolset/wix/blob/f440fb317c630e7bc6d4ee4d657a200654e2f876/src/api/burn/inc/BootstrapperEngineTypes.h#L19
+			-->
 			<MsiPackage
-				bal:DisplayInternalUICondition="1"
+				bal:DisplayInternalUICondition="WixBundleAction = 6"
 				SourceFile="GainPackage.msi" />
 		</Chain>
 
