@@ -16,6 +16,9 @@
 
 		<Chain>
 			<PackageGroupRef Id="NetFx472Web"/>
+			<MsiPackage
+				bal:DisplayInternalUICondition="1"
+				SourceFile="GainPackage.msi" />
 		</Chain>
 
 	</Bundle>

@@ -1,11 +1,14 @@
 ﻿<Project Sdk="WixToolset.Sdk/5.0.2">
-	<PropertyGroup>
-		<OutputPath>$(ProjectDir)bin\$(Configuration)\$(Platform)\</OutputPath>
-		<Configurations>Debug;Release;Staging</Configurations>
-		<OutputType>Bundle</OutputType>
-	</PropertyGroup>
-	<ItemGroup>
-		<PackageReference Include="WixToolset.Bal.wixext" Version="5.0.2" />
-		<PackageReference Include="WixToolset.Netfx.wixext" Version="5.0.2" />
-	</ItemGroup>
+  <PropertyGroup>
+    <OutputPath>$(ProjectDir)bin\$(Configuration)\$(Platform)\</OutputPath>
+    <Configurations>Debug;Release;Staging</Configurations>
+    <OutputType>Bundle</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Bal.wixext" Version="5.0.2" />
+    <PackageReference Include="WixToolset.Netfx.wixext" Version="5.0.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GainPackage\GainPackage.wixproj" />
+  </ItemGroup>
 </Project>
