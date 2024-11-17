@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GainService", "GainService\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GainApp", "GainApp\GainApp.csproj", "{69B01A97-BCC2-41D7-BB2E-67CA4DB990D2}"
 EndProject
-Project("{B7DD6F7E-DEF8-4E67-B5B7-07EF123DB6F0}") = "Installer", "Installer\Installer.wixproj", "{686825AA-56A8-4313-A084-DDB0F158311A}"
+Project("{B7DD6F7E-DEF8-4E67-B5B7-07EF123DB6F0}") = "GainPackage", "GainPackage\GainPackage.wixproj", "{686825AA-56A8-4313-A084-DDB0F158311A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DentrixDlg", "DentrixDlg\DentrixDlg.csproj", "{B905B7AF-08E2-4150-8991-62FA7C20BA20}"
 EndProject

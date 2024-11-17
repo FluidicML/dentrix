@@ -59,7 +59,7 @@ summarize:
 - `GainApp` is a small [WPF](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/overview/?view=netdesktop-9.0)-based
   project used to update API keys, initiate the connection to Dentrix, and
   check (at a very high-level) the state of the locally running `GainService`.
-- The `Installer` is a [WiX](https://wixtoolset.org/) project defining our
+- `GainPackage` is a [WiX](https://wixtoolset.org/) project defining our
   installer. The resulting installation script adds the necessary registry
   keys, boots and configures our service, installs all signed .dlls and .exes,
   etc.
@@ -71,8 +71,8 @@ Separately:
   executable is sent to the Dentrix team for registration. Refer to the README
   found within that directory for more details.
 - The `DentrixDlg` project hosts custom actions used to find where Dentrix is
-  installed. These custom actions (CAs) are meant to be used by the `Installer`
-  project.
+  installed. These custom actions (CAs) are meant to be used by the
+  `GainPackage` project.
 
 The actual process of code signing happens through GitHub CI. Refer to the
 `dentrix-adapter.yml` workflow for details. Keep in mind you can only connect
@@ -87,7 +87,7 @@ At the top-level of this repository exist multiple **projects** created using
 - `GainApp`
 - `GainService`
 - `DentrixDlg`
-- `Installer`
+- `GainPackage`
 
 Within each of these projects exists another README that dives deeper into how
 they work. Alongside these projects exists the `FluidicML.sln` file. This is
@@ -95,7 +95,7 @@ the **solution**, a small XML file containing descriptions of the various
 projects.
 
 Also found within these projects are `.csproj` or `.wixproj` files. The latter
-is discussed in the `Installer` project's README. The former contains MSBuild
+is discussed in the `GainPackage` project's README. The former contains MSBuild
 XML code that gets executed when calling `Build` from within Visual Studio or
 by calling `MSBuild.exe` from the command line. Alternatively, we can also
 choose to run the `dotnet` command. This is a thin wrapper around `MSBuild.exe`
