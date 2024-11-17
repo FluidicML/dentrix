@@ -1,39 +1,85 @@
 # Gain - Dentrix Adapter
 
-## Quickstart
+## Overview
 
-This is the Windows application for proxying queries sent from the Gain backend
-and query results returned from the locally installed Dentrix instance. Though
-our adapter is intended to be small, there are a few moving parts necessary to
-get things working:
+The Dentrix software suite is meant to be installed on a cluster of machines.
+*Exactly one* of the nodes is the designated **Dentrix Server**. It is
+responsible for managing the database and scheduling/coordinating changes that
+other nodes on the network need. *At least one* of the nodes is a **Dentrix
+Workstation**. This is the machine hosting the main user-facing Dentrix
+application. It queries the server on the network for most operations.
 
-- `GainService` is a [Windows Service](https://learn.microsoft.com/en-us/dotnet/core/extensions/windows-service)
-  that maintains a websocket connection to the Gain backend. Queries are
-  received along this connection and proxied to/from the locally installed
-  Dentrix instance.
-- `Gain` is a small WPF-based project useful for updating API keys, initiating
-  the connection to Dentrix, and checking (at a very high-level) the state of
-  the `GainService`.
+For many small practices, it's probably the case that a single computer serves
+as both the Dentrix Server and Workstation. In larger offices, we might instead
+see multiple different workstations connected to some Dentrix Server running on
+Windows Server. In this case, the Dentrix Server isn't expected to ever be
+connected to directly.
+
+3P plugins like the one we're building *must* have some component that exists
+on a Dentrix Workstation. This is because connecting to the Dentrix Server is
+done through a function in `Dentrix.API.dll` (provided by Dentrix) that
+launches a GUI for additional authentication. This would inevitably fail on
+platforms without a user interface like Windows Server. That said, this is a
+one-time process. The function registers a new user into the local Dentrix
+database and returns a connection string. The returned connection string can be
+passed around for use by any other executable without issue.
+
+With this context in mind, we can think about how we could choose to design the
+Gain adapter. This adapter is meant to be a proxy for queries, forwarding SQL
+statements sent by the Gain servers to the local Dentrix instance.
+
+In the ideal situation, we have an installer that runs on a Dentrix Workstation
+and obtains a connection string. This connection string can then be passed to
+our adapter that lives on the same node as the Dentrix Server. In this way, the
+adapter will run as long as the master node of the cluster is running. This
+approach also introduces complications though - its harder to test services
+that span a network or that need to work on multiple operating systems (even if
+they are all Windows variants).
+
+In a less ideal situation, we could instead have our adapter installed onto a
+Dentrix Workstation in the same way any other traditional application would.
+The problem here though is that when the workstation is offline, so is our
+adapter. Worse, if the installing user were to just logout, that would also
+render our adapter useless.
+
+So we compromise. The Gain adapter has two components - a user-facing
+application and a
+[Windows Service](https://learn.microsoft.com/en-us/dotnet/core/extensions/windows-service).
+Both are installed onto a Dentrix Workstation but the service lives outside the
+domain of users, existing (and running) on the machine even if a different (or
+no) user is logged in. The application exists solely to bootstrap the service
+with an API key and the Dentrix connection string. Once that is set, the
+service can ideally run indefinitely without intervention. The main caveat is
+that an internet connection needs to be maintained on the machine. To
+summarize:
+
+- `GainService` is a Windows service that maintains a websocket connection to
+  the Gain backend. Queries are received along this connection and proxied
+  to/from the locally installed Dentrix instance.
+- `Gain` is a small [WPF](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/overview/?view=netdesktop-9.0)-based
+  project used to update API keys, initiate the connection to Dentrix, and
+  check (at a very high-level) the state of the locally running `GainService`.
 - The `Installer` is a [WiX](https://wixtoolset.org/) project defining our
   installer. The resulting installation script adds the necessary registry
   keys, boots and configures our service, installs all signed .dlls and .exes,
   etc.
 
-Separately we also have:
+Separately:
 
-- The `CodeSigningCertificate` is a standalone directory containing a copy of
-  the executable we need to sign with our EV code signing certificate. This
-  signed executable is sent to the Dentrix team for registration. Refer to the
-  README found within that directory for more details.
+- `CodeSigningCertificate` is a standalone directory containing a copy of the
+  executable we need to sign with our EV code signing certificate. This signed
+  executable is sent to the Dentrix team for registration. Refer to the README
+  found within that directory for more details.
 - The `DentrixDlg` project hosts custom actions used to find where Dentrix is
-  installed. These custom actions (CAs) are meant to be used by the
-  `DentrixDlg` defined within the `Installer` project.
+  installed. These custom actions (CAs) are meant to be used by the `Installer`
+  project.
 
-Code signing happens through GitHub CI. Refer to the `dentrix-adapter.yml`
-workflow for details. Keep in mind you can only connect to Dentrix through a
-signed application. This unfortunately makes the dev cycle pretty slow.
+The actual process of code signing happens through GitHub CI. Refer to the
+`dentrix-adapter.yml` workflow for details. Keep in mind you can only connect
+to Dentrix through a signed application. This unfortunately makes the dev cycle
+pretty slow.
 
-## Overview
+## Development
 
 At the top-level of this repository exist multiple **projects** created using
 [Visual Studio](https://visualstudio.microsoft.com/):
