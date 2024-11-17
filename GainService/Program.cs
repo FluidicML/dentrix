@@ -20,6 +20,8 @@ public class Program
     {
         var builder = Host.CreateApplicationBuilder(args);
 
+        builder.Services.AddWindowsService();
+
         LoggerProviderOptions.RegisterProviderOptions<
             EventLogSettings, EventLogLoggerProvider
         >(builder.Services);
