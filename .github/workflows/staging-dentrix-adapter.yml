@@ -44,18 +44,6 @@ jobs:
           dotnet build --configuration:Staging --property:"Platform=x86;PlatformTarget=x86" --arch:x86 GainInstaller
           dotnet build --configuration:Staging --property:"Platform=x64;PlatformTarget=x64" --arch:x64 GainInstaller
 
-      - name: Sign Installers
-        run: >
-          AzureSignTool sign
-          -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}"
-          -kvt "${{ secrets.AZURE_TENANT_ID }}"
-          -kvi "${{ secrets.AZURE_CLIENT_ID }}"
-          -kvs "${{ secrets.AZURE_CLIENT_SECRET }}"
-          -kvc "${{ secrets.AZURE_CERT_NAME }}"
-          -tr http://timestamp.digicert.com
-          -v
-          GainInstaller/bin/Staging/**/*.exe
-
       - name: Upload Installer (x86)
         uses: actions/upload-artifact@v4
         with:
