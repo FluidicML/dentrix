@@ -1,0 +1,22 @@
+﻿<Wix
+	xmlns="http://wixtoolset.org/schemas/v4/wxs"
+	xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal"
+	xmlns:netfx="http://wixtoolset.org/schemas/v4/wxs/netfx">
+	<Bundle
+		Name="Gain"
+		Manufacturer="Fluidic ML, INC"
+		Version="1.0.0.0"
+		UpgradeCode="e6daac6d-65c4-483b-a94f-8b8bd8c2e54b">
+
+		<BootstrapperApplication>
+			<bal:WixStandardBootstrapperApplication
+				LicenseUrl="https://www.example.com/license"
+				Theme="hyperlinkLicense" />
+		</BootstrapperApplication>
+
+		<Chain>
+			<PackageGroupRef Id="NetFx472Web"/>
+		</Chain>
+
+	</Bundle>
+</Wix>

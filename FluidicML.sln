@@ -11,6 +11,8 @@ Project("{B7DD6F7E-DEF8-4E67-B5B7-07EF123DB6F0}") = "GainPackage", "GainPackage\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DentrixDlg", "DentrixDlg\DentrixDlg.csproj", "{B905B7AF-08E2-4150-8991-62FA7C20BA20}"
 EndProject
+Project("{B7DD6F7E-DEF8-4E67-B5B7-07EF123DB6F0}") = "GainInstaller", "GainInstaller\GainInstaller.wixproj", "{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -123,6 +125,30 @@ Global
 		{B905B7AF-08E2-4150-8991-62FA7C20BA20}.Staging|x64.Build.0 = Staging|Any CPU
 		{B905B7AF-08E2-4150-8991-62FA7C20BA20}.Staging|x86.ActiveCfg = Staging|Any CPU
 		{B905B7AF-08E2-4150-8991-62FA7C20BA20}.Staging|x86.Build.0 = Staging|Any CPU
+		{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}.Debug|Any CPU.Build.0 = Debug|x64
+		{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}.Debug|ARM64.Build.0 = Debug|ARM64
+		{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}.Debug|x64.ActiveCfg = Debug|x64
+		{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}.Debug|x64.Build.0 = Debug|x64
+		{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}.Debug|x86.ActiveCfg = Debug|x86
+		{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}.Debug|x86.Build.0 = Debug|x86
+		{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}.Release|Any CPU.ActiveCfg = Release|x64
+		{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}.Release|Any CPU.Build.0 = Release|x64
+		{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}.Release|ARM64.ActiveCfg = Release|ARM64
+		{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}.Release|ARM64.Build.0 = Release|ARM64
+		{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}.Release|x64.ActiveCfg = Release|x64
+		{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}.Release|x64.Build.0 = Release|x64
+		{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}.Release|x86.ActiveCfg = Release|x86
+		{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}.Release|x86.Build.0 = Release|x86
+		{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}.Staging|Any CPU.ActiveCfg = Debug|x64
+		{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}.Staging|Any CPU.Build.0 = Debug|x64
+		{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}.Staging|ARM64.ActiveCfg = Debug|ARM64
+		{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}.Staging|ARM64.Build.0 = Debug|ARM64
+		{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}.Staging|x64.ActiveCfg = Debug|x64
+		{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}.Staging|x64.Build.0 = Debug|x64
+		{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}.Staging|x86.ActiveCfg = Debug|x86
+		{B92C1392-E6B9-4CDD-9C88-6FBC1608807D}.Staging|x86.Build.0 = Debug|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - staging
+      - jrpotter/bundle
 
 jobs:
   build:
@@ -20,13 +21,8 @@ jobs:
 
       - name: Build Projects
         run: |
-          dotnet build --configuration:Staging --property:"Platform=x86;PlatformTarget=x86" --arch:x86 Gain
-          dotnet build --configuration:Staging --property:"Platform=x86;PlatformTarget=x86" --arch:x86 GainService
-          dotnet build --configuration:Staging --property:"Platform=x86;PlatformTarget=x86" --arch:x86 DentrixDlg
-
-          dotnet build --configuration:Staging --property:"Platform=x64;PlatformTarget=x64" --arch:x64 Gain
-          dotnet build --configuration:Staging --property:"Platform=x64;PlatformTarget=x64" --arch:x64 GainService
-          dotnet build --configuration:Staging --property:"Platform=x64;PlatformTarget=x64" --arch:x64 DentrixDlg
+          dotnet build --configuration:Staging --property:"Platform=x86;PlatformTarget=x86" --arch:x86 GainPackage
+          dotnet build --configuration:Staging --property:"Platform=x64;PlatformTarget=x64" --arch:x64 GainPackage
 
       - name: Sign Projects
         run: >
@@ -40,12 +36,13 @@ jobs:
           -v
           */bin/Staging/**/*.dll
           */bin/Staging/**/*.exe
+          */bin/Staging/**/*.msi
 
       - name: Build Installers
         run: |
           # https://wixtoolset.org/docs/development/wips/replace-win64-with-intuitive-attribute/
-          dotnet build --configuration:Staging --property:"Platform=x86;PlatformTarget=x86" --arch:x86 Installer
-          dotnet build --configuration:Staging --property:"Platform=x64;PlatformTarget=x64" --arch:x64 Installer
+          dotnet build --configuration:Staging --property:"Platform=x86;PlatformTarget=x86" --arch:x86 GainInstaller
+          dotnet build --configuration:Staging --property:"Platform=x64;PlatformTarget=x64" --arch:x64 GainInstaller
 
       - name: Sign Installers
         run: >
@@ -57,16 +54,16 @@ jobs:
           -kvc "${{ secrets.AZURE_CERT_NAME }}"
           -tr http://timestamp.digicert.com
           -v
-          */bin/Staging/**/*.msi
+          */bin/Staging/**/*.exe
 
       - name: Upload Installer (x86)
         uses: actions/upload-artifact@v4
         with:
           name: Installer (x86)
-          path: Installer/bin/Staging/x86/en-US/Installer.msi
+          path: GainInstaller/bin/Staging/x86/GainInstaller.exe
 
       - name: Upload Installer (x64)
         uses: actions/upload-artifact@v4
         with:
           name: Installer (x64)
-          path: Installer/bin/Staging/x64/en-US/Installer.msi
+          path: GainInstaller/bin/Staging/x64/GainInstaller.exe
