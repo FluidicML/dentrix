@@ -220,3 +220,10 @@ properties set that enable optimization and strip out debugging symbols.
 Ultimately, if we choose to use a project configuration for builds, we must
 also make sure the configuration is set appropriately. It's probably easiest to
 do that within Visual Studio.
+
+## Release
+
+To build a signed version of the solution according to the `Staging`
+configuration, push to the `staging` branch. The `Release` configuration is
+targeted on the `prod` branch. Once the GitHub CI action completes, the
+installers (x86) and (x64) will be available as artifacts.
