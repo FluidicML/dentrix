@@ -54,7 +54,7 @@ jobs:
           -kvc "${{ secrets.AZURE_CERT_NAME }}"
           -tr http://timestamp.digicert.com
           -v
-          */bin/Staging/**/*.exe
+          GainInstaller/bin/Staging/**/*.exe
 
       - name: Upload Installer (x86)
         uses: actions/upload-artifact@v4
