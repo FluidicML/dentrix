@@ -3,11 +3,6 @@
 	<Fragment>
 		<UI Id="FL_DialogSet_$(WIXUIARCH)">
 			<Publish
-				Dialog="LicenseAgreementDlg"
-				Control="Print"
-				Event="DoAction"
-				Value="WixUIPrintEula_$(WIXUIARCH)" />
-			<Publish
 				Dialog="BrowseDlg"
 				Control="OK"
 				Event="DoAction"
@@ -46,14 +41,11 @@
 			<DialogRef Id="ResumeDlg" />
 			<DialogRef Id="UserExit" />
 
-			<Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg" Condition="NOT Installed" />
+			<Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="DentrixDlg" Condition="NOT Installed" />
 			<Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Condition="Installed AND PATCH" />
 
-			<Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" />
-			<Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="DentrixDlg" Condition="LicenseAccepted = &quot;1&quot;" />
-
 			<!-- Custom dialogs. These are used to search for the Dentrix installation. -->
-			<Publish Dialog="DentrixDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg" />
+			<Publish Dialog="DentrixDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" />
 			<Publish Dialog="DentrixDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg" />
 			<Publish Dialog="DentrixDlg" Control="ChangeFolder" Property="FL_DENTRIX_DIR" Value="[FL_DENTRIX_DIR]" Order="1" />
 			<Publish Dialog="DentrixDlg" Control="ChangeFolder" Event="SpawnDialog" Value="DentrixBrowseDlg" Order="2" />
