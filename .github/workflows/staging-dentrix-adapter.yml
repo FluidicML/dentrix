@@ -70,7 +70,7 @@ jobs:
       - name: Reattach Burn Engines
         run: |
           wix burn reattach GainInstaller/bin/Staging/x86/GainInstaller.exe -engine GainInstaller/bin/Staging/x86/engine.exe -o GainInstaller/bin/Staging/x86/gain.exe
-          wix burn reattach GainInstaller/bin/Staging/x86/GainInstaller.exe -engine GainInstaller/bin/Staging/x64/engine.exe -o GainInstaller/bin/Staging/x64/gain.exe
+          wix burn reattach GainInstaller/bin/Staging/x64/GainInstaller.exe -engine GainInstaller/bin/Staging/x64/engine.exe -o GainInstaller/bin/Staging/x64/gain.exe
 
       - name: Sign Bundles
         run: >
