@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - staging
-      - jrpotter/bundle
 
 jobs:
   build:
@@ -47,11 +46,11 @@ jobs:
       - name: Upload Installer (x86)
         uses: actions/upload-artifact@v4
         with:
-          name: Installer (x86)
+          name: Gain Installer (x86)
           path: GainInstaller/bin/Staging/x86/GainInstaller.exe
 
       - name: Upload Installer (x64)
         uses: actions/upload-artifact@v4
         with:
-          name: Installer (x64)
+          name: Gain Installer (x64)
           path: GainInstaller/bin/Staging/x64/GainInstaller.exe
