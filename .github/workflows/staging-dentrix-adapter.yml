@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - staging
+      - jrpotter/sign
 
 jobs:
   build:
@@ -16,26 +17,9 @@ jobs:
           submodules: true
 
       - name: Install AzureSignTool
-        run: dotnet tool install --global AzureSignTool
-
-      - name: Build Projects
         run: |
-          dotnet build --configuration:Staging --property:"Platform=x86;PlatformTarget=x86" --arch:x86 GainPackage
-          dotnet build --configuration:Staging --property:"Platform=x64;PlatformTarget=x64" --arch:x64 GainPackage
-
-      - name: Sign Projects
-        run: >
-          AzureSignTool sign
-          -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}"
-          -kvt "${{ secrets.AZURE_TENANT_ID }}"
-          -kvi "${{ secrets.AZURE_CLIENT_ID }}"
-          -kvs "${{ secrets.AZURE_CLIENT_SECRET }}"
-          -kvc "${{ secrets.AZURE_CERT_NAME }}"
-          -tr http://timestamp.digicert.com
-          -v
-          */bin/Staging/**/*.dll
-          */bin/Staging/**/*.exe
-          */bin/Staging/**/*.msi
+          dotnet tool install --global AzureSignTool
+          dotnet tool install --global wix
 
       - name: Build Installers
         run: |
@@ -43,14 +27,28 @@ jobs:
           dotnet build --configuration:Staging --property:"Platform=x86;PlatformTarget=x86" --arch:x86 GainInstaller
           dotnet build --configuration:Staging --property:"Platform=x64;PlatformTarget=x64" --arch:x64 GainInstaller
 
+      - name: Sign Engine (x86)
+        run: |
+          wix burn detach GainInstaller/bin/Staging/x86/GainInstaller.exe -engine GainInstaller/bin/Staging/x86/burnengine.exe
+          AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc "${{ secrets.AZURE_CERT_NAME }}" -tr http://timestamp.digicert.com -v GainInstaller/bin/Staging/x86/burnengine.exe
+          wix burn reattach GainInstaller/bin/Staging/x86/GainInstaller.exe -engine GainInstaller/bin/Staging/x86/burnengine.exe -o GainInstaller/bin/Staging/x86/bundle.exe
+          AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc "${{ secrets.AZURE_CERT_NAME }}" -tr http://timestamp.digicert.com -v GainInstaller/bin/Staging/x86/bundle.exe
+
+      - name: Sign Engine (x64)
+        run: |
+          wix burn detach GainInstaller/bin/Staging/x64/GainInstaller.exe -engine GainInstaller/bin/Staging/x64/burnengine.exe
+          AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc "${{ secrets.AZURE_CERT_NAME }}" -tr http://timestamp.digicert.com -v GainInstaller/bin/Staging/x64/burnengine.exe
+          wix burn reattach GainInstaller/bin/Staging/x64/GainInstaller.exe -engine GainInstaller/bin/Staging/x64/burnengine.exe -o GainInstaller/bin/Staging/x64/bundle.exe
+          AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc "${{ secrets.AZURE_CERT_NAME }}" -tr http://timestamp.digicert.com -v GainInstaller/bin/Staging/x64/bundle.exe
+
       - name: Upload Installer (x86)
         uses: actions/upload-artifact@v4
         with:
           name: Gain Installer (x86)
-          path: GainInstaller/bin/Staging/x86/GainInstaller.exe
+          path: GainInstaller/bin/Staging/x86/bundle.exe
 
       - name: Upload Installer (x64)
         uses: actions/upload-artifact@v4
         with:
           name: Gain Installer (x64)
-          path: GainInstaller/bin/Staging/x64/GainInstaller.exe
+          path: GainInstaller/bin/Staging/x64/bundle.exe
