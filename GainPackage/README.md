@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a [WiX](https://wixtooslet.org/) project defining our installer. As
+This is a [WiX](https://wixtooslet.org/) project defining our `.msi` file. As
 such, it maintains project references to all the other top-level projects in
 this repository.
 

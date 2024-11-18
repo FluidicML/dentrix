@@ -1,0 +1,31 @@
+﻿<Wix
+	xmlns="http://wixtoolset.org/schemas/v4/wxs"
+	xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+	<Bundle
+		Name="Gain"
+		Manufacturer="Fluidic ML, INC"
+		Version="1.0.0.0"
+		UpgradeCode="e6daac6d-65c4-483b-a94f-8b8bd8c2e54b">
+
+		<BootstrapperApplication>
+			<bal:WixStandardBootstrapperApplication
+				LicenseUrl="https://www.example.com/license"
+				Theme="hyperlinkLicense" />
+		</BootstrapperApplication>
+
+		<Chain>
+			<PackageGroupRef Id="NetFx472Web"/>
+			<PackageGroupRef Id="DotNetCore32" />
+			<PackageGroupRef Id="DotNetCore64" />
+			<!--
+			WixBundleAction with value 6 means to only show the internal UI during
+			installation. Refer to the enum values found here:
+			https://github.com/wixtoolset/wix/blob/f440fb317c630e7bc6d4ee4d657a200654e2f876/src/api/burn/inc/BootstrapperEngineTypes.h#L19
+			-->
+			<MsiPackage
+				bal:DisplayInternalUICondition="WixBundleAction = 6"
+				SourceFile="GainPackage.msi" />
+		</Chain>
+
+	</Bundle>
+</Wix>
