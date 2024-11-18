@@ -1,7 +1,6 @@
 ﻿<Wix
 	xmlns="http://wixtoolset.org/schemas/v4/wxs"
-	xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal"
-	xmlns:netfx="http://wixtoolset.org/schemas/v4/wxs/netfx">
+	xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
 	<Bundle
 		Name="Gain"
 		Manufacturer="Fluidic ML, INC"
@@ -16,6 +15,8 @@
 
 		<Chain>
 			<PackageGroupRef Id="NetFx472Web"/>
+			<PackageGroupRef Id="DotNetCore32" />
+			<PackageGroupRef Id="DotNetCore64" />
 			<!--
 			WixBundleAction with value 6 means to only show the internal UI during
 			installation. Refer to the enum values found here:
