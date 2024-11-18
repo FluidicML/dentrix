@@ -5,6 +5,7 @@
 		Name="Gain"
 		Manufacturer="Fluidic ML, INC"
 		Version="1.0.0.0"
+		IconSourceFile="Assets\Images\shortcut.ico"
 		UpgradeCode="e6daac6d-65c4-483b-a94f-8b8bd8c2e54b">
 
 		<BootstrapperApplication>
