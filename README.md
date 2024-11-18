@@ -59,10 +59,6 @@ summarize:
 - `GainApp` is a small [WPF](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/overview/?view=netdesktop-9.0)-based
   project used to update API keys, initiate the connection to Dentrix, and
   check (at a very high-level) the state of the locally running `GainService`.
-- `GainPackage` is a [WiX](https://wixtoolset.org/) project defining our
-  installer. The resulting installation script adds the necessary registry
-  keys, boots and configures our service, installs all signed .dlls and .exes,
-  etc.
 
 Separately:
 
@@ -71,8 +67,14 @@ Separately:
   executable is sent to the Dentrix team for registration. Refer to the README
   found within that directory for more details.
 - The `DentrixDlg` project hosts custom actions used to find where Dentrix is
-  installed. These custom actions (CAs) are meant to be used by the
-  `GainPackage` project.
+  installed. These CAs are used by the `GainPackage` project.
+- `GainPackage` is a [WiX](https://wixtoolset.org/) project defining our `.msi`
+  installer. The resulting installation script adds the necessary registry
+  keys, boots and configures our service, installs all signed .dlls and .exes,
+  etc.
+- `GainInstaller` is a WiX project defining our bootstrapper application. This
+  checks for (and installs if necessary) the .NET runtimes necessary to run our
+  app. Afterwards it invokes the `.msi` installer once finished.
 
 The actual process of code signing happens through GitHub CI. Refer to the
 `dentrix-adapter.yml` workflow for details. Keep in mind you can only connect
@@ -88,6 +90,7 @@ At the top-level of this repository exist multiple **projects** created using
 - `GainService`
 - `DentrixDlg`
 - `GainPackage`
+- `GainInstaller`
 
 Within each of these projects exists another README that dives deeper into how
 they work. Alongside these projects exists the `FluidicML.sln` file. This is
