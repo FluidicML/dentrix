@@ -4,6 +4,7 @@
     <Configurations>Debug;Release;Staging</Configurations>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="Assets\Images\dialog.bmp" />
     <Content Include="Assets\Images\shortcut.ico" />
     <Content Include="Variables.wxi" />
   </ItemGroup>
@@ -11,7 +12,6 @@
     <None Include="Assets\MNCN5L2G.dtxkey">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Content Include="Assets\LICENSE.rtf" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />

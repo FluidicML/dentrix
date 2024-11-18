@@ -5,7 +5,7 @@
 <Wix
 	xmlns="http://wixtoolset.org/schemas/v4/wxs"
 	xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
-	
+
 	<!--
 	Our preferred `Manufacturer` name is "Fluidic ML, INC." but the trailing
 	period is stripped in certain contexts and not others. Don't include for
@@ -49,6 +49,9 @@
 		<Icon Id="FL_AppShortcut.Ico" SourceFile="Assets\Images\shortcut.ico"/>
 
 		<Property Id="ARPPRODUCTICON" Value="FL_AppShortcut.Ico" />
+
+		<WixVariable Id="WixUIBannerBmp" Value="Assets\Images\banner.bmp" />
+		<WixVariable Id="WixUIDialogBmp" Value="Assets\Images\dialog.bmp" />
 
 		<!-- Keep id shorter here to work around modularization error (warning WIX1000). -->
 		<Binary
@@ -118,9 +121,6 @@
 		<InstallExecuteSequence>
 			<Custom Action="FL_DENTRIX_DIR" Before="InstallFinalize" />
 		</InstallExecuteSequence>
-
-		<!-- I did encounter this annoying error: https://stackoverflow.com/a/6380750 -->
-		<WixVariable Id="WixUILicenseRtf" Value="Assets\LICENSE.rtf" />
 
 		<ui:WixUI Id="FL_DialogSet" InstallDirectory="FL_InstallFolder" />
 

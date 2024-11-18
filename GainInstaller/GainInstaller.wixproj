@@ -5,10 +5,16 @@
     <OutputType>Bundle</OutputType>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="Assets\Images\logo.png" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="WixToolset.Bal.wixext" Version="5.0.2" />
     <PackageReference Include="WixToolset.Netfx.wixext" Version="5.0.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GainPackage\GainPackage.wixproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\LICENSE.rtf" />
   </ItemGroup>
 </Project>

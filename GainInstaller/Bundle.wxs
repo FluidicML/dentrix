@@ -9,8 +9,9 @@
 
 		<BootstrapperApplication>
 			<bal:WixStandardBootstrapperApplication
-				LicenseUrl="https://www.example.com/license"
-				Theme="hyperlinkLicense" />
+				LicenseFile="Assets\LICENSE.rtf"
+				LogoFile="Assets\Images\logo.png"
+				Theme="rtfLargeLicense" />
 		</BootstrapperApplication>
 
 		<Chain>
