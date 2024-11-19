@@ -2,7 +2,7 @@
 
 namespace FluidicML.Gain.DTO;
 
-public sealed class QueryResultDto
+public sealed class AdapterQueryResultDto
 {
     public required int id { get; set; }
 

@@ -109,6 +109,11 @@ public sealed class SocketAdapter
         }, stoppingToken);
     }
 
+    // Too fast and we risk overflowing buffer queues in our websocket server. Should probably play
+    // around with this value a bit. Better fix is either batching results or building out infrastructure
+    // that can handle large streams of data.
+    private const int emitThrottleDelay = 500;
+
     /// <summary>
     /// Ensures only one connection request happens at a time.
     /// </summary>
@@ -185,11 +190,31 @@ public sealed class SocketAdapter
                 _logger.LogDebug("Pong at: {time}", DateTimeOffset.Now);
             };
 
+            _socket.On("jwt-query", async (response) =>
+            {
+                var jwtQueryDto = response.GetValue<JwtQueryDto>();
+
+                await foreach (var result in _dentrix.Query(jwtQueryDto.query, emitToken))
+                {
+                    await _socket.EmitAsync(
+                        "jwt-query-result",
+                        new JwtQueryResultDto()
+                        {
+                            uuid = jwtQueryDto.uuid,
+                            value = result.value,
+                            status = (int)result.status
+                        }
+                    );
+                }
+
+                await Task.Delay(emitThrottleDelay);
+            });
+
             _socket.On("adapter-query", async (response) =>
             {
-                var queryDto = response.GetValue<QueryDto>();
+                var adapterQueryDto = response.GetValue<AdapterQueryDto>();
 
-                await foreach (var result in _dentrix.Query(queryDto.query, emitToken))
+                await foreach (var result in _dentrix.Query(adapterQueryDto.query, emitToken))
                 {
                     // Calling this function with a cancellation token breaks for some reason.
                     // Since emittance should be quick and the cancellation token is tested
@@ -198,19 +223,15 @@ public sealed class SocketAdapter
                     // last.
                     await _socket.EmitAsync(
                         "adapter-query-result",
-                        new QueryResultDto()
+                        new AdapterQueryResultDto()
                         {
-                            id = queryDto.id,
+                            id = adapterQueryDto.id,
                             value = result.value,
                             status = (int)result.status
                         }
                     );
 
-                    // Too fast and we risk overflowing buffer queues in our websocket
-                    // server. Should probably play around with this value a bit. Better
-                    // fix is either batching results or building out infrastructure that
-                    // can handle large streams of data.
-                    await Task.Delay(500);
+                    await Task.Delay(emitThrottleDelay);
                 }
             });
 
