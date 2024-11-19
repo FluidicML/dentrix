@@ -185,7 +185,7 @@ public sealed class SocketAdapter
                 _logger.LogDebug("Pong at: {time}", DateTimeOffset.Now);
             };
 
-            _socket.On("query", async (response) =>
+            _socket.On("adapter-query", async (response) =>
             {
                 var queryDto = response.GetValue<QueryDto>();
 
@@ -197,7 +197,7 @@ public sealed class SocketAdapter
                     // it though, keep in mind the token is the *second* argument, not the
                     // last.
                     await _socket.EmitAsync(
-                        "query-result",
+                        "adapter-query-result",
                         new QueryResultDto()
                         {
                             id = queryDto.id,
