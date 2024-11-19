@@ -101,7 +101,6 @@ public sealed class SocketAdapter
                 catch (Exception e) when (e is not OperationCanceledException)
                 {
                     _logger.LogError(e, "Error connecting websocket to server at: {time}", DateTimeOffset.Now);
-                    await Disconnect();
                 }
 
                 await Task.Delay(10_000, stoppingToken);
