@@ -248,7 +248,10 @@ public sealed class SocketAdapter
     {
         if (_emitTokenSource != null)
         {
-            _emitTokenSource?.Cancel();
+            if (!_emitTokenSource.IsCancellationRequested)
+            {
+                _emitTokenSource?.Cancel();
+            }
             _emitTokenSource?.Dispose();
             _emitTokenSource = null;
         }
