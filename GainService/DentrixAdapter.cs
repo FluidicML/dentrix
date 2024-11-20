@@ -100,7 +100,6 @@ public sealed class DentrixAdapter
         [EnumeratorCancellation] CancellationToken stoppingToken
     )
     {
-        System.Diagnostics.Debugger.Launch();
         if (string.IsNullOrEmpty(_databaseConnStr))
         {
             _logger.LogError("Query made without Dentrix connection at: {time}", DateTimeOffset.Now);
@@ -159,16 +158,7 @@ public sealed class DentrixAdapter
             }
             catch (Exception e)
             {
-                try
-                {
-                    _logger.LogError(e, "Could not execute Dentrix database reader at: {time}", DateTimeOffset.Now);
-                }
-                catch (AggregateException e2)
-                {
-                    int j = 1;
-                    j += 1;
-                }
-                
+                _logger.LogError(e, "Could not execute Dentrix database reader at: {time}", DateTimeOffset.Now);
                 reader?.Dispose();
                 reader = null;
             }

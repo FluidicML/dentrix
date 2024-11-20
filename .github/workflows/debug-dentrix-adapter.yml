@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - debug
-      - jrpotter/serilog
 
 jobs:
   build:
