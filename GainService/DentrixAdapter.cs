@@ -100,6 +100,8 @@ public sealed class DentrixAdapter
         [EnumeratorCancellation] CancellationToken stoppingToken
     )
     {
+        System.Diagnostics.Debugger.Launch();
+
         if (string.IsNullOrEmpty(_databaseConnStr))
         {
             _logger.LogError("Query made without Dentrix connection at: {time}", DateTimeOffset.Now);

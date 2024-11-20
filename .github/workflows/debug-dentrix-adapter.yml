@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - debug
+      - jrpotter/debug-queries
 
 jobs:
   build:
