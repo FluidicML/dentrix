@@ -85,7 +85,7 @@ public partial class SettingsPage : INavigableView<SettingsViewModel>
         }
         catch (TimeoutException)
         {
-            ViewModel.Message = "Could not connect to Dentrix service.";
+            ViewModel.Message = "Could not connect to Gain servers.";
             ViewModel.IsError = true;
         }
         catch (Exception exc)

@@ -136,13 +136,10 @@ public sealed class SocketAdapter
                 return;
             }
 
-            // Avoid asynchronous code between updating the _emitTokenSource and _socket.
-            // These values need to be uploaded at the same time from the perspective of
-            // other tasks.
+            // Create a new token source specifically for this socket instance.
+            // On reconnect, we should cancel it.
             _emitTokenSource = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
 
-            // If a socket were to be re-initialized, all in-flight requests should be
-            // canceled. Use the following token to make this cancellation work.
             var emitToken = _emitTokenSource.Token;
 
             _socket = new SocketIOClient.SocketIO(
@@ -171,7 +168,7 @@ public sealed class SocketAdapter
 
             _socket.OnReconnectAttempt += (sender, attempt) =>
             {
-                _logger.LogDebug("Reconnect attempt {attempt} at: {time}", attempt, DateTimeOffset.Now);
+                _logger.LogInformation("Reconnect attempt {attempt} at: {time}", attempt, DateTimeOffset.Now);
             };
 
             _socket.OnError += (sender, e) =>
@@ -197,6 +194,7 @@ public sealed class SocketAdapter
                 {
                     await _socket.EmitAsync(
                         "jwt-query-result",
+                        // emitToken,
                         new JwtQueryResultDto()
                         {
                             uuid = jwtQueryDto.uuid,
@@ -206,7 +204,7 @@ public sealed class SocketAdapter
                     );
                 }
 
-                await Task.Delay(emitThrottleDelay);
+                await Task.Delay(emitThrottleDelay, emitToken);
             });
 
             _socket.On("adapter-query", async (response) =>
@@ -215,13 +213,9 @@ public sealed class SocketAdapter
 
                 await foreach (var result in _dentrix.Query(adapterQueryDto.query, emitToken))
                 {
-                    // Calling this function with a cancellation token breaks for some reason.
-                    // Since emittance should be quick and the cancellation token is tested
-                    // on each iteration, seems safe to just remove. If you do decide to add
-                    // it though, keep in mind the token is the *second* argument, not the
-                    // last.
                     await _socket.EmitAsync(
                         "adapter-query-result",
+                        // emitToken,
                         new AdapterQueryResultDto()
                         {
                             id = adapterQueryDto.id,
@@ -230,14 +224,17 @@ public sealed class SocketAdapter
                         }
                     );
 
-                    await Task.Delay(emitThrottleDelay);
+                    await Task.Delay(emitThrottleDelay, emitToken);
                 }
             });
 
             _logger.LogInformation("Initiating websocket at: {time}", DateTimeOffset.Now);
 
             // Connection attempts run in the background. This `await` call finishes quickly.
-            await _socket.ConnectAsync(emitToken);
+            // Mirrors how the default `ConnectAsync` constructor works when passing in our
+            // own cancellation token.
+            using var connectTokenSource = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
+            await _socket.ConnectAsync(connectTokenSource.Token);
         }
         catch (Exception e) when (e is not OperationCanceledException)
         {
@@ -256,11 +253,13 @@ public sealed class SocketAdapter
         {
             try
             {
-                _emitTokenSource?.Cancel();
+                // Intentionally avoid calling `Dispose` in this case. Any outstanding
+                // tasks that rely on this need the token to continue existing beforehand.
+                // We'll trust the GC to eventually kick in here.
+                _emitTokenSource.Cancel();
             }
             finally
             {
-                _emitTokenSource?.Dispose();
                 _emitTokenSource = null;
             }
         }

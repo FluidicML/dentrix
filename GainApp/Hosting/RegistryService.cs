@@ -18,14 +18,18 @@ public sealed class RegistryService
 
         if (string.IsNullOrEmpty(AuthKeyFile))
         {
+#if !Debug
             throw new InvalidProgramException($"Missing registry key \"{RegAuthKeyFile}\".");
+#endif
         }
 
         DentrixExePath = HKLUSoftwareGetValue(logger, RegDentrixExePath)?.ToString() ?? string.Empty;
 
         if (string.IsNullOrEmpty(DentrixExePath))
         {
+#if !Debug
             throw new InvalidProgramException($"Missing registry key \"{RegDentrixExePath}\".");
+#endif
         }
     }
 
