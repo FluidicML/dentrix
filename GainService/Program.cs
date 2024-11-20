@@ -25,10 +25,6 @@ public class Program
             options.ServiceName = "Gain Service";
         });
 
-        LoggerProviderOptions.RegisterProviderOptions<
-            EventLogSettings, EventLogLoggerProvider
-        >(builder.Services);
-
         builder.Services.AddHostedService<WindowsBackgroundService>();
         builder.Services.AddSingleton<IConfiguration>(config);
         builder.Services.AddSingleton<DentrixAdapter>();

@@ -43,10 +43,6 @@ public partial class App : Application
             .ConfigureServices(
                 (_1, services) =>
                 {
-                    LoggerProviderOptions.RegisterProviderOptions<
-                        EventLogSettings, EventLogLoggerProvider
-                    >(services);
-
                     _ = services.AddHostedService<ApplicationHostService>();
                     _ = services.AddSingleton(_configService);
                     _ = services.AddSingleton<PipeService>();

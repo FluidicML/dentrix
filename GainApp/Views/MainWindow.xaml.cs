@@ -1,5 +1,6 @@
 ﻿using FluidicML.Gain.Hosting;
 using FluidicML.Gain.ViewModels;
+using Microsoft.Extensions.Logging;
 using System.Windows;
 
 namespace FluidicML.Gain.Views;
@@ -9,6 +10,7 @@ namespace FluidicML.Gain.Views;
 /// </summary>
 public partial class MainWindow : IWindow
 {
+    private readonly ILogger<MainWindow> _logger;
     private readonly PipeService _pipeService;
     private readonly DentrixService _dentrixService;
     private readonly SettingsPage _settingsPage;
@@ -18,12 +20,14 @@ public partial class MainWindow : IWindow
     private readonly static CancellationToken _stoppingToken = _cts.Token;
 
     public MainWindow(
+        ILogger<MainWindow> logger,
         PipeService pipeService,
         DentrixService dentrixService,
         SettingsPage settingsPage,
         MainWindowViewModel mainWindowViewModel
     )
     {
+        _logger = logger;
         _pipeService = pipeService;
         _dentrixService = dentrixService;
         _settingsPage = settingsPage;
@@ -33,6 +37,8 @@ public partial class MainWindow : IWindow
 
         DataContext = this;
         InitializeComponent();
+
+        _logger.LogError("TESTING");
     }
 
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)
