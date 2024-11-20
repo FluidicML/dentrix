@@ -15,48 +15,65 @@ public sealed class PipeAdapter(
     {
         _ = Task.Run(async () =>
         {
-            // TODO: We need to update this so that only a Fluidic ML, INC. verified
-            // program can read/write to this pipe.
-            PipeSecurity pipeSecurity = new();
-            var sid = new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null);
-            pipeSecurity.SetAccessRule(new PipeAccessRule(sid, PipeAccessRights.ReadWrite, AccessControlType.Allow));
-
-            await using var pipeServer = NamedPipeServerStreamAcl.Create(
-                _config.GetValue<string>("PipeServer")!,
-                PipeDirection.InOut,
-                NamedPipeServerStream.MaxAllowedServerInstances,
-                PipeTransmissionMode.Message,
-                PipeOptions.Asynchronous,
-                1024,
-                1024,
-                pipeSecurity
-            );
-
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
-                    await pipeServer.WaitForConnectionAsync(stoppingToken);
-
-                    var writer = new StreamWriter(pipeServer);
-                    var reader = new StreamReader(pipeServer);
-
-                    string? buffer = await reader.ReadLineAsync(stoppingToken);
-                    if (!string.IsNullOrEmpty(buffer))
-                    {
-                        await Dispatch(buffer, writer, reader, stoppingToken);
-                    }
+                    await OpenPipe(stoppingToken);
                 }
                 catch (Exception e) when (e is not OperationCanceledException)
                 {
-                    _logger.LogError(e, "Could not read/write to named pipe at: {time}.", DateTimeOffset.Now);
+                    _logger.LogError(e, "Broken named pipe at: {time}", DateTimeOffset.Now);
                 }
-                finally
-                {
-                    pipeServer.Disconnect();
-                }
+
+                await Task.Delay(30_000, stoppingToken);
             }
         }, stoppingToken);
+    }
+
+    private async Task OpenPipe(CancellationToken stoppingToken)
+    {
+        // TODO: We need to update this so that only a Fluidic ML, INC. verified
+        // program can read/write to this pipe.
+        PipeSecurity pipeSecurity = new();
+        var sid = new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null);
+        pipeSecurity.SetAccessRule(new PipeAccessRule(sid, PipeAccessRights.ReadWrite, AccessControlType.Allow));
+
+        await using var pipeServer = NamedPipeServerStreamAcl.Create(
+            _config.GetValue<string>("PipeServer")!,
+            PipeDirection.InOut,
+            NamedPipeServerStream.MaxAllowedServerInstances,
+            PipeTransmissionMode.Message,
+            PipeOptions.Asynchronous,
+            1024,
+            1024,
+            pipeSecurity
+        );
+
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            try
+            {
+                await pipeServer.WaitForConnectionAsync(stoppingToken);
+
+                var writer = new StreamWriter(pipeServer);
+                var reader = new StreamReader(pipeServer);
+
+                string? buffer = await reader.ReadLineAsync(stoppingToken);
+                if (!string.IsNullOrEmpty(buffer))
+                {
+                    await Dispatch(buffer, writer, reader, stoppingToken);
+                }
+            }
+            catch (Exception e) when (e is not OperationCanceledException)
+            {
+                _logger.LogError(e, "Could not read/write to named pipe at: {time}.", DateTimeOffset.Now);
+            }
+            finally
+            {
+                pipeServer.Disconnect();
+            }
+        }
     }
 
     private async Task Dispatch(

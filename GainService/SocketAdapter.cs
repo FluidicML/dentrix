@@ -93,18 +93,14 @@ public sealed class SocketAdapter
             {
                 try
                 {
-                    if (_socket == null)
-                    {
-                        await Connect(_apiKey, stoppingToken);
-                    }
+                    await Connect(_apiKey, stoppingToken);
                 }
                 catch (Exception e) when (e is not OperationCanceledException)
                 {
-                    _logger.LogError(e, "Error connecting websocket to server at: {time}", DateTimeOffset.Now);
-                    await Disconnect();
+                    _logger.LogError(e, "Websocket error at: {time}", DateTimeOffset.Now);
                 }
 
-                await Task.Delay(10_000, stoppingToken);
+                await Task.Delay(30_000, stoppingToken);
             }
         }, stoppingToken);
     }
@@ -140,10 +136,13 @@ public sealed class SocketAdapter
                 return;
             }
 
-            // If a socket were to be re-initialized, all in-flight requests should be
-            // canceled. Use the following token to make this cancellation work.
+            // Avoid asynchronous code between updating the _emitTokenSource and _socket.
+            // These values need to be uploaded at the same time from the perspective of
+            // other tasks.
             _emitTokenSource = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
 
+            // If a socket were to be re-initialized, all in-flight requests should be
+            // canceled. Use the following token to make this cancellation work.
             var emitToken = _emitTokenSource.Token;
 
             _socket = new SocketIOClient.SocketIO(
@@ -236,7 +235,14 @@ public sealed class SocketAdapter
             });
 
             _logger.LogInformation("Initiating websocket at: {time}", DateTimeOffset.Now);
+
+            // Connection attempts run in the background. This `await` call finishes quickly.
             await _socket.ConnectAsync(emitToken);
+        }
+        catch (Exception e) when (e is not OperationCanceledException)
+        {
+            await Disconnect();
+            throw;
         }
         finally
         {
@@ -248,10 +254,7 @@ public sealed class SocketAdapter
     {
         if (_emitTokenSource != null)
         {
-            if (!_emitTokenSource.IsCancellationRequested)
-            {
-                _emitTokenSource?.Cancel();
-            }
+            _emitTokenSource?.Cancel();
             _emitTokenSource?.Dispose();
             _emitTokenSource = null;
         }
