@@ -71,10 +71,6 @@ public sealed class PipeAdapter(
                     await Dispatch(buffer, writer, reader, stoppingToken);
                 }
             }
-            catch (Exception e) when (e is not OperationCanceledException)
-            {
-                _logger.LogError(e, "Could not read/write to named pipe at: {time}.", DateTimeOffset.Now);
-            }
             finally
             {
                 pipeServer.Disconnect();
