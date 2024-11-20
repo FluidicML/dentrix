@@ -160,7 +160,7 @@ public sealed class DentrixAdapter
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Could not execute Dentrix database reader at: {time}", DateTimeOffset.Now);
+                //_logger.LogError(e, "Could not execute Dentrix database reader at: {time}", DateTimeOffset.Now);
                 reader?.Dispose();
                 reader = null;
             }
