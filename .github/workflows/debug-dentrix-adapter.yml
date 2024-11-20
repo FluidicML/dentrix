@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - debug
-      - jrpotter/cancel-emit
 
 jobs:
   build:

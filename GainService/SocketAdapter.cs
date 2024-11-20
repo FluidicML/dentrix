@@ -186,6 +186,12 @@ public sealed class SocketAdapter
                 _logger.LogDebug("Pong at: {time}", DateTimeOffset.Now);
             };
 
+            // Do not include cancellation tokens in the `EmitAsync` calls (commented out).
+            // A few outstanding issues in the the library's GitHub issues, but it seems
+            // to somehow corrupt the response. Since we have cancellation in the foreach
+            // loop and the socket handlers should be cleaned up regardless, it fortunately
+            // doesn't seem all that necessary anyways.
+
             _socket.On("jwt-query", async (response) =>
             {
                 var jwtQueryDto = response.GetValue<JwtQueryDto>();
@@ -194,7 +200,7 @@ public sealed class SocketAdapter
                 {
                     await _socket.EmitAsync(
                         "jwt-query-result",
-                        emitToken,
+                        // emitToken,
                         new JwtQueryResultDto()
                         {
                             uuid = jwtQueryDto.uuid,
@@ -215,7 +221,7 @@ public sealed class SocketAdapter
                 {
                     await _socket.EmitAsync(
                         "adapter-query-result",
-                        emitToken,
+                        // emitToken,
                         new AdapterQueryResultDto()
                         {
                             id = adapterQueryDto.id,
