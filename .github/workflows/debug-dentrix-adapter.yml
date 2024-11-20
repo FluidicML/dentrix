@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - debug
-      - jrpotter/pipe-pool
 
 jobs:
   build:
