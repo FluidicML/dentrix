@@ -17,7 +17,8 @@ public sealed class SocketAdapter
     /// <summary>
     /// Used to cancel in-flight websocket requests.
     /// </summary>
-    private CancellationTokenSource? _emitTokenSource;
+    private CancellationTokenSource? _socketTokenSource;
+    private CancellationTokenSource? _linkedTokenSource;
 
     public bool IsConnected
     {
@@ -36,7 +37,7 @@ public sealed class SocketAdapter
 
         _apiKey = ReadIsolatedStorage();
         _socket = null;
-        _emitTokenSource = null;
+        _socketTokenSource = null;
     }
 
     private string ReadIsolatedStorage()
@@ -136,14 +137,18 @@ public sealed class SocketAdapter
                 return;
             }
 
-            // Avoid asynchronous code between updating the _emitTokenSource and _socket.
-            // These values need to be uploaded at the same time from the perspective of
-            // other tasks.
-            _emitTokenSource = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
+            // Create a new token source specifically for this socket instance.
+            // On reconnect, we should cancel it.
+            _socketTokenSource = new CancellationTokenSource();
 
-            // If a socket were to be re-initialized, all in-flight requests should be
-            // canceled. Use the following token to make this cancellation work.
-            var emitToken = _emitTokenSource.Token;
+            // Links the socket token source with the original stopping token. If
+            // either is canceled, so is the linked token.
+            _linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource([
+                _socketTokenSource.Token,
+                stoppingToken
+            ]);
+
+            var linkedToken = _linkedTokenSource.Token;
 
             _socket = new SocketIOClient.SocketIO(
                 _config.GetValue<string>("WebSocketUrl"),
@@ -193,7 +198,7 @@ public sealed class SocketAdapter
             {
                 var jwtQueryDto = response.GetValue<JwtQueryDto>();
 
-                await foreach (var result in _dentrix.Query(jwtQueryDto.query, emitToken))
+                await foreach (var result in _dentrix.Query(jwtQueryDto.query, linkedToken))
                 {
                     await _socket.EmitAsync(
                         "jwt-query-result",
@@ -213,7 +218,7 @@ public sealed class SocketAdapter
             {
                 var adapterQueryDto = response.GetValue<AdapterQueryDto>();
 
-                await foreach (var result in _dentrix.Query(adapterQueryDto.query, emitToken))
+                await foreach (var result in _dentrix.Query(adapterQueryDto.query, linkedToken))
                 {
                     // Calling this function with a cancellation token breaks for some reason.
                     // Since emittance should be quick and the cancellation token is tested
@@ -237,7 +242,7 @@ public sealed class SocketAdapter
             _logger.LogInformation("Initiating websocket at: {time}", DateTimeOffset.Now);
 
             // Connection attempts run in the background. This `await` call finishes quickly.
-            await _socket.ConnectAsync(emitToken);
+            await _socket.ConnectAsync(linkedToken);
         }
         catch (Exception e) when (e is not OperationCanceledException)
         {
@@ -252,17 +257,24 @@ public sealed class SocketAdapter
 
     private async Task Disconnect()
     {
-        if (_emitTokenSource != null)
+        if (_socketTokenSource != null)
         {
             try
             {
-                _emitTokenSource?.Cancel();
+                _socketTokenSource?.Cancel();
             }
             finally
             {
-                _emitTokenSource?.Dispose();
-                _emitTokenSource = null;
+                _socketTokenSource?.Dispose();
+                _socketTokenSource = null;
             }
+        }
+
+        if (_linkedTokenSource != null)
+        {
+            // Do *not* cancel. That would also cancel the top-level cancellation token source.
+            _linkedTokenSource?.Dispose();
+            _linkedTokenSource = null;
         }
 
         if (_socket != null)
