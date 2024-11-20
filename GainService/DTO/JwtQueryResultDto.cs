@@ -6,6 +6,8 @@ public sealed class JwtQueryResultDto
 {
     public required string uuid {  get; set; }
 
+    public required int nonce { get; set; }
+
     public required object? value { get; set; }
 
     public required int status { get; set; }

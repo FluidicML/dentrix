@@ -204,6 +204,7 @@ public sealed class SocketAdapter
                         new JwtQueryResultDto()
                         {
                             uuid = jwtQueryDto.uuid,
+                            nonce = jwtQueryDto.nonce,
                             value = result.value,
                             status = (int)result.status
                         }
