@@ -5,9 +5,8 @@ using FluidicML.Gain.ViewModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging.Configuration;
-using Microsoft.Extensions.Logging.EventLog;
 using System.Windows;
+using Serilog;
 
 namespace FluidicML.Gain;
 
@@ -40,13 +39,27 @@ public partial class App : Application
             {
                 _ = c.SetBasePath(AppContext.BaseDirectory);
             })
+            .ConfigureLogging(c =>
+            {
+                // Do not change the `EventLog` source value specified in the `appsettings.json`
+                // file. Once the application logs to a particular source once, Windows will
+                // raise an exception if it attempts to log elsewhere. This choice of initial source
+                // is specified within the registry.
+                //
+                // The choice of `Application` is generally a safe default considering it will
+                // already exist on all Windows installations (meaning we can avoid mucking around
+                // with necessary permissions needed to create a new source). If gung ho on converting,
+                // refer to https://stackoverflow.com/a/51232566 on how to reset. You'll likely want
+                // to incorporate these steps into an update patch of the installer.
+                var logger = new LoggerConfiguration()
+                    .ReadFrom.Configuration(_configService)
+                    .CreateLogger();
+
+                c.AddSerilog(logger);
+            })
             .ConfigureServices(
                 (_1, services) =>
                 {
-                    LoggerProviderOptions.RegisterProviderOptions<
-                        EventLogSettings, EventLogLoggerProvider
-                    >(services);
-
                     _ = services.AddHostedService<ApplicationHostService>();
                     _ = services.AddSingleton(_configService);
                     _ = services.AddSingleton<PipeService>();

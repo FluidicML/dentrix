@@ -1,5 +1,4 @@
-using Microsoft.Extensions.Logging.Configuration;
-using Microsoft.Extensions.Logging.EventLog;
+using Serilog;
 
 namespace FluidicML.Gain;
 
@@ -20,17 +19,25 @@ public class Program
     {
         var builder = Host.CreateApplicationBuilder(args);
 
-        builder.Services.AddWindowsService();
+        builder
+            .Services
+            .AddWindowsService(c =>
+            {
+                c.ServiceName = "Gain Service";
+            })
+            .AddLogging(c =>
+            {
+                var logger = new LoggerConfiguration()
+                    .ReadFrom.Configuration(config)
+                    .CreateLogger();
 
-        LoggerProviderOptions.RegisterProviderOptions<
-            EventLogSettings, EventLogLoggerProvider
-        >(builder.Services);
-
-        builder.Services.AddHostedService<WindowsBackgroundService>();
-        builder.Services.AddSingleton<IConfiguration>(config);
-        builder.Services.AddSingleton<DentrixAdapter>();
-        builder.Services.AddSingleton<SocketAdapter>();
-        builder.Services.AddSingleton<PipeAdapter>();
+                c.AddSerilog(logger);
+            })
+            .AddHostedService<WindowsBackgroundService>()
+            .AddSingleton<IConfiguration>(config)
+            .AddSingleton<DentrixAdapter>()
+            .AddSingleton<SocketAdapter>()
+            .AddSingleton<PipeAdapter>();
 
         var host = builder.Build();
         host.Run();
