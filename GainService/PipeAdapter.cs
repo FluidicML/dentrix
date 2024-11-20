@@ -11,28 +11,34 @@ public sealed class PipeAdapter(
     SocketAdapter _socket
 )
 {
+    private const int POOL_SIZE = 10;
+
     public void Initialize(CancellationToken stoppingToken)
     {
-        _ = Task.Run(async () =>
+        for (int i = 0; i < POOL_SIZE; i++)
         {
-            while (!stoppingToken.IsCancellationRequested)
+            _ = Task.Run(async () =>
             {
-                try
+                while (!stoppingToken.IsCancellationRequested)
                 {
-                    await OpenPipe(stoppingToken);
-                }
-                catch (Exception e) when (e is not OperationCanceledException)
-                {
-                    _logger.LogError(e, "Broken named pipe at: {time}", DateTimeOffset.Now);
-                }
+                    try
+                    {
+                        await OpenPipe(stoppingToken);
+                    }
+                    catch (Exception e) when (e is not OperationCanceledException)
+                    {
+                        _logger.LogError(e, "Broken named pipe at: {time}", DateTimeOffset.Now);
+                    }
 
-                await Task.Delay(30_000, stoppingToken);
-            }
-        }, stoppingToken);
+                    await Task.Delay(30_000, stoppingToken);
+                }
+            }, stoppingToken);
+        }
     }
 
     private async Task OpenPipe(CancellationToken stoppingToken)
     {
+
         // TODO: We need to update this so that only a Fluidic ML, INC. verified
         // program can read/write to this pipe.
         PipeSecurity pipeSecurity = new();
