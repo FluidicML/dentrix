@@ -101,6 +101,8 @@ public sealed class PipeService(
     {
         var locked = await _webSocketSemaphore.WaitAsync(0, stoppingToken);
 
+        System.Diagnostics.Debugger.Launch();
+
         if (!locked)
         {
             return Status.LOCKED;
