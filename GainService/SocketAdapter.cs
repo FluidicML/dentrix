@@ -194,7 +194,7 @@ public sealed class SocketAdapter
                 {
                     await _socket.EmitAsync(
                         "jwt-query-result",
-                        // emitToken,
+                        emitToken,
                         new JwtQueryResultDto()
                         {
                             uuid = jwtQueryDto.uuid,
@@ -215,7 +215,7 @@ public sealed class SocketAdapter
                 {
                     await _socket.EmitAsync(
                         "adapter-query-result",
-                        // emitToken,
+                        emitToken,
                         new AdapterQueryResultDto()
                         {
                             id = adapterQueryDto.id,
