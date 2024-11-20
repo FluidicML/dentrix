@@ -174,7 +174,7 @@ public sealed class DentrixAdapter
                 while (true)
                 {
                     var reading = true;
-                    Dictionary<string, object>? json = [];
+                    Dictionary<string, object?>? json = [];
                     OperationCanceledException? canceled = null;
 
                     try
@@ -189,7 +189,14 @@ public sealed class DentrixAdapter
                             for (int i = 0; i < numberOfColumns; i++)
                             {
                                 var type = reader.GetFieldType(i);
-                                json[reader.GetName(i)] = Convert.ChangeType(columns[i], type);
+                                if (columns[i] == System.DBNull.Value)
+                                {
+                                    json[reader.GetName(i)] = null;
+                                }
+                                else
+                                {
+                                    json[reader.GetName(i)] = Convert.ChangeType(columns[i], type);
+                                }
                             }
                         }
                     }
