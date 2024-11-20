@@ -5,9 +5,8 @@ using FluidicML.Gain.ViewModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging.Configuration;
-using Microsoft.Extensions.Logging.EventLog;
 using System.Windows;
+using Serilog;
 
 namespace FluidicML.Gain;
 
@@ -40,13 +39,17 @@ public partial class App : Application
             {
                 _ = c.SetBasePath(AppContext.BaseDirectory);
             })
+            .ConfigureLogging(c =>
+            {
+                var logger = new LoggerConfiguration()
+                    .ReadFrom.Configuration(_configService)
+                    .CreateLogger();
+
+                c.AddSerilog(logger);
+            })
             .ConfigureServices(
                 (_1, services) =>
                 {
-                    LoggerProviderOptions.RegisterProviderOptions<
-                        EventLogSettings, EventLogLoggerProvider
-                    >(services);
-
                     _ = services.AddHostedService<ApplicationHostService>();
                     _ = services.AddSingleton(_configService);
                     _ = services.AddSingleton<PipeService>();
