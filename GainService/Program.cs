@@ -20,7 +20,10 @@ public class Program
     {
         var builder = Host.CreateApplicationBuilder(args);
 
-        builder.Services.AddWindowsService();
+        builder.Services.AddWindowsService(options =>
+        {
+            options.ServiceName = "Gain Service";
+        });
 
         LoggerProviderOptions.RegisterProviderOptions<
             EventLogSettings, EventLogLoggerProvider
