@@ -26,7 +26,7 @@ public sealed class PipeAdapter(
                     _logger.LogError(e, "Broken named pipe at: {time}", DateTimeOffset.Now);
                 }
 
-                await Task.Delay(30_000, stoppingToken);
+                await Task.Delay(5_000, stoppingToken);
             }
         }, stoppingToken);
     }

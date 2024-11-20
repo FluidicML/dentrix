@@ -17,8 +17,7 @@ public sealed class SocketAdapter
     /// <summary>
     /// Used to cancel in-flight websocket requests.
     /// </summary>
-    private CancellationTokenSource? _socketTokenSource;
-    private CancellationTokenSource? _linkedTokenSource;
+    private CancellationTokenSource? _emitTokenSource;
 
     public bool IsConnected
     {
@@ -37,7 +36,7 @@ public sealed class SocketAdapter
 
         _apiKey = ReadIsolatedStorage();
         _socket = null;
-        _socketTokenSource = null;
+        _emitTokenSource = null;
     }
 
     private string ReadIsolatedStorage()
@@ -139,16 +138,9 @@ public sealed class SocketAdapter
 
             // Create a new token source specifically for this socket instance.
             // On reconnect, we should cancel it.
-            _socketTokenSource = new CancellationTokenSource();
+            _emitTokenSource = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
 
-            // Links the socket token source with the original stopping token. If
-            // either is canceled, so is the linked token.
-            _linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource([
-                _socketTokenSource.Token,
-                stoppingToken
-            ]);
-
-            var linkedToken = _linkedTokenSource.Token;
+            var emitToken = _emitTokenSource.Token;
 
             _socket = new SocketIOClient.SocketIO(
                 _config.GetValue<string>("WebSocketUrl"),
@@ -176,7 +168,7 @@ public sealed class SocketAdapter
 
             _socket.OnReconnectAttempt += (sender, attempt) =>
             {
-                _logger.LogDebug("Reconnect attempt {attempt} at: {time}", attempt, DateTimeOffset.Now);
+                _logger.LogInformation("Reconnect attempt {attempt} at: {time}", attempt, DateTimeOffset.Now);
             };
 
             _socket.OnError += (sender, e) =>
@@ -198,10 +190,11 @@ public sealed class SocketAdapter
             {
                 var jwtQueryDto = response.GetValue<JwtQueryDto>();
 
-                await foreach (var result in _dentrix.Query(jwtQueryDto.query, linkedToken))
+                await foreach (var result in _dentrix.Query(jwtQueryDto.query, emitToken))
                 {
                     await _socket.EmitAsync(
                         "jwt-query-result",
+                        // emitToken,
                         new JwtQueryResultDto()
                         {
                             uuid = jwtQueryDto.uuid,
@@ -211,22 +204,18 @@ public sealed class SocketAdapter
                     );
                 }
 
-                await Task.Delay(emitThrottleDelay);
+                await Task.Delay(emitThrottleDelay, emitToken);
             });
 
             _socket.On("adapter-query", async (response) =>
             {
                 var adapterQueryDto = response.GetValue<AdapterQueryDto>();
 
-                await foreach (var result in _dentrix.Query(adapterQueryDto.query, linkedToken))
+                await foreach (var result in _dentrix.Query(adapterQueryDto.query, emitToken))
                 {
-                    // Calling this function with a cancellation token breaks for some reason.
-                    // Since emittance should be quick and the cancellation token is tested
-                    // on each iteration, seems safe to just remove. If you do decide to add
-                    // it though, keep in mind the token is the *second* argument, not the
-                    // last.
                     await _socket.EmitAsync(
                         "adapter-query-result",
+                        // emitToken,
                         new AdapterQueryResultDto()
                         {
                             id = adapterQueryDto.id,
@@ -235,14 +224,17 @@ public sealed class SocketAdapter
                         }
                     );
 
-                    await Task.Delay(emitThrottleDelay);
+                    await Task.Delay(emitThrottleDelay, emitToken);
                 }
             });
 
             _logger.LogInformation("Initiating websocket at: {time}", DateTimeOffset.Now);
 
             // Connection attempts run in the background. This `await` call finishes quickly.
-            await _socket.ConnectAsync(linkedToken);
+            // Mirrors how the default `ConnectAsync` constructor works when passing in our
+            // own cancellation token.
+            using var connectTokenSource = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
+            await _socket.ConnectAsync(connectTokenSource.Token);
         }
         catch (Exception e) when (e is not OperationCanceledException)
         {
@@ -257,24 +249,19 @@ public sealed class SocketAdapter
 
     private async Task Disconnect()
     {
-        if (_socketTokenSource != null)
+        if (_emitTokenSource != null)
         {
             try
             {
-                _socketTokenSource?.Cancel();
+                // Intentionally avoid calling `Dispose` in this case. Any outstanding
+                // tasks that rely on this need the token to continue existing beforehand.
+                // We'll trust the GC to eventually kick in here.
+                _emitTokenSource.Cancel();
             }
             finally
             {
-                _socketTokenSource?.Dispose();
-                _socketTokenSource = null;
+                _emitTokenSource = null;
             }
-        }
-
-        if (_linkedTokenSource != null)
-        {
-            // Do *not* cancel. That would also cancel the top-level cancellation token source.
-            _linkedTokenSource?.Dispose();
-            _linkedTokenSource = null;
         }
 
         if (_socket != null)

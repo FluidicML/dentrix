@@ -38,7 +38,9 @@ public sealed class DentrixService
 
         if (hModule == IntPtr.Zero)
         {
+#if !Debug
             throw new InvalidProgramException($"Could not load {DtxAPI}.");
+#endif
         }
     }
 
