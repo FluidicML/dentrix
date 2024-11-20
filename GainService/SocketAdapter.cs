@@ -254,9 +254,15 @@ public sealed class SocketAdapter
     {
         if (_emitTokenSource != null)
         {
-            _emitTokenSource?.Cancel();
-            _emitTokenSource?.Dispose();
-            _emitTokenSource = null;
+            try
+            {
+                _emitTokenSource?.Cancel();
+            }
+            finally
+            {
+                _emitTokenSource?.Dispose();
+                _emitTokenSource = null;
+            }
         }
 
         if (_socket != null)
