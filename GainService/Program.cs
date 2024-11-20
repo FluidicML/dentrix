@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging.Configuration;
 using Microsoft.Extensions.Logging.EventLog;
+using Serilog;
 
 namespace FluidicML.Gain;
 
@@ -22,9 +23,14 @@ public class Program
 
         builder.Services.AddWindowsService();
 
-        LoggerProviderOptions.RegisterProviderOptions<
-            EventLogSettings, EventLogLoggerProvider
-        >(builder.Services);
+        builder.Services.AddLogging(builder =>
+        {
+            var logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(config)
+                .CreateLogger();
+
+            builder.AddSerilog(logger);
+        });
 
         builder.Services.AddHostedService<WindowsBackgroundService>();
         builder.Services.AddSingleton<IConfiguration>(config);
