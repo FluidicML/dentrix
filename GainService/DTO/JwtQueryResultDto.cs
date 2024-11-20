@@ -11,4 +11,6 @@ public sealed class JwtQueryResultDto
     public required object? value { get; set; }
 
     public required int status { get; set; }
+
+    public required string? message { get; set; }
 }

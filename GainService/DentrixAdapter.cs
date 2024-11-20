@@ -23,7 +23,8 @@ public enum QueryResultStatus
 public sealed class QueryResult
 {
     public required QueryResultStatus status;
-    public required IDictionary<string, object>? value;
+    public required IDictionary<string, object?>? value;
+    public required string? message;
 }
 
 public sealed class DentrixAdapter
@@ -103,9 +104,16 @@ public sealed class DentrixAdapter
         if (string.IsNullOrEmpty(_databaseConnStr))
         {
             _logger.LogError("Query made without Dentrix connection at: {time}", DateTimeOffset.Now);
-            yield return new() { status = QueryResultStatus.DISCONNECTED, value = null };
+            yield return new()
+            {
+                status = QueryResultStatus.DISCONNECTED,
+                value = null,
+                message = "Dentrix adapter is not connected."
+            };
             yield break;
         }
+
+        var openErrorMessage = "Unexpected error connecting to Dentrix database.";
 
         OdbcConnection? conn = new(_databaseConnStr);
         try
@@ -122,6 +130,11 @@ public sealed class DentrixAdapter
         {
             _logger.LogError(e, "Could not connect to Dentrix at: {time}", DateTimeOffset.Now);
 
+            if (e is OdbcException)
+            {
+                openErrorMessage = e.Message;
+            }
+
             // It is possible the connection string changed between when our connection was made
             // and when this exception threw. If that was the case, don't reset our work. Otherwise
             // we assume our connection string is no longer valid. We can resume once our frontend
@@ -137,12 +150,19 @@ public sealed class DentrixAdapter
 
         if (conn == null)
         {
-            yield return new() { status = QueryResultStatus.CONNECT_FAILED, value = null };
+            yield return new()
+            {
+                status = QueryResultStatus.CONNECT_FAILED,
+                value = null,
+                message = openErrorMessage
+            };
             yield break;
         }
 
         using (conn)
         {
+            var execErrorMessage = "Unexpected error executing against Dentrix database.";
+
             using var command = new OdbcCommand(query, conn);
 
             OdbcDataReader? reader = null;
@@ -158,6 +178,10 @@ public sealed class DentrixAdapter
             }
             catch (Exception e)
             {
+                if (e is OdbcException)
+                {
+                    execErrorMessage = e.Message;
+                }
                 _logger.LogError(e, "Could not execute Dentrix database reader at: {time}", DateTimeOffset.Now);
                 reader?.Dispose();
                 reader = null;
@@ -165,12 +189,19 @@ public sealed class DentrixAdapter
 
             if (reader == null)
             {
-                yield return new() { status = QueryResultStatus.INVALID_QUERY, value = null };
+                yield return new()
+                {
+                    status = QueryResultStatus.INVALID_QUERY,
+                    value = null,
+                    message = execErrorMessage
+                };
                 yield break;
             }
 
             using (reader)
             {
+                var readErrorMessage = "Unexpected error reading from Dentrix database.";
+
                 while (true)
                 {
                     var reading = true;
@@ -208,22 +239,43 @@ public sealed class DentrixAdapter
                     catch (Exception e)
                     {
                         _logger.LogError(e, "Dentrix reader interrupted at: {time}", DateTimeOffset.Now);
+
+                        if (e is OdbcException)
+                        {
+                            readErrorMessage = e.Message;
+                        }
+
                         json = null;
                     }
 
                     if (!reading)
                     {
-                        yield return new() { status = QueryResultStatus.FINISHED, value = null };
+                        yield return new()
+                        {
+                            status = QueryResultStatus.FINISHED,
+                            value = null,
+                            message = null
+                        };
                         yield break;
                     }
 
                     if (canceled == null && json != null)
                     {
-                        yield return new() { status = QueryResultStatus.RESULT, value = json };
+                        yield return new()
+                        {
+                            status = QueryResultStatus.RESULT,
+                            value = json,
+                            message = null,
+                        };
                         continue;
                     }
 
-                    yield return new() { status = QueryResultStatus.INTERRUPTED, value = null };
+                    yield return new()
+                    {
+                        status = QueryResultStatus.INTERRUPTED,
+                        value = null,
+                        message = readErrorMessage
+                    };
 
                     if (canceled != null)
                     {

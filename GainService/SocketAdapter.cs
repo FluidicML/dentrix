@@ -206,7 +206,8 @@ public sealed class SocketAdapter
                             uuid = jwtQueryDto.uuid,
                             nonce = jwtQueryDto.nonce,
                             value = result.value,
-                            status = (int)result.status
+                            status = (int)result.status,
+                            message = result.message
                         }
                     );
                 }
@@ -227,7 +228,8 @@ public sealed class SocketAdapter
                         {
                             id = adapterQueryDto.id,
                             value = result.value,
-                            status = (int)result.status
+                            status = (int)result.status,
+                            message = result.message
                         }
                     );
 
