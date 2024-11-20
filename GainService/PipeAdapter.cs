@@ -11,34 +11,28 @@ public sealed class PipeAdapter(
     SocketAdapter _socket
 )
 {
-    private const int POOL_SIZE = 10;
-
     public void Initialize(CancellationToken stoppingToken)
     {
-        for (int i = 0; i < POOL_SIZE; i++)
+        _ = Task.Run(async () =>
         {
-            _ = Task.Run(async () =>
+            while (!stoppingToken.IsCancellationRequested)
             {
-                while (!stoppingToken.IsCancellationRequested)
+                try
                 {
-                    try
-                    {
-                        await OpenPipe(stoppingToken);
-                    }
-                    catch (Exception e) when (e is not OperationCanceledException)
-                    {
-                        _logger.LogError(e, "Broken named pipe at: {time}", DateTimeOffset.Now);
-                    }
-
-                    await Task.Delay(30_000, stoppingToken);
+                    await OpenPipe(stoppingToken);
                 }
-            }, stoppingToken);
-        }
+                catch (Exception e) when (e is not OperationCanceledException)
+                {
+                    _logger.LogError(e, "Broken named pipe at: {time}", DateTimeOffset.Now);
+                }
+
+                await Task.Delay(30_000, stoppingToken);
+            }
+        }, stoppingToken);
     }
 
     private async Task OpenPipe(CancellationToken stoppingToken)
     {
-
         // TODO: We need to update this so that only a Fluidic ML, INC. verified
         // program can read/write to this pipe.
         PipeSecurity pipeSecurity = new();
@@ -68,7 +62,7 @@ public sealed class PipeAdapter(
                 string? buffer = await reader.ReadLineAsync(stoppingToken);
                 if (!string.IsNullOrEmpty(buffer))
                 {
-                    await Dispatch(buffer, writer, reader, stoppingToken);
+                    await Dispatch(buffer, writer, stoppingToken);
                 }
             }
             finally
@@ -81,7 +75,6 @@ public sealed class PipeAdapter(
     private async Task Dispatch(
         String buffer,
         StreamWriter writer,
-        StreamReader reader,
         CancellationToken stoppingToken
     )
     {

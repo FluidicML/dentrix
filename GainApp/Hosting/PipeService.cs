@@ -21,7 +21,7 @@ public sealed class PipeService(
     IConfiguration _config
 )
 {
-    private const int TIMEOUT_MILLIS = 2500;
+    private const int TIMEOUT_MILLIS = 5000;
 
     public async Task SendApiKey(string apiKey)
     {
