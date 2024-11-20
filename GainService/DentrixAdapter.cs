@@ -143,6 +143,8 @@ public sealed class DentrixAdapter
 
         using (conn)
         {
+            var failedStatus = QueryResultStatus.INVALID_QUERY;
+
             using var command = new OdbcCommand(query, conn);
 
             OdbcDataReader? reader = null;
@@ -155,6 +157,13 @@ public sealed class DentrixAdapter
                 reader?.Dispose();
                 reader = null;
                 throw;
+            }
+            catch (OdbcException e)
+            {
+                System.Diagnostics.Debugger.Launch();
+                _logger.LogError(e, "Could not execute Dentrix database reader at: {time}", DateTimeOffset.Now);
+                reader?.Dispose();
+                reader = null;
             }
             catch (Exception e)
             {
