@@ -21,10 +21,7 @@ public class Program
 
         builder
             .Services
-            .AddWindowsService(c =>
-            {
-                c.ServiceName = "Gain Service";
-            })
+            .AddWindowsService()
             .AddLogging(c =>
             {
                 // Do not change the `EventLog` source value specified in the `appsettings.json`
