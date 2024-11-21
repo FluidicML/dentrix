@@ -194,6 +194,7 @@ public sealed class SocketAdapter
 
             _socket.On("jwt-query", async (response) =>
             {
+                System.Diagnostics.Debugger.Launch();
                 var jwtQueryDto = response.GetValue<JwtQueryDto>();
 
                 await foreach (var result in _dentrix.Query(jwtQueryDto.query, emitToken))

@@ -19,7 +19,7 @@ public partial class App : Application
         new ConfigurationBuilder()
             .AddJsonFile("appsettings.json")
 #if Debug
-            .AddJsonFile("appsettings.Debug.json")
+            .AddJsonFile("appsettings.Production.json")
 #elif Staging
             .AddJsonFile("appsettings.Staging.json")
 #elif Release
