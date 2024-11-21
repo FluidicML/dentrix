@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - prod
+      - jrpotter/prod-conn
 
 jobs:
   build:
