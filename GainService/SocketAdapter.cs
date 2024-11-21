@@ -117,8 +117,6 @@ public sealed class SocketAdapter
 
     public async Task Connect(string apiKey, CancellationToken stoppingToken)
     {
-        System.Diagnostics.Debugger.Launch();
-
         await _semConnect.WaitAsync(stoppingToken);
 
         try
