@@ -7,7 +7,7 @@ public class Program
     private static readonly IConfiguration config = new ConfigurationBuilder()
         .AddJsonFile("appsettings.json")
 #if Debug
-        .AddJsonFile("appsettings.Production.json")
+        .AddJsonFile("appsettings.Debug.json")
 #elif Staging
         .AddJsonFile("appsettings.Staging.json")
 #elif Release

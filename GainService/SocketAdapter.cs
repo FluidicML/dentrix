@@ -158,13 +158,11 @@ public sealed class SocketAdapter
 
             _socket.OnConnected += (sender, e) =>
             {
-                System.Diagnostics.Debugger.Launch();
                 _logger.LogInformation("Connected at: {time}", DateTimeOffset.Now);
             };
 
             _socket.OnDisconnected += (sender, e) =>
             {
-                System.Diagnostics.Debugger.Launch();
                 _logger.LogInformation("Disconnected \"{e}\" at: {time}", e, DateTimeOffset.Now);
             };
 
@@ -175,7 +173,6 @@ public sealed class SocketAdapter
 
             _socket.OnError += (sender, e) =>
             {
-                System.Diagnostics.Debugger.Launch();
                 _logger.LogError("Error \"{e}\" at: {time}", e, DateTimeOffset.Now);
             };
 
@@ -197,7 +194,6 @@ public sealed class SocketAdapter
 
             _socket.On("jwt-query", async (response) =>
             {
-                System.Diagnostics.Debugger.Launch();
                 var jwtQueryDto = response.GetValue<JwtQueryDto>();
 
                 await foreach (var result in _dentrix.Query(jwtQueryDto.query, emitToken))
