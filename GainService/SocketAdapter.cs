@@ -158,11 +158,13 @@ public sealed class SocketAdapter
 
             _socket.OnConnected += (sender, e) =>
             {
+                System.Diagnostics.Debugger.Launch();
                 _logger.LogInformation("Connected at: {time}", DateTimeOffset.Now);
             };
 
             _socket.OnDisconnected += (sender, e) =>
             {
+                System.Diagnostics.Debugger.Launch();
                 _logger.LogInformation("Disconnected \"{e}\" at: {time}", e, DateTimeOffset.Now);
             };
 
@@ -173,6 +175,7 @@ public sealed class SocketAdapter
 
             _socket.OnError += (sender, e) =>
             {
+                System.Diagnostics.Debugger.Launch();
                 _logger.LogError("Error \"{e}\" at: {time}", e, DateTimeOffset.Now);
             };
 
