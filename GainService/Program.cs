@@ -7,7 +7,7 @@ public class Program
     private static readonly IConfiguration config = new ConfigurationBuilder()
         .AddJsonFile("appsettings.json")
 #if Debug
-        .AddJsonFile("appsettings.Production.json")
+        .AddJsonFile("appsettings.Debug.json")
 #elif Staging
         .AddJsonFile("appsettings.Staging.json")
 #elif Release
@@ -21,10 +21,7 @@ public class Program
 
         builder
             .Services
-            .AddWindowsService(c =>
-            {
-                c.ServiceName = "Gain Service";
-            })
+            .AddWindowsService()
             .AddLogging(c =>
             {
                 // Do not change the `EventLog` source value specified in the `appsettings.json`
