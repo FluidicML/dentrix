@@ -151,7 +151,9 @@ public sealed class SocketAdapter
                 new SocketIOOptions
                 {
                     EIO = EngineIO.V4,
-                    // Rely on our own top-level task loop to perform reconnects.
+                    // The reconnect mechanism provided by seems to fail periodically.
+                    // Instead, keep the socket disconnected on failure and use our own
+                    // top-level task loop to perform the reconnects.
                     Reconnection = false,
                     ConnectionTimeout = TimeSpan.FromSeconds(30.0),
                     AutoUpgrade = true,

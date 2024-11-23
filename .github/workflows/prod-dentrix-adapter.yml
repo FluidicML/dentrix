@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - prod
-      - jrpotter/reconnect
 
 jobs:
   build:
