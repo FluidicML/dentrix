@@ -44,7 +44,7 @@ public partial class MainWindow : IWindow
         _ = Task.Run(CheckDentrix, _stoppingToken);
     }
 
-    static readonly Random _random = new Random();
+    private static readonly Random _random = new();
 
     private async Task CheckBackgroundService()
     {
@@ -57,7 +57,8 @@ public partial class MainWindow : IWindow
                 _mainWindowViewModel.StatusBackgroundService = QueryStatusToBool(status);
             }
 
-            await Task.Delay(20_000 + _random.Next(5_000, 15_000), _stoppingToken);
+            // 30 +/- 10 seconds.
+            await Task.Delay(20_000 + _random.Next(0, 20_000), _stoppingToken);
         }
     }
 
@@ -72,7 +73,8 @@ public partial class MainWindow : IWindow
                 _mainWindowViewModel.StatusWebSocket = QueryStatusToBool(status);
             }
 
-            await Task.Delay(20_000 + _random.Next(5_000, 15_000), _stoppingToken);
+            // 30 +/- 10 seconds.
+            await Task.Delay(20_000 + _random.Next(0, 20_000), _stoppingToken);
         }
     }
 
@@ -99,7 +101,8 @@ public partial class MainWindow : IWindow
                 }
             }
 
-            await Task.Delay(20_000 + _random.Next(5_000, 15_000), _stoppingToken);
+            // 30 +/- 10 seconds.
+            await Task.Delay(20_000 + _random.Next(0, 20_000), _stoppingToken);
         }
     }
 
