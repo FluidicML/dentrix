@@ -1,6 +1,7 @@
 ﻿using FluidicML.Gain.DTO;
 using SocketIO.Core;
 using SocketIOClient;
+using System;
 using System.IO.IsolatedStorage;
 
 namespace FluidicML.Gain;
@@ -81,6 +82,8 @@ public sealed class SocketAdapter
         writer.Flush();
     }
 
+    private static readonly Random _random = new();
+
     public void Initialize(CancellationToken stoppingToken)
     {
         _ = Task.Run(async () =>
@@ -100,7 +103,8 @@ public sealed class SocketAdapter
                     _logger.LogError(e, "Websocket error at: {time}", DateTimeOffset.Now);
                 }
 
-                await Task.Delay(30_000, stoppingToken);
+                // 30 +/- 10 seconds.
+                await Task.Delay(20_000 + _random.Next(0, 20_000), stoppingToken);
             }
         }, stoppingToken);
     }
@@ -121,7 +125,7 @@ public sealed class SocketAdapter
 
         try
         {
-            if (_socket != null && _apiKey == apiKey)
+            if (_socket?.Connected == true && _apiKey == apiKey)
             {
                 return;
             }
@@ -147,10 +151,11 @@ public sealed class SocketAdapter
                 new SocketIOOptions
                 {
                     EIO = EngineIO.V4,
-                    Reconnection = true,
-                    ReconnectionAttempts = int.MaxValue,
-                    ReconnectionDelay = 5000, // Milliseconds
-                    ConnectionTimeout = TimeSpan.FromSeconds(10.0),
+                    // The reconnect mechanism provided by seems to fail periodically.
+                    // Instead, keep the socket disconnected on failure and use our own
+                    // top-level task loop to perform the reconnects.
+                    Reconnection = false,
+                    ConnectionTimeout = TimeSpan.FromSeconds(30.0),
                     AutoUpgrade = true,
                     Transport = SocketIOClient.Transport.TransportProtocol.WebSocket,
                     Auth = new Dictionary<string, string>() { { "apiKey", _apiKey } }
@@ -164,11 +169,6 @@ public sealed class SocketAdapter
             _socket.OnDisconnected += (sender, e) =>
             {
                 _logger.LogInformation("Disconnected \"{e}\" at: {time}", e, DateTimeOffset.Now);
-            };
-
-            _socket.OnReconnectAttempt += (sender, attempt) =>
-            {
-                _logger.LogInformation("Reconnect attempt {attempt} at: {time}", attempt, DateTimeOffset.Now);
             };
 
             _socket.OnError += (sender, e) =>
